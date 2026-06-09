@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_ADMIN_ENDPOINT,
+  baseURL: "https://api.ooms.in/admin",
   timeout: 30000,
 });
 

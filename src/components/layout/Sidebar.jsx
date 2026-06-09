@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, User, Settings, LogOut } from 'lucide-react';
+import { Home, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Sidebar = () => {
@@ -7,8 +7,7 @@ const Sidebar = () => {
 
   const navItems = [
     { path: '/', icon: Home, label: 'Home' },
-    { path: '/profile', icon: User, label: 'Profile' },
-    { path: '/settings', icon: Settings, label: 'Settings' },
+
   ];
 
   return (
