@@ -76,16 +76,14 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// ─── Profile Avatar Component (Added) ───────────────────────────────────────
+// ─── Profile Avatar Component ───────────────────────────────────────
 
 const ProfileAvatar = ({ record, name, className, children }) => {
-  // Get profile image from record if available
   const getInitials = () => {
     if (!name) return 'U';
     return name.charAt(0).toUpperCase();
   };
 
-  // You can customize this based on your actual data structure
   const profileImage = record?.profile?.avatar || record?.profile?.profile_image || null;
 
   if (profileImage) {
@@ -352,25 +350,55 @@ export default function UserManagement() {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [viewMode, setViewMode] = useState("table");
 
+  // Refs to prevent duplicate API calls
   const fetchInProgress = useRef(false);
   const initialFetchDone = useRef(false);
+  const currentRequestId = useRef(0);
+  const lastFetchParams = useRef({ page: 1, limit: 20, search: "" });
 
   const { pagination, updatePagination, goToPage, changeLimit } = usePagination(1, 20);
 
   // Debounce search
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearchTerm(searchTerm), 500);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Fetch users function with duplicate prevention
   const fetchUsers = useCallback(async (page = pagination.page, resetLoading = true) => {
-    if (fetchInProgress.current) return;
+    // Prevent multiple simultaneous requests
+    if (fetchInProgress.current) {
+      console.log("Fetch already in progress, skipping...");
+      return;
+    }
+
+    // Check if we're fetching the same parameters
+    const currentParams = {
+      page,
+      limit: pagination.limit,
+      search: debouncedSearchTerm
+    };
+    
+    if (
+      lastFetchParams.current.page === currentParams.page &&
+      lastFetchParams.current.limit === currentParams.limit &&
+      lastFetchParams.current.search === currentParams.search &&
+      !resetLoading
+    ) {
+      console.log("Same parameters, skipping duplicate fetch");
+      return;
+    }
+
     fetchInProgress.current = true;
     if (resetLoading) setLoading(true);
-
+    
+    // Generate unique request ID
+    const requestId = ++currentRequestId.current;
+    
     try {
       const params = new URLSearchParams({ 
         page_no: page.toString(), 
@@ -378,10 +406,20 @@ export default function UserManagement() {
       });
       if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
 
+      console.log(`Fetching users with params:`, params.toString());
+      
       const response = await apiCall(`/user/list?${params.toString()}`, 'GET');
+      
+      // Check if this request is still the latest
+      if (requestId !== currentRequestId.current) {
+        console.log("Stale request ignored");
+        return;
+      }
+      
       if (!response.ok) throw new Error('Failed to fetch users');
 
       const result = await response.json();
+      
       if (result.success) {
         setUsers(result.data || []);
         updatePagination({
@@ -392,41 +430,40 @@ export default function UserManagement() {
           has_more: result.pagination.has_more,
         });
         setError(null);
+        
+        // Update last fetch params
+        lastFetchParams.current = currentParams;
       } else {
         throw new Error(result.message || 'Failed to fetch users');
       }
     } catch (err) {
+      console.error("Fetch error:", err);
       setError(err.message);
       toast.error(err.message || "Failed to load users.");
     } finally {
-      setLoading(false);
-      setIsInitialLoad(false);
-      fetchInProgress.current = false;
+      if (requestId === currentRequestId.current) {
+        setLoading(false);
+        fetchInProgress.current = false;
+      }
     }
-  }, [pagination.limit, debouncedSearchTerm, updatePagination]);
+  }, [pagination.limit, pagination.page, debouncedSearchTerm, updatePagination]);
 
-  // Initial load
+  // Initial load - runs only once on mount
   useEffect(() => {
     if (!initialFetchDone.current) {
-      fetchUsers(1, true);
+      console.log("Initial fetch triggered");
       initialFetchDone.current = true;
+      fetchUsers(1, true);
     }
   }, [fetchUsers]);
 
-  // Page change
+  // Handle page changes
   useEffect(() => {
-    if (!isInitialLoad && !fetchInProgress.current && initialFetchDone.current) {
+    if (initialFetchDone.current && !fetchInProgress.current) {
+      console.log("Page/limit/search changed, fetching...");
       fetchUsers(pagination.page, true);
     }
-  }, [pagination.page, pagination.limit, debouncedSearchTerm]);
-
-  // Filter reset
-  useEffect(() => {
-    if (!isInitialLoad) {
-      if (pagination.page !== 1) goToPage(1);
-      else fetchUsers(1, true);
-    }
-  }, [debouncedSearchTerm]);
+  }, [pagination.page, pagination.limit, debouncedSearchTerm, fetchUsers]);
 
   const handleViewUser = (user) => {
     setSelectedUser(user);
@@ -434,11 +471,33 @@ export default function UserManagement() {
   };
 
   const handlePageChange = useCallback((newPage) => {
-    if (newPage !== pagination.page) goToPage(newPage);
+    if (newPage !== pagination.page && !fetchInProgress.current) {
+      goToPage(newPage);
+    }
   }, [pagination.page, goToPage]);
 
-  // ─── Table columns config ─────────────────────────────────────────────────
+  const handleLimitChange = useCallback((newLimit) => {
+    if (newLimit !== pagination.limit && !fetchInProgress.current) {
+      changeLimit(newLimit);
+      // Reset to page 1 when changing limit
+      if (pagination.page !== 1) {
+        goToPage(1);
+      }
+    }
+  }, [pagination.limit, changeLimit, goToPage]);
 
+  const handleRefresh = useCallback(() => {
+    if (!fetchInProgress.current) {
+      // Reset to page 1 on refresh
+      if (pagination.page !== 1) {
+        goToPage(1);
+      } else {
+        fetchUsers(1, true);
+      }
+    }
+  }, [fetchUsers, pagination.page, goToPage]);
+
+  // Table columns config
   const tableColumns = useMemo(() => [
     {
       key: 'user',
@@ -519,7 +578,10 @@ export default function UserManagement() {
     },
   ], []);
 
-  if (isInitialLoad && loading) return <Skeleton />;
+  // Show loading skeleton only on initial load
+  if (loading && users.length === 0) {
+    return <Skeleton />;
+  }
 
   return (
     <ManagementHub
@@ -527,7 +589,7 @@ export default function UserManagement() {
       title="User Management"
       description="View and manage all registered users from a single workspace."
       accent="blue"
-      onRefresh={() => fetchUsers(1, true)}
+      onRefresh={handleRefresh}
       summary={
         <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
           Total: <span className="font-semibold text-slate-900">{pagination.total}</span> users
@@ -554,7 +616,10 @@ export default function UserManagement() {
                 className="w-full pl-11 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm min-h-[42px]"
               />
               {searchTerm && (
-                <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1">
+                <button 
+                  onClick={() => setSearchTerm('')} 
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                >
                   <X size={14} />
                 </button>
               )}
@@ -574,8 +639,12 @@ export default function UserManagement() {
           </div>
         </motion.div>
 
-        {/* Loading */}
-        {loading && !users.length && <Skeleton />}
+        {/* Loading indicator for subsequent loads */}
+        {loading && users.length > 0 && (
+          <div className="flex justify-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        )}
 
         {/* Error state */}
         {error && (
@@ -584,7 +653,7 @@ export default function UserManagement() {
             <p className="text-xl text-gray-600">Error loading users</p>
             <p className="text-gray-400 mt-2">{error}</p>
             <button
-              onClick={() => fetchUsers(1, true)}
+              onClick={handleRefresh}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               Try Again
@@ -655,7 +724,7 @@ export default function UserManagement() {
                   itemsPerPage={pagination.limit}
                   onPageChange={handlePageChange}
                   showInfo={viewMode !== 'card'}
-                  onLimitChange={changeLimit}
+                  onLimitChange={handleLimitChange}
                 />
               </motion.div>
             )}
