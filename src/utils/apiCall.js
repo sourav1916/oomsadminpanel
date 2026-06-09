@@ -1,68 +1,65 @@
-// src/utils/apiCall.js
-import axios from "axios";
-import { toast } from "react-toastify";
+const API_BASE = "https://api.ooms.in/admin";
 
-const API = axios.create({
-  baseURL: "https://api.ooms.in/admin",
-  timeout: 30000,
-});
+/**
+ * Unified API calling utility
+ * @param {string} endpoint - The API endpoint or full URL
+ * @param {string} method - HTTP method (GET, POST, PUT, DELETE, etc.)
+ * @param {Object|null} body - Request payload
+ * @returns {Promise<Response>} - The fetch response object
+ */
+export const apiCall = async (endpoint, method = 'GET', body = null) => {
+  const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
 
-// Request Interceptor
-API.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
+  const headers = {};
 
-    if (token) {
-      config.headers.token = token;
-    }
+  if (!(body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
-    if (username) {
-      config.headers.username = username;
-    }
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  if (username) {
+    headers['username'] = username;
+  }
 
-// Global error handler for API calls
-export const handleApiError = (error, customMessage = null) => {
-  let errorMessage = customMessage;
+  const options = {
+    method,
+    headers,
+  };
 
-  if (!errorMessage) {
-    if (error.code === 'ECONNABORTED') {
-      errorMessage = "Request timeout. Please try again.";
-    } else if (!error.response) {
-      errorMessage = "Unable to connect to server. Please check your internet connection.";
-    } else if (error.response?.status === 400) {
-      errorMessage = error.response?.data?.message || "Bad request. Please check your input.";
-    } else if (error.response?.status === 401) {
-      errorMessage = error.response?.data?.message || "Session expired. Please login again.";
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
-    } else if (error.response?.status === 403) {
-      errorMessage = error.response?.data?.message || "You don't have permission to perform this action.";
-    } else if (error.response?.status === 404) {
-      errorMessage = error.response?.data?.message || "Resource not found.";
-    } else if (error.response?.status === 409) {
-      errorMessage = error.response?.data?.message || "Conflict with existing data.";
-    } else if (error.response?.status === 422) {
-      errorMessage = error.response?.data?.message || "Validation failed. Please check your input.";
-    } else if (error.response?.status === 429) {
-      errorMessage = "Too many requests. Please try again later.";
-    } else if (error.response?.status === 500) {
-      errorMessage = error.response?.data?.message || "Server error. Please try again later.";
+  if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) {
+    if (body instanceof FormData) {
+      options.body = body;
     } else {
-      errorMessage = error?.response?.data?.message || error?.message || "Something went wrong";
+      options.body = JSON.stringify(body);
     }
   }
 
-  toast.error(errorMessage);
-  return errorMessage;
+  // Handle absolute vs relative URLs
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+
+  try {
+    const response = await fetch(url, options);
+    
+    // Global 401 Unauthorized handler
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      
+      // Redirect to login page if not already there
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    
+    return response;
+  } catch (error) {
+    console.error(`API Call Error (${url}):`, error);
+    throw error;
+  }
 };
 
-export default API;
+export default apiCall;
