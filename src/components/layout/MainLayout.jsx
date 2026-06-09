@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
@@ -105,7 +106,7 @@ const MainLayout = ({ children }) => {
           }}
         >
           <div className="w-full p-4 md:p-6">
-            {children}
+            {children || <Outlet />}
           </div>
         </main>
       </div>

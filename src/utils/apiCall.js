@@ -1,52 +1,65 @@
-import axios from "axios";
-import { toast } from "react-toastify";
+const API_BASE = "https://api.ooms.in/admin";
 
-const API = axios.create({
-  baseURL: "https://api.ooms.in/admin",
-  timeout: 30000,
-});
+/**
+ * Unified API calling utility
+ * @param {string} endpoint - The API endpoint or full URL
+ * @param {string} method - HTTP method (GET, POST, PUT, DELETE, etc.)
+ * @param {Object|null} body - Request payload
+ * @returns {Promise<Response>} - The fetch response object
+ */
+export const apiCall = async (endpoint, method = 'GET', body = null) => {
+  const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
 
-// Request Interceptor
-API.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
+  const headers = {};
 
-    if (token) {
-      config.headers.token = token;
-    }
-
-    if (username) {
-      config.headers.username = username;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response Interceptor
-API.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    const message =
-      error?.response?.data?.message ||
-      error?.message ||
-      "Something went wrong";
-
-    toast.error(message);
-
-    if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
-
-      window.location.href = "/login";
-    }
-
-    return Promise.reject(error);
+  if (!(body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
   }
-);
 
-export default API;
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (username) {
+    headers['username'] = username;
+  }
+
+  const options = {
+    method,
+    headers,
+  };
+
+  if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) {
+    if (body instanceof FormData) {
+      options.body = body;
+    } else {
+      options.body = JSON.stringify(body);
+    }
+  }
+
+  // Handle absolute vs relative URLs
+  const url = endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`;
+
+  try {
+    const response = await fetch(url, options);
+    
+    // Global 401 Unauthorized handler
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      
+      // Redirect to login page if not already there
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    
+    return response;
+  } catch (error) {
+    console.error(`API Call Error (${url}):`, error);
+    throw error;
+  }
+};
+
+export default apiCall;

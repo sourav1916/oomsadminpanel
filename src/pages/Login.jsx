@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/common/Button";
-import API from "../utils/apiCall";
+import apiCall from "../utils/apiCall";
 import { toast } from "react-toastify";
 
 const Login = () => {
@@ -25,16 +25,22 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await API.post("/auth/login/send-otp", {
+      const response = await apiCall("/auth/login/send-otp", "POST", {
         email,
         password,
       });
 
-      toast.success(res.data.message || "OTP sent successfully");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send OTP");
+      }
+
+      toast.success(data.message || "OTP sent successfully");
       setOtpSent(true);
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Failed to send OTP");
+      toast.error(error.message || "Failed to send OTP");
     } finally {
       setLoading(false);
     }
@@ -51,23 +57,28 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await API.post("/auth/login", {
+      const response = await apiCall("/auth/login", "POST", {
         email,
         password,
         otp,
       });
 
-      const data = res.data;
+      const data = await response.json();
 
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
+      localStorage.setItem("username", data.username || email.split('@')[0]);
 
       toast.success(data.message || "Login successful");
 
       navigate("/");
     } catch (error) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(error.message || "Login failed");
     } finally {
       setLoading(false);
     }
