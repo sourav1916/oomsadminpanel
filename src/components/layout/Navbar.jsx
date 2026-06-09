@@ -7,7 +7,6 @@ import {
   ChevronDown, 
   Settings, 
   LogOut,
-  CircleUser
 } from 'lucide-react';
 
 const Navbar = ({
