@@ -6,7 +6,6 @@ import PublicRoute from "./components/PublicRoute";
 
 import MainLayout from "./components/layout/MainLayout";
 import Login from "./pages/Login";
-import Home from "./pages/Dashboard";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Branches from "./pages/Branches";
@@ -36,12 +35,14 @@ function App() {
               </ProtectedRoute>
             }
           >
+            {/* Dashboard routes - both will show Dashboard */}
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="home" element={<Home />} />
+            
+            {/* Other routes */}
             <Route path="users" element={<Users />} />
             <Route path="branches" element={<Branches />} />
-            <Route path="services" element={<Services />}/>
+            <Route path="services" element={<Services />} />
           </Route>
 
           {/* Catch all route - redirect to dashboard */}

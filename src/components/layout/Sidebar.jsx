@@ -30,7 +30,7 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
     {
       icon: House,
       label: 'Dashboard',
-      path: '/dashboard',
+      path: '/',
     },
     {
       icon: Users,
