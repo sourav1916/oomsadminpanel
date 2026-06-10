@@ -4,27 +4,16 @@ import {
   Users, 
   Building2, 
   ConciergeBell, 
-  ChevronRight, 
-  ChevronDown, 
   LifeBuoy, 
   BarChart3, 
   Settings,
-  UserCircle
 } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 
 const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [openSections, setOpenSections] = useState({});
   const location = useLocation();
   const currentPath = location.pathname;
-
-  const toggleSection = (sectionName) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [sectionName]: !prev[sectionName]
-    }));
-  };
 
   const menuItems = [
     {
