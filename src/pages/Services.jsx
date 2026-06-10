@@ -32,6 +32,7 @@ import ManagementTable from '../components/common/ManagementTable';
 import ManagementCard from '../components/common/ManagementCard';
 import ManagementHub from '../components/common/ManagementHub';
 import ModalScrollLock from "../components/common/ModalScrollLock";
+import SelectField from '../components/common/SelectField';
 
 // ─── Constants & Helpers ─────────────────────────────────────────────────────
 
@@ -289,15 +290,16 @@ const ServiceFormModal = ({ service, onClose, onSuccess }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Service Type
                 </label>
-                <select
+                <SelectField
                   name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                >
-                  <option value="general">General</option>
-                  <option value="compliance">Compliance</option>
-                </select>
+                  value={{ value: formData.type, label: formData.type === 'general' ? 'General' : 'Compliance' }}
+                  onChange={(selectedOption) => handleChange({ target: { name: 'type', value: selectedOption.value } })}
+                  options={[
+                    { value: 'general', label: 'General' },
+                    { value: 'compliance', label: 'Compliance' }
+                  ]}
+                  menuPlacement="auto"
+                />
               </div>
 
               <div className="flex items-center gap-3 pt-7">
@@ -321,16 +323,20 @@ const ServiceFormModal = ({ service, onClose, onSuccess }) => {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Frequency
                 </label>
-                <select
+                <SelectField
                   name="frequency"
-                  value={formData.frequency}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                >
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="yearly">Yearly</option>
-                </select>
+                  value={{ 
+                    value: formData.frequency, 
+                    label: formData.frequency === 'monthly' ? 'Monthly' : formData.frequency === 'quarterly' ? 'Quarterly' : 'Yearly' 
+                  }}
+                  onChange={(selectedOption) => handleChange({ target: { name: 'frequency', value: selectedOption.value } })}
+                  options={[
+                    { value: 'monthly', label: 'Monthly' },
+                    { value: 'quarterly', label: 'Quarterly' },
+                    { value: 'yearly', label: 'Yearly' }
+                  ]}
+                  menuPlacement="auto"
+                />
               </div>
 
               <div>
