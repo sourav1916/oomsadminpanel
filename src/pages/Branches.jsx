@@ -19,6 +19,10 @@ import {
   CreditCard,
   FileText,
   DollarSign,
+  MoreVertical,
+  Settings,
+  Users,
+  Gift,
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall'; 
@@ -129,7 +133,7 @@ const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
 
 // ─── Branch Card Component ───────────────────────────────────────────────────
 
-const BranchCard = ({ branch, index, onView, onNavigateToBranch }) => {
+const BranchCard = ({ branch, index, onView, onNavigateToBranch, onNavigateToServices }) => {
   const hasTaxInfo = branch.tax_info?.pan || branch.tax_info?.gst;
 
   return (
@@ -175,6 +179,12 @@ const BranchCard = ({ branch, index, onView, onNavigateToBranch }) => {
           onClick: () => onNavigateToBranch(branch),
           className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50',
         },
+        {
+          label: 'Services',
+          icon: <Settings size={12} />,
+          onClick: () => onNavigateToServices(branch),
+          className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
+        },
       ]}
       menuId={`branch-card-${branch.branch_id}`}
       footer={
@@ -216,7 +226,7 @@ const BranchCard = ({ branch, index, onView, onNavigateToBranch }) => {
 
 // ─── View Branch Modal ───────────────────────────────────────────────────────
 
-const ViewBranchModal = ({ branch, onClose, onNavigateToBranch }) => {
+const ViewBranchModal = ({ branch, onClose, onNavigateToBranch, onNavigateToServices }) => {
   const [showOwnerInfo, setShowOwnerInfo] = useState(false);
 
   return (
@@ -413,16 +423,28 @@ const ViewBranchModal = ({ branch, onClose, onNavigateToBranch }) => {
 
         {/* Footer */}
         <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 shrink-0">
-          <button
-            onClick={() => {
-              onNavigateToBranch(branch);
-              onClose();
-            }}
-            className="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition-all flex items-center gap-2"
-          >
-            <Building size={16} />
-            View Full Branch Profile
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                onNavigateToBranch(branch);
+                onClose();
+              }}
+              className="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition-all flex items-center gap-2"
+            >
+              <Building size={16} />
+              View Full Branch Profile
+            </button>
+            <button
+              onClick={() => {
+                onNavigateToServices(branch);
+                onClose();
+              }}
+              className="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2"
+            >
+              <Settings size={16} />
+              Manage Services
+            </button>
+          </div>
           <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
             Close
           </button>
@@ -456,6 +478,11 @@ export default function BranchManagement() {
   // Navigate to branch profile page
   const handleNavigateToBranch = useCallback((branch) => {
     navigate(`/branch/${branch.branch_id}`);
+  }, [navigate]);
+
+  // Navigate to branch services page
+  const handleNavigateToServices = useCallback((branch) => {
+    navigate(`/branch/${branch.branch_id}/services`);
   }, [navigate]);
 
   // Debounce search
@@ -595,7 +622,7 @@ export default function BranchManagement() {
     }
   }, [fetchBranches, pagination.page, goToPage]);
 
-  // Table columns config
+  // Table columns config with three-dot menu
   const tableColumns = useMemo(() => [
     {
       key: 'branch',
@@ -823,6 +850,12 @@ export default function BranchManagement() {
                       onClick: () => handleNavigateToBranch(branch),
                       className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50',
                     },
+                    {
+                      label: 'Services',
+                      icon: <Settings size={12} />,
+                      onClick: () => handleNavigateToServices(branch),
+                      className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
+                    },
                   ]}
                   accent="purple"
                 />
@@ -839,6 +872,7 @@ export default function BranchManagement() {
                         index={index}
                         onView={handleViewBranch}
                         onNavigateToBranch={handleNavigateToBranch}
+                        onNavigateToServices={handleNavigateToServices}
                       />
                     ))}
                   </AnimatePresence>
@@ -873,6 +907,7 @@ export default function BranchManagement() {
               setSelectedBranch(null);
             }}
             onNavigateToBranch={handleNavigateToBranch}
+            onNavigateToServices={handleNavigateToServices}
           />
         )}
       </AnimatePresence>

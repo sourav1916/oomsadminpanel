@@ -24,6 +24,8 @@ import {
     UserCheck,
     TrendingUp,
     Store as StoreIcon,
+    Settings,
+    Package,
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
@@ -61,7 +63,7 @@ const InfoCard = ({ icon: Icon, title, children, className = "" }) => (
 );
 
 const InfoRow = ({ icon: Icon, label, value, className = "" }) => (
-    <div className={`flex items-start gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 ${className}`}>
         <Icon size={14} className="text-gray-400 mt-0.5 shrink-0" />
         <div className="flex-1">
             <span className="text-xs text-gray-500">{label}:</span>
@@ -169,6 +171,10 @@ export default function BranchDetails() {
         navigate(-1);
     };
 
+    const handleViewServices = () => {
+        navigate(`/branch/${branchId}/services`);
+    };
+
     if (loading) {
         return <Skeleton />;
     }
@@ -211,13 +217,23 @@ export default function BranchDetails() {
                             <span className="text-xs text-gray-400">/</span>
                             <span className="text-sm text-gray-900">{branch?.name || 'Branch Details'}</span>
                         </div>
-                        <RefreshButton onClick={handleRefresh} loading={refreshing}>
-                            {refreshing ? "Refreshing..." : "Refresh"}
-                        </RefreshButton>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={handleViewServices}
+                                className="w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                            >
+                                <Settings size={18} />
+                                <span className="text-sm font-semibold">Branch Services</span>
+                            </button>
+                            <RefreshButton onClick={handleRefresh} loading={refreshing}>
+                                {refreshing ? "Refreshing..." : "Refresh"}
+                            </RefreshButton>
+                        </div>
+
                     </div>
 
                     {/* Main Branch Info */}
-                    <div className="px-6 py-5">
+                    <div className="px-6 pt-5 pb-2">
                         <div className="flex flex-col lg:flex-row gap-6">
                             {/* Left Section - Logo and Basic Info */}
                             <div className="flex items-start gap-5 flex-1">
@@ -246,6 +262,7 @@ export default function BranchDetails() {
                                             <span className="text-sm text-gray-600 font-mono">ID: {branch?.branch_id || 'N/A'}</span>
                                         </div>
                                         <StatusBadge status={branch?.status} />
+
                                     </div>
 
                                     {/* Additional Details Row */}
@@ -262,25 +279,21 @@ export default function BranchDetails() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Right Section - Contact Info */}
-                            <div className="lg:border-l lg:border-gray-200 lg:pl-6">
-                                <div className="space-y-2">
-                                    {contact?.mobile_1 && (
-                                        <InfoRow icon={Phone} label="Mobile 1" value={contact.mobile_1} />
-                                    )}
-                                    {contact?.mobile_2 && (
-                                        <InfoRow icon={Phone} label="Mobile 2" value={contact.mobile_2} />
-                                    )}
-                                    {contact?.email_1 && (
-                                        <InfoRow icon={Mail} label="Email 1" value={contact.email_1} />
-                                    )}
-                                    {contact?.email_2 && (
-                                        <InfoRow icon={Mail} label="Email 2" value={contact.email_2} />
-                                    )}
-                                </div>
-                            </div>
                         </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 px-4 pb-4 pt-2 border items-center">
+                        {contact?.mobile_1 && (
+                            <InfoRow icon={Phone} label="Mobile 1" value={contact.mobile_1} />
+                        )}
+                        {contact?.mobile_2 && (
+                            <InfoRow icon={Phone} label="Mobile 2" value={contact.mobile_2} />
+                        )}
+                        {contact?.email_1 && (
+                            <InfoRow icon={Mail} label="Email 1" value={contact.email_1} />
+                        )}
+                        {contact?.email_2 && (
+                            <InfoRow icon={Mail} label="Email 2" value={contact.email_2} />
+                        )}
                     </div>
                 </div>
             </div>

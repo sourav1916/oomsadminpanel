@@ -17,6 +17,7 @@ import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
 import BranchDetails from './pages/BranchDetails';
+import BranchServices from "./pages/BranchServices";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
               <Route path="users" element={<Users />} />
               <Route path="user/profile/:username" element={<UserProfile />} />
               <Route path="branch/:branchId" element={<BranchDetails />} />
+              <Route path="/branch/:branchId/services" element={<BranchServices />} />
               <Route path="branches" element={<Branches />} />
               <Route path="services" element={<Services />} />
             </Route>
