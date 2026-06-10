@@ -9,7 +9,6 @@ import {
   Briefcase,
   Mail,
   Phone,
-  MapPin,
   Calendar,
   CheckCircle,
   Ban,
@@ -17,6 +16,7 @@ import {
   FileText,
   UserCircle,
   IdCard,
+  ArrowLeft,
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
@@ -33,23 +33,25 @@ import StatisticsCard from "../components/user/StatisticsCard";
 const StatusBadge = ({ status }) => {
   if (status) {
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
-        <CheckCircle size={10} /> Active
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+        <CheckCircle size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Active
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
-      <Ban size={10} /> Inactive
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
+      <Ban size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Inactive
     </span>
   );
 };
 
 const DetailItem = ({ icon: Icon, label, value, className = "" }) => (
-  <div className={`flex items-center gap-2 ${className}`}>
-    <Icon size={14} className="text-gray-400 shrink-0" />
-    <span className="text-xs text-gray-500">{label}:</span>
-    <span className="text-sm text-gray-700 font-medium">{value || "N/A"}</span>
+  <div className={`flex items-center gap-1 sm:gap-2 ${className}`}>
+    <Icon size={12} className="text-gray-400 shrink-0 w-3 h-3 sm:w-3.5 sm:h-3.5" />
+    <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+      <span className="text-[10px] sm:text-xs text-gray-500 shrink-0">{label}:</span>
+      <span className="text-[11px] sm:text-sm text-gray-800 font-medium truncate">{value || "N/A"}</span>
+    </div>
   </div>
 );
 
@@ -91,7 +93,7 @@ export default function UserProfile() {
     }
 
     fetchInProgress.current = true;
-    
+
     try {
       if (showRefresh) {
         setRefreshing(true);
@@ -184,72 +186,79 @@ export default function UserProfile() {
       <div className="mb-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           {/* Top Bar with Eyebrow and Refresh */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
-            <div className="flex items-center gap-2">
-              <UserCircle size={16} className="text-blue-500" />
-              <span className="text-sm font-medium text-gray-600">Profile</span>
-              <span className="text-xs text-gray-400">/</span>
-              <span className="text-sm text-gray-900">{profile?.name || user?.username}</span>
+          <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+            <div className="flex items-center gap-2 min-w-0">
+              <button
+                onClick={handleBack}
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
+              >
+                <ArrowLeft size={18} className="text-gray-600" />
+              </button>
+              <UserCircle size={16} className="text-blue-500 shrink-0" />
+              <span className="text-sm font-medium text-gray-600 shrink-0 hidden sm:inline">Profile</span>
+              <span className="text-xs text-gray-400 shrink-0 hidden sm:inline">/</span>
+              <span className="text-sm text-gray-900 font-semibold truncate">{profile?.name || user?.username}</span>
             </div>
-            <RefreshButton
-              onClick={handleRefresh}
-              loading={refreshing}
-            >
-              {refreshing ? "Refreshing..." : "Refresh"}
-            </RefreshButton>
+            <div className="flex items-center gap-2 shrink-0">
+              <RefreshButton
+                onClick={handleRefresh}
+                loading={refreshing}
+                className="justify-center px-3 sm:px-4"
+              >
+                <span className="hidden sm:inline">{refreshing ? "Refreshing..." : "Refresh"}</span>
+              </RefreshButton>
+            </div>
           </div>
 
           {/* Main User Info */}
-          <div className="px-6 py-5">
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Left Section - Avatar and Basic Info */}
-              <div className="flex items-start gap-5 flex-1">
-                {/* Avatar */}
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg ring-4 ring-blue-50 shrink-0">
-                  {profile?.image ? (
-                    <img
-                      src={profile.image}
-                      alt={profile.name}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-3xl font-bold text-white">
-                      {profile?.name?.charAt(0) || user?.username?.charAt(0) || "U"}
-                    </span>
+          <div className="px-3 sm:px-6 py-3 sm:py-5">
+            <div className="flex flex-row items-start gap-3 sm:gap-5">
+              {/* Avatar */}
+              <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm sm:shadow-lg ring-2 sm:ring-4 ring-blue-50 shrink-0">
+                {profile?.image ? (
+                  <img
+                    src={profile.image}
+                    alt={profile.name}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="text-lg sm:text-3xl font-bold text-white">
+                    {profile?.name?.charAt(0) || user?.username?.charAt(0) || "U"}
+                  </span>
+                )}
+              </div>
+
+              {/* User Details */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
+                  <h1 className="text-base sm:text-2xl font-bold text-gray-900 truncate leading-tight">
+                    {profile?.name || user?.username}
+                  </h1>
+                  <StatusBadge status={user?.status} />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 mb-1.5 sm:mb-3">
+                  <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full">
+                    <Mail size={10} className="text-gray-400 shrink-0 sm:w-3 sm:h-3" />
+                    <span className="text-[10px] sm:text-sm text-gray-600 truncate leading-none">{user?.login_id}</span>
+                  </div>
+                  {profile?.mobile && (
+                    <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full">
+                      <Phone size={10} className="text-gray-400 shrink-0 sm:w-3 sm:h-3" />
+                      <span className="text-[10px] sm:text-sm text-gray-600 truncate leading-none">+{profile.country_code || '91'} {profile.mobile}</span>
+                    </div>
                   )}
                 </div>
 
-                {/* User Details */}
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                    {profile?.name || user?.username}
-                  </h1>
-
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3">
-                    <div className="flex items-center gap-2">
-                      <Mail size={14} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">{user?.login_id}</span>
-                    </div>
-                    {profile?.mobile && (
-                      <div className="flex items-center gap-2">
-                        <Phone size={14} className="text-gray-400" />
-                        <span className="text-sm text-gray-600">+{profile.country_code || '91'} {profile.mobile}</span>
-                      </div>
-                    )}
-                    <StatusBadge status={user?.status} />
-                  </div>
-
-                  {/* Additional Details Row */}
-                  <div className="flex flex-wrap gap-x-6 gap-y-2">
-                    <DetailItem icon={IdCard} label="User ID" value={user?.username} />
-                    <DetailItem icon={Calendar} label="Member Since" value={new Date(user?.create_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
-                    {user?.create_by && (
-                      <DetailItem icon={User} label="Created By" value={user?.create_by} />
-                    )}
-                    {user?.remark && (
-                      <DetailItem icon={FileText} label="Remark" value={user?.remark} />
-                    )}
-                  </div>
+                {/* Additional Details Row */}
+                <div className="flex flex-wrap gap-x-3 sm:gap-x-6 gap-y-1 sm:gap-y-2 w-full text-left">
+                  <DetailItem icon={Calendar} label="Since" value={new Date(user?.create_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
+                  {user?.create_by && (
+                    <DetailItem icon={User} label="By" value={user?.create_by} />
+                  )}
+                  {user?.remark && (
+                    <DetailItem icon={FileText} label="Remark" value={user?.remark} />
+                  )}
                 </div>
               </div>
             </div>

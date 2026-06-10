@@ -9,15 +9,10 @@ import {
   X,
   Eye,
   Calendar,
-  DollarSign,
-  CreditCard,
-  FileText,
   Tag,
   Clock,
   CheckCircle,
   Ban,
-  RefreshCw,
-  Percent,
   BookOpen,
   TrendingUp,
   Hash,
@@ -275,7 +270,7 @@ export default function BranchServices() {
     }
 
     fetchInProgress.current = true;
-    
+
     if (showRefresh) {
       setRefreshing(true);
     } else {
@@ -379,7 +374,7 @@ export default function BranchServices() {
       <div className="mb-6">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           {/* Top Bar */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+          <div className="flex items-center justify-between px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
             <div className="flex items-center gap-4">
               <button
                 onClick={handleBack}
@@ -394,8 +389,8 @@ export default function BranchServices() {
                 <span className="text-sm text-gray-900">{branchInfo?.name || 'Services'}</span>
               </div>
             </div>
-            <RefreshButton onClick={handleRefresh} loading={refreshing}>
-              {refreshing ? "Refreshing..." : "Refresh"}
+            <RefreshButton onClick={handleRefresh} loading={refreshing}  className="justify-center px-3 sm:px-4">
+              <span className="hidden sm:inline">{refreshing ? "Refreshing..." : "Refresh"}</span>
             </RefreshButton>
           </div>
 

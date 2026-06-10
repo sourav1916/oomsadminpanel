@@ -105,7 +105,7 @@ const MainLayout = ({ children }) => {
             maxWidth: isMobile ? '100%' : `calc(100vw - ${desktopSidebarCollapsed ? '64px' : '256px'})`,
           }}
         >
-          <div className="w-full max-w-8xl p-0 ">
+          <div className="w-full max-w-8xl p-2 ">
             {children || <Outlet />}
           </div>
         </main>
