@@ -15,11 +15,9 @@ import {
   Globe,
   ChevronDown,
   ChevronUp,
-  Store,
   User,
   CreditCard,
   FileText,
-  Clock,
   DollarSign,
 } from "lucide-react";
 import { toast } from 'react-toastify';
@@ -128,7 +126,6 @@ const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
 
 const BranchCard = ({ branch, index, onView }) => {
   const hasTaxInfo = branch.tax_info?.pan || branch.tax_info?.gst;
-  const hasContact = branch.contact?.mobile_1 || branch.contact?.email_1;
 
   return (
     <ManagementCard
@@ -401,7 +398,7 @@ export default function BranchManagement() {
   }, [searchTerm]);
 
   // Fetch branches function with duplicate prevention
-  const fetchBranches = useCallback(async (page = pagination.page, resetLoading = true) => {
+  const fetchBranches = useCallback(async (page, resetLoading = true) => {
     // Prevent multiple simultaneous requests
     if (fetchInProgress.current) {
       console.log("Fetch already in progress, skipping...");
@@ -478,7 +475,7 @@ export default function BranchManagement() {
         fetchInProgress.current = false;
       }
     }
-  }, [pagination.limit, pagination.page, debouncedSearchTerm, updatePagination]);
+  }, [pagination.limit, debouncedSearchTerm, updatePagination]);
 
   // Initial load - runs only once on mount
   useEffect(() => {
@@ -516,7 +513,7 @@ export default function BranchManagement() {
         goToPage(1);
       }
     }
-  }, [pagination.limit, changeLimit, goToPage]);
+  }, [pagination.limit, pagination.page, changeLimit, goToPage]);
 
   const handleRefresh = useCallback(() => {
     if (!fetchInProgress.current) {

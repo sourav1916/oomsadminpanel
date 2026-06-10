@@ -78,7 +78,6 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
 
     if (!token) {
       // No token, just clean up locally

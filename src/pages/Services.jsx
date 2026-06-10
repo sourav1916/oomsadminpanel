@@ -6,7 +6,6 @@ import {
   Package,
   Calendar,
   CheckCircle,
-  Ban,
   Eye,
   DollarSign,
   Clock,
@@ -14,7 +13,6 @@ import {
   Tag,
   Hash,
   AlertCircle,
-  TrendingUp,
   Repeat,
   CalendarDays,
   IndianRupee,
@@ -23,7 +21,6 @@ import {
   Plus,
   Edit,
   Save,
-  AlertTriangle,
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall'; 
@@ -83,23 +80,6 @@ const getTypeBadge = (type, isCompliance) => {
     return { icon: CheckCircle, text: 'Compliance', className: 'bg-blue-100 text-blue-800 border border-blue-200' };
   }
   return { icon: Package, text: 'General', className: 'bg-gray-100 text-gray-800 border border-gray-200' };
-};
-
-const getStatusBadge = (isCompliance) => {
-  if (isCompliance) {
-    return { icon: CheckCircle, text: 'Active', className: 'bg-green-100 text-green-800 border border-green-200' };
-  }
-  return { icon: Ban, text: 'Inactive', className: 'bg-red-100 text-red-800 border border-red-200' };
-};
-
-const StatusBadge = ({ isCompliance }) => {
-  const badge = getStatusBadge(isCompliance);
-  const Icon = badge.icon;
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${badge.className}`}>
-      <Icon size={10} /> {badge.text}
-    </span>
-  );
 };
 
 const TypeBadge = ({ type, compliance }) => {
@@ -741,7 +721,7 @@ export default function ServiceManagement() {
   }, [searchTerm]);
 
   // Fetch services function with duplicate prevention
-  const fetchServices = useCallback(async (page = pagination.page, resetLoading = true) => {
+  const fetchServices = useCallback(async (page, resetLoading = true) => {
     if (fetchInProgress.current) {
       console.log("Fetch already in progress, skipping...");
       return;
@@ -812,7 +792,7 @@ export default function ServiceManagement() {
         fetchInProgress.current = false;
       }
     }
-  }, [pagination.limit, pagination.page, debouncedSearchTerm, updatePagination]);
+  }, [pagination.limit, debouncedSearchTerm, updatePagination]);
 
   // Initial load - runs only once on mount
   useEffect(() => {
@@ -865,7 +845,7 @@ export default function ServiceManagement() {
         goToPage(1);
       }
     }
-  }, [pagination.limit, changeLimit, goToPage]);
+  }, [pagination.limit, pagination.page, changeLimit, goToPage]);
 
   const handleRefresh = useCallback(() => {
     if (!fetchInProgress.current) {
@@ -876,13 +856,6 @@ export default function ServiceManagement() {
       }
     }
   }, [fetchServices, pagination.page, goToPage]);
-
-  // Calculate summary stats
-  const summaryStats = useMemo(() => {
-    const complianceCount = services.filter(s => s.compliance).length;
-    const totalAmount = services.reduce((sum, s) => sum + (s.default_amount || 0), 0);
-    return { complianceCount, totalAmount, total: services.length };
-  }, [services]);
 
   // Table columns config
   const tableColumns = useMemo(() => [

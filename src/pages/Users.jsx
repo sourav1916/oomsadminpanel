@@ -369,7 +369,7 @@ export default function UserManagement() {
   }, [searchTerm]);
 
   // Fetch users function with duplicate prevention
-  const fetchUsers = useCallback(async (page = pagination.page, resetLoading = true) => {
+  const fetchUsers = useCallback(async (page, resetLoading = true) => {
     // Prevent multiple simultaneous requests
     if (fetchInProgress.current) {
       console.log("Fetch already in progress, skipping...");
@@ -446,7 +446,7 @@ export default function UserManagement() {
         fetchInProgress.current = false;
       }
     }
-  }, [pagination.limit, pagination.page, debouncedSearchTerm, updatePagination]);
+  }, [pagination.limit, debouncedSearchTerm, updatePagination]);
 
   // Initial load - runs only once on mount
   useEffect(() => {
@@ -484,7 +484,7 @@ export default function UserManagement() {
         goToPage(1);
       }
     }
-  }, [pagination.limit, changeLimit, goToPage]);
+  }, [pagination.limit, pagination.page, changeLimit, goToPage]);
 
   const handleRefresh = useCallback(() => {
     if (!fetchInProgress.current) {

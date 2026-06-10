@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { FaEllipsisV } from 'react-icons/fa';
@@ -24,7 +24,7 @@ const ActionMenu = ({ actions = [], activeId, onToggle, menuId, trigger }) => {
 
   const isMenuOpen = activeId !== undefined ? activeId === menuId : isOpen;
 
-  const captureCoords = () => {
+  const captureCoords = useCallback(() => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       setCoords({
@@ -33,7 +33,15 @@ const ActionMenu = ({ actions = [], activeId, onToggle, menuId, trigger }) => {
         triggerRight: rect.right,
       });
     }
-  };
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    if (onToggle) {
+      onToggle(null, null);
+    } else {
+      setIsOpen(false);
+    }
+  }, [onToggle]);
 
   const toggleMenu = (e) => {
     e.stopPropagation();
@@ -42,14 +50,6 @@ const ActionMenu = ({ actions = [], activeId, onToggle, menuId, trigger }) => {
       onToggle(e, menuId);
     } else {
       setIsOpen((prev) => !prev);
-    }
-  };
-
-  const closeMenu = () => {
-    if (onToggle) {
-      onToggle(null, null);
-    } else {
-      setIsOpen(false);
     }
   };
 
@@ -77,7 +77,7 @@ const ActionMenu = ({ actions = [], activeId, onToggle, menuId, trigger }) => {
       document.removeEventListener('keydown', handleEscape);
       window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, captureCoords, closeMenu]);
   // ── Position (all viewport-relative for position:fixed) ──────────────────────
   const menuWidth = 192;
   const menuHeight = actions.length * 44 + 16;
