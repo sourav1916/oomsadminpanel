@@ -590,11 +590,7 @@ export default function UserManagement() {
       description="View and manage all registered users from a single workspace."
       accent="blue"
       onRefresh={handleRefresh}
-      summary={
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
-          Total: <span className="font-semibold text-slate-900">{pagination.total}</span> users
-        </div>
-      }
+
     >
       <div className="space-y-6 p-2 lg:p-0">
 

@@ -974,23 +974,6 @@ export default function ServiceManagement() {
             New Service
           </button>
         }
-        summary={
-          <div className="inline-flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
-            <span>Total: <span className="font-semibold text-slate-900">{pagination.total}</span> services</span>
-            {summaryStats.complianceCount > 0 && (
-              <>
-                <span className="text-slate-300">|</span>
-                <span>Compliance: <span className="font-semibold text-blue-600">{summaryStats.complianceCount}</span></span>
-              </>
-            )}
-            {summaryStats.totalAmount > 0 && (
-              <>
-                <span className="text-slate-300">|</span>
-                <span>Total Value: <span className="font-semibold text-green-600">{formatCurrency(summaryStats.totalAmount)}</span></span>
-              </>
-            )}
-          </div>
-        }
       >
         <div className="space-y-6 p-2 lg:p-0">
 

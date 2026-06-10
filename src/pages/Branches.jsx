@@ -638,11 +638,7 @@ export default function BranchManagement() {
       description="View and manage all registered branches from a single workspace."
       accent="purple"
       onRefresh={handleRefresh}
-      summary={
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
-          Total: <span className="font-semibold text-slate-900">{pagination.total}</span> branches
-        </div>
-      }
+      
     >
       <div className="space-y-6 p-2 lg:p-0">
 
