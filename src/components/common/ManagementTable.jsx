@@ -90,7 +90,7 @@ export default function ManagementTable({
       animate={{ opacity: 1, y: 0 }}
       className={joinClasses('overflow-hidden rounded-xl bg-white w-full', cardClass, containerClassName, className)}
     >
-      <div className={joinClasses('w-full', tableClassName)}>
+      <div className={joinClasses('w-full overflow-x-auto', tableClassName)}>
         <table className="w-full text-left text-sm text-gray-700">
           {showHeader && (
             <thead className={joinClasses('hidden sm:table-header-group bg-gradient-to-r from-gray-100 to-gray-200 text-xs uppercase text-gray-600', headerClassName)}>
@@ -139,6 +139,7 @@ export default function ManagementTable({
                         key={column.key}
                         className={joinClasses(
                           densityClasses,
+                          'max-w-[150px] sm:max-w-[200px] lg:max-w-[250px] truncate',
                           column.className,
                           cellClassName
                         )}

@@ -7,7 +7,7 @@ const AdminSkeleton = () => {
       {/* Header Section */}
       <div className="mb-6">
         <div className="h-8 w-48 bg-gray-200 rounded-lg mb-3"></div>
-        <div className="h-4 w-96 bg-gray-200 rounded-lg"></div>
+        <div className="h-4 w-64 sm:w-96 bg-gray-200 rounded-lg"></div>
       </div>
 
       {/* Filters Bar */}

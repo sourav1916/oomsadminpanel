@@ -88,7 +88,7 @@ const Pagination = ({
                 )}
 
                 {/* Page number buttons */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center justify-center flex-wrap gap-1 mt-2 sm:mt-0">
                     <button
                         onClick={() => onPageChange(1)}
                         disabled={currentPage === 1}

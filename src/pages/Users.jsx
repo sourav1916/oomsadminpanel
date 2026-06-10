@@ -558,11 +558,11 @@ export default function UserManagement() {
       key: 'user',
       label: 'User',
       render: (user) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full">
           <ProfileAvatar
             record={user}
             name={user.profile?.name || user.username}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold cursor-pointer hover:opacity-80 transition-opacity"
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold cursor-pointer hover:opacity-80 transition-opacity shrink-0"
             onClick={(e) => {
               e.stopPropagation();
               handleNavigateToProfile(user);
@@ -570,9 +570,9 @@ export default function UserManagement() {
           >
             {(user.profile?.name?.charAt(0) || user.username?.charAt(0) || 'U').toUpperCase()}
           </ProfileAvatar>
-          <div>
+          <div className="min-w-0 flex-1">
             <p 
-              className="trancate font-semibold text-gray-800 text-sm cursor-pointer hover:text-blue-600 transition-colors"
+              className="truncate font-semibold text-gray-800 text-sm cursor-pointer hover:text-blue-600 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 handleNavigateToProfile(user);
@@ -580,7 +580,7 @@ export default function UserManagement() {
             >
               {user.profile?.name || user.username}
             </p>
-            <p className="trancate text-xs text-gray-500">{user.login_id}</p>
+            <p className="truncate text-xs text-gray-500">{user.login_id}</p>
           </div>
         </div>
       ),
