@@ -124,7 +124,7 @@ export default function ManagementTable({
                   key={key}
                   onClick={onRowClick ? () => onRowClick(row, index) : undefined}
                   className={joinClasses(
-                    'align-middle text-center transition-all duration-200',
+                    'align-middle text-left transition-all duration-200',
                     onRowClick && 'cursor-pointer hover:bg-slate-50',
                     rowClassName
                   )}

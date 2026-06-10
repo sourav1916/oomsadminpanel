@@ -108,7 +108,7 @@ export const TableRowSkeleton = ({ columns = 5 }) => {
 // Form Skeleton
 export const FormSkeleton = () => {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-3 animate-pulse">
       <div>
         <div className="h-4 w-24 bg-gray-200 rounded mb-2"></div>
         <div className="h-10 w-full bg-gray-200 rounded-lg"></div>

@@ -35,7 +35,7 @@ export default function ProfileTab({ user, profile }) {
   const address = profile?.address || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Personal Information */}
       <InfoSection title="Personal Information" icon={User}>
         <InfoField label="Full Name" value={profile?.name} />

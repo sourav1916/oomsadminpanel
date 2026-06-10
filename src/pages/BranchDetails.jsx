@@ -201,7 +201,7 @@ export default function BranchDetails() {
     return (
         <div className="min-h-screen mx-auto">
             {/* Header Section */}
-            <div className="mb-6">
+            <div className="lg:mb-6 mb-2">
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                     {/* Top Bar with Eyebrow and Refresh */}
                     <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
@@ -313,7 +313,7 @@ export default function BranchDetails() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 lg:gap-4 gap-2 mb-2 lg:mb-6"
                 >
                     {statistics.clients && (
                         <StatisticsCard

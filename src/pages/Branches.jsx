@@ -747,7 +747,7 @@ export default function BranchManagement() {
       accent="purple"
       onRefresh={handleRefresh}
     >
-      <div className="space-y-6 p-2 lg:p-0">
+      <div className="space-y-3">
 
         {/* Filters Bar */}
         <motion.div

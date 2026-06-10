@@ -658,7 +658,7 @@ export default function UserManagement() {
       accent="blue"
       onRefresh={handleRefresh}
     >
-      <div className="space-y-6 p-2 lg:p-0">
+      <div className="space-y-3">
 
         {/* Filters Bar */}
         <motion.div
