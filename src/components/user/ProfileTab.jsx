@@ -3,13 +3,8 @@ import React from "react";
 import {
   User,
   Phone,
-  Mail,
   MapPin,
-  IdCard,
-  Calendar,
-  Globe,
   Building,
-  CreditCard,
 } from "lucide-react";
 
 const InfoSection = ({ title, icon: Icon, children }) => (

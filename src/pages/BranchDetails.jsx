@@ -103,6 +103,9 @@ export default function BranchDetails() {
         }
 
         fetchInProgress.current = true;
+        
+        // Generate unique request ID
+        const requestId = ++currentRequestId.current;
 
         try {
             if (showRefresh) {
@@ -111,9 +114,6 @@ export default function BranchDetails() {
                 setLoading(true);
             }
             setError(null);
-
-            // Generate unique request ID
-            const requestId = ++currentRequestId.current;
 
             const response = await apiCall(`/branch/details/${branchId}`, 'GET');
 
@@ -139,7 +139,7 @@ export default function BranchDetails() {
             setError(err.message);
             toast.error(err.message || "Failed to load branch details.");
         } finally {
-            if (currentRequestId.current === currentRequestId.current) {
+            if (requestId === currentRequestId.current) {
                 setLoading(false);
                 setRefreshing(false);
                 fetchInProgress.current = false;

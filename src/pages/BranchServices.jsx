@@ -74,21 +74,6 @@ const getTypeBadge = (type, isCompliance) => {
   );
 };
 
-const StatusBadge = ({ status }) => {
-  if (status) {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
-        <CheckCircle size={10} /> Active
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
-      <Ban size={10} /> Inactive
-    </span>
-  );
-};
-
 // ─── Service Card Component ─────────────────────────────────────────────────
 
 const ServiceCard = ({ service, index }) => {

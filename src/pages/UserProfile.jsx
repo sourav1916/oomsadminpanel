@@ -15,7 +15,6 @@ import {
   Users,
   FileText,
   UserCircle,
-  IdCard,
   ArrowLeft,
 } from "lucide-react";
 import { toast } from 'react-toastify';
@@ -93,6 +92,9 @@ export default function UserProfile() {
     }
 
     fetchInProgress.current = true;
+    
+    // Generate unique request ID
+    const requestId = ++currentRequestId.current;
 
     try {
       if (showRefresh) {
@@ -101,9 +103,6 @@ export default function UserProfile() {
         setLoading(true);
       }
       setError(null);
-
-      // Generate unique request ID
-      const requestId = ++currentRequestId.current;
 
       const response = await apiCall(`/user/profile/${username}`, 'GET');
 
@@ -129,7 +128,7 @@ export default function UserProfile() {
       setError(err.message);
       toast.error(err.message || "Failed to load user profile.");
     } finally {
-      if (currentRequestId.current === currentRequestId.current) {
+      if (requestId === currentRequestId.current) {
         setLoading(false);
         setRefreshing(false);
         fetchInProgress.current = false;
@@ -178,7 +177,6 @@ export default function UserProfile() {
   }
 
   const { user, profile, statistics } = userData;
-  const address = profile?.address || {};
 
   return (
     <div className="min-h-screen mx-auto">

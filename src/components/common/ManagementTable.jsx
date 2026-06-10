@@ -98,7 +98,7 @@ export default function ManagementTable({
                 {visibleColumns.map((column) => (
                   <th
                     key={column.key}
-                    className={joinClasses(densityClasses, 'font-semibold text-center', column.headerClassName)}
+                    className={joinClasses(densityClasses, 'font-semibold text-left', column.headerClassName)}
                   >
                     {column.label}
                   </th>
