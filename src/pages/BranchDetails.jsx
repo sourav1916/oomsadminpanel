@@ -276,7 +276,7 @@ export default function BranchDetails() {
 
                     {/* Contact Section Mobile Toggle */}
                     {(contact?.mobile_1 || contact?.mobile_2 || contact?.email_1 || contact?.email_2) && (
-                        <div className="sm:hidden px-4 py-3 border-t border-slate-100 bg-gray-50/50">
+                        <div className="xl:hidden px-4 py-3 border-t border-slate-100 bg-gray-50/50">
                             <button
                                 onClick={() => setShowMobileContacts(!showMobileContacts)}
                                 className="w-full flex items-center justify-between text-sm text-gray-700 font-medium"
@@ -290,7 +290,7 @@ export default function BranchDetails() {
                         </div>
                     )}
 
-                    <div className={`${showMobileContacts ? 'grid' : 'hidden'} sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-4 sm:px-6 pb-4 pt-2 sm:pt-4 border-t-0 sm:border-t border-slate-100 items-center bg-gray-50/50`}>
+                    <div className={`${showMobileContacts ? 'grid' : 'hidden'} xl:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 px-4 sm:px-6 pb-4 pt-2 xl:pt-4 border-t-0 xl:border-t border-slate-100 items-center bg-gray-50/50`}>
                         {contact?.mobile_1 && (
                             <InfoRow icon={Phone} label="Mobile 1" value={contact.mobile_1} />
                         )}
