@@ -572,7 +572,7 @@ export default function UserManagement() {
           </ProfileAvatar>
           <div>
             <p 
-              className="font-semibold text-gray-800 text-sm cursor-pointer hover:text-blue-600 transition-colors"
+              className="trancate font-semibold text-gray-800 text-sm cursor-pointer hover:text-blue-600 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 handleNavigateToProfile(user);
@@ -580,7 +580,7 @@ export default function UserManagement() {
             >
               {user.profile?.name || user.username}
             </p>
-            <p className="text-xs text-gray-500">{user.login_id}</p>
+            <p className="trancate text-xs text-gray-500">{user.login_id}</p>
           </div>
         </div>
       ),

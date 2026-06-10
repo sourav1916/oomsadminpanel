@@ -639,7 +639,7 @@ export default function BranchManagement() {
           />
           <div>
             <p 
-              className="font-semibold text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors"
+              className="font-semibold whitespaccce-nowrap text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 handleNavigateToBranch(branch);
