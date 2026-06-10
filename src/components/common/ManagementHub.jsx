@@ -73,19 +73,22 @@ export default function ManagementHub({
             </div>
 
             {(summary || actions || onRefresh) && (
-              <div className="flex flex-wrap items-center justify-end gap-1.5">
+              <div className="flex flex-wrap items-center justify-between w-full gap-1.5">
                 {summary}
-                {onRefresh && (
-                  <RefreshButton
-                    type="button"
-                    loading={refreshing}
-                    onClick={onRefresh}
-                    title={refreshTitle || refreshLabel}
-                  >
-                    {refreshLabel}
-                  </RefreshButton>
-                )}
-                {actions}
+                <div className="flex w-full items-center justify-end gap-1.5">
+                  {onRefresh && (
+                    <RefreshButton
+                      type="button"
+                      loading={refreshing}
+                      onClick={onRefresh}
+                      title={refreshTitle || refreshLabel}
+                    >
+                      {refreshLabel}
+                    </RefreshButton>
+                  )}
+                  {actions}
+                </div>
+                
               </div>
             )}
           </div>
