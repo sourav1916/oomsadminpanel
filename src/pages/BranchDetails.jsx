@@ -1,5 +1,5 @@
 // pages/BranchDetails.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -87,7 +87,27 @@ export default function BranchDetails() {
     const [error, setError] = useState(null);
     const [branchData, setBranchData] = useState(null);
 
+    // Refs to prevent duplicate API calls
+    const fetchInProgress = useRef(false);
+    const initialFetchDone = useRef(false);
+    const currentRequestId = useRef(0);
+    const lastFetchedBranchId = useRef(null);
+
     const fetchBranchDetails = useCallback(async (showRefresh = false) => {
+        // Prevent multiple simultaneous requests
+        if (fetchInProgress.current) {
+            console.log("Fetch already in progress, skipping...");
+            return;
+        }
+
+        // Prevent fetching the same branch ID twice
+        if (!showRefresh && lastFetchedBranchId.current === branchId) {
+            console.log("Already fetched this branch, skipping...");
+            return;
+        }
+
+        fetchInProgress.current = true;
+
         try {
             if (showRefresh) {
                 setRefreshing(true);
@@ -96,7 +116,16 @@ export default function BranchDetails() {
             }
             setError(null);
 
+            // Generate unique request ID
+            const requestId = ++currentRequestId.current;
+
             const response = await apiCall(`/branch/details/${branchId}`, 'GET');
+
+            // Check if this request is still the latest
+            if (requestId !== currentRequestId.current) {
+                console.log("Stale request ignored");
+                return;
+            }
 
             if (!response.ok) throw new Error('Failed to fetch branch details');
 
@@ -104,6 +133,8 @@ export default function BranchDetails() {
 
             if (result.success) {
                 setBranchData(result.data);
+                lastFetchedBranchId.current = branchId;
+                setError(null);
             } else {
                 throw new Error(result.message || 'Failed to fetch branch details');
             }
@@ -112,18 +143,25 @@ export default function BranchDetails() {
             setError(err.message);
             toast.error(err.message || "Failed to load branch details.");
         } finally {
-            setLoading(false);
-            setRefreshing(false);
+            if (currentRequestId.current === currentRequestId.current) {
+                setLoading(false);
+                setRefreshing(false);
+                fetchInProgress.current = false;
+            }
         }
     }, [branchId]);
 
     useEffect(() => {
-        if (branchId) {
+        if (branchId && !initialFetchDone.current) {
+            console.log("Initial fetch triggered for branch:", branchId);
+            initialFetchDone.current = true;
             fetchBranchDetails();
         }
     }, [branchId, fetchBranchDetails]);
 
     const handleRefresh = () => {
+        // Reset the last fetched branch ID to allow refresh
+        lastFetchedBranchId.current = null;
         fetchBranchDetails(true);
     };
 
