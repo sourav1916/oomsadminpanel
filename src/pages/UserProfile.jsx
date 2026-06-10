@@ -1,5 +1,5 @@
 // pages/UserProfile.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -64,6 +64,12 @@ export default function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
 
+  // Refs to prevent duplicate API calls
+  const fetchInProgress = useRef(false);
+  const initialFetchDone = useRef(false);
+  const currentRequestId = useRef(0);
+  const lastFetchedUsername = useRef(null);
+
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
     { id: "branches", label: "Branches", icon: Building },
@@ -72,6 +78,20 @@ export default function UserProfile() {
   ];
 
   const fetchUserProfile = useCallback(async (showRefresh = false) => {
+    // Prevent multiple simultaneous requests
+    if (fetchInProgress.current) {
+      console.log("Fetch already in progress, skipping...");
+      return;
+    }
+
+    // Prevent fetching the same username twice
+    if (!showRefresh && lastFetchedUsername.current === username) {
+      console.log("Already fetched this username, skipping...");
+      return;
+    }
+
+    fetchInProgress.current = true;
+    
     try {
       if (showRefresh) {
         setRefreshing(true);
@@ -80,7 +100,16 @@ export default function UserProfile() {
       }
       setError(null);
 
+      // Generate unique request ID
+      const requestId = ++currentRequestId.current;
+
       const response = await apiCall(`/user/profile/${username}`, 'GET');
+
+      // Check if this request is still the latest
+      if (requestId !== currentRequestId.current) {
+        console.log("Stale request ignored");
+        return;
+      }
 
       if (!response.ok) throw new Error('Failed to fetch user profile');
 
@@ -88,6 +117,8 @@ export default function UserProfile() {
 
       if (result.success) {
         setUserData(result.data);
+        lastFetchedUsername.current = username;
+        setError(null);
       } else {
         throw new Error(result.message || 'Failed to fetch user profile');
       }
@@ -96,18 +127,25 @@ export default function UserProfile() {
       setError(err.message);
       toast.error(err.message || "Failed to load user profile.");
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (currentRequestId.current === currentRequestId.current) {
+        setLoading(false);
+        setRefreshing(false);
+        fetchInProgress.current = false;
+      }
     }
   }, [username]);
 
   useEffect(() => {
-    if (username) {
+    if (username && !initialFetchDone.current) {
+      console.log("Initial fetch triggered");
+      initialFetchDone.current = true;
       fetchUserProfile();
     }
   }, [username, fetchUserProfile]);
 
   const handleRefresh = () => {
+    // Reset the last fetched username to allow refresh
+    lastFetchedUsername.current = null;
     fetchUserProfile(true);
   };
 
@@ -212,54 +250,6 @@ export default function UserProfile() {
                       <DetailItem icon={FileText} label="Remark" value={user?.remark} />
                     )}
                   </div>
-                </div>
-              </div>
-
-              {/* Right Section - Location & Contact Info */}
-              <div className="lg:border-l lg:border-gray-200 lg:pl-6">
-                <div className="space-y-3">
-                  {(address?.address_line_1 || address?.address_line_2) && (
-                    <div className="flex items-start gap-2">
-                      <MapPin size={14} className="text-gray-400 mt-0.5 shrink-0" />
-                      <div className="text-sm text-gray-600">
-                        {address.address_line_1 && <div>{address.address_line_1}</div>}
-                        {address.address_line_2 && <div>{address.address_line_2}</div>}
-                        <div>
-                          {[address.city, address.district, address.state].filter(Boolean).join(', ')}
-                          {address.pincode && ` - ${address.pincode}`}
-                        </div>
-                        {address.country && <div>{address.country}</div>}
-                      </div>
-                    </div>
-                  )}
-
-                  {profile?.pan_number && (
-                    <div className="flex items-center gap-2">
-                      <IdCard size={14} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">PAN: {profile.pan_number}</span>
-                    </div>
-                  )}
-
-                  {profile?.email && profile.email !== user?.login_id && (
-                    <div className="flex items-center gap-2">
-                      <Mail size={14} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">Alt Email: {profile.email}</span>
-                    </div>
-                  )}
-
-                  {profile?.date_of_birth && (
-                    <div className="flex items-center gap-2">
-                      <Calendar size={14} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">DOB: {new Date(profile.date_of_birth).toLocaleDateString()}</span>
-                    </div>
-                  )}
-
-                  {profile?.gender && (
-                    <div className="flex items-center gap-2">
-                      <User size={14} className="text-gray-400" />
-                      <span className="text-sm text-gray-600">Gender: {profile.gender}</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -406,6 +396,7 @@ export default function UserProfile() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
               >
+                {/* Pass user and profile data to ProfileTab */}
                 <ProfileTab user={user} profile={profile} />
               </motion.div>
             )}
@@ -417,6 +408,7 @@ export default function UserProfile() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
               >
+                {/* BranchesTab will fetch its own data */}
                 <BranchesTab username={username} />
               </motion.div>
             )}
@@ -428,6 +420,7 @@ export default function UserProfile() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
               >
+                {/* SessionsTab will fetch its own data */}
                 <SessionsTab username={username} />
               </motion.div>
             )}
@@ -439,6 +432,7 @@ export default function UserProfile() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
               >
+                {/* ServicesTab will fetch its own data */}
                 <ServicesTab username={username} />
               </motion.div>
             )}

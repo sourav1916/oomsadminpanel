@@ -30,6 +30,7 @@ import ManagementTable from '../components/common/ManagementTable';
 import ManagementCard from '../components/common/ManagementCard';
 import ManagementHub from '../components/common/ManagementHub';
 import ModalScrollLock from "../components/common/ModalScrollLock";
+import { useNavigate } from 'react-router-dom';
 
 // ─── Constants & Helpers ─────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ const StatusBadge = ({ status }) => {
 
 // ─── Branch Avatar Component ─────────────────────────────────────────────────
 
-const BranchAvatar = ({ branch, name }) => {
+const BranchAvatar = ({ branch, name, onClick }) => {
   const getInitials = () => {
     if (!name) return 'B';
     return name.charAt(0).toUpperCase();
@@ -92,7 +93,8 @@ const BranchAvatar = ({ branch, name }) => {
       <img
         src={logo}
         alt={name}
-        className="object-cover w-10 h-10 rounded-xl"
+        className="object-cover w-10 h-10 rounded-xl cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={onClick}
         onError={(e) => {
           e.target.style.display = 'none';
           e.target.parentElement.innerHTML = getInitials();
@@ -102,7 +104,10 @@ const BranchAvatar = ({ branch, name }) => {
   }
 
   return (
-    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-semibold shrink-0">
+    <div 
+      className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-semibold shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+      onClick={onClick}
+    >
       {getInitials()}
     </div>
   );
@@ -124,7 +129,7 @@ const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
 
 // ─── Branch Card Component ───────────────────────────────────────────────────
 
-const BranchCard = ({ branch, index, onView }) => {
+const BranchCard = ({ branch, index, onView, onNavigateToBranch }) => {
   const hasTaxInfo = branch.tax_info?.pan || branch.tax_info?.gst;
 
   return (
@@ -132,9 +137,28 @@ const BranchCard = ({ branch, index, onView }) => {
       delay={index * 0.05}
       accent="purple"
       eyebrow={`Branch ID: ${branch.branch_id}`}
-      title={branch.name}
+      title={
+        <span 
+          className="cursor-pointer hover:text-purple-600 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNavigateToBranch(branch);
+          }}
+        >
+          {branch.name}
+        </span>
+      }
       subtitle={branch.owner?.login_id || 'No owner email'}
-      icon={<BranchAvatar branch={branch} name={branch.name} />}
+      icon={
+        <BranchAvatar 
+          branch={branch} 
+          name={branch.name} 
+          onClick={(e) => {
+            e.stopPropagation();
+            onNavigateToBranch(branch);
+          }}
+        />
+      }
       badge={<StatusBadge status={branch.status} />}
       onClick={() => onView(branch)}
       hoverable
@@ -144,6 +168,12 @@ const BranchCard = ({ branch, index, onView }) => {
           icon: <Eye size={12} />,
           onClick: () => onView(branch),
           className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50',
+        },
+        {
+          label: 'View Branch Profile',
+          icon: <Building size={12} />,
+          onClick: () => onNavigateToBranch(branch),
+          className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50',
         },
       ]}
       menuId={`branch-card-${branch.branch_id}`}
@@ -186,7 +216,7 @@ const BranchCard = ({ branch, index, onView }) => {
 
 // ─── View Branch Modal ───────────────────────────────────────────────────────
 
-const ViewBranchModal = ({ branch, onClose }) => {
+const ViewBranchModal = ({ branch, onClose, onNavigateToBranch }) => {
   const [showOwnerInfo, setShowOwnerInfo] = useState(false);
 
   return (
@@ -215,9 +245,24 @@ const ViewBranchModal = ({ branch, onClose }) => {
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           {/* Branch Header */}
           <div className="flex items-center gap-4 pb-4 border-b">
-            <BranchAvatar branch={branch} name={branch.name} />
+            <BranchAvatar 
+              branch={branch} 
+              name={branch.name} 
+              onClick={() => {
+                onNavigateToBranch(branch);
+                onClose();
+              }}
+            />
             <div>
-              <h3 className="text-xl font-bold text-gray-800">{branch.name}</h3>
+              <h3 
+                className="text-xl font-bold text-gray-800 cursor-pointer hover:text-purple-600 transition-colors"
+                onClick={() => {
+                  onNavigateToBranch(branch);
+                  onClose();
+                }}
+              >
+                {branch.name}
+              </h3>
               <p className="text-gray-600 flex items-center gap-2 mt-1">
                 <Building className="text-purple-500" size={14} />
                 Branch ID: {branch.branch_id}
@@ -235,7 +280,15 @@ const ViewBranchModal = ({ branch, onClose }) => {
               {branch.logo && (
                 <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
                   <p className="text-xs text-gray-500 mb-2">Logo</p>
-                  <img src={branch.logo} alt="Branch Logo" className="max-h-24 object-contain rounded-lg" />
+                  <img 
+                    src={branch.logo} 
+                    alt="Branch Logo" 
+                    className="max-h-24 object-contain rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => {
+                      onNavigateToBranch(branch);
+                      onClose();
+                    }}
+                  />
                 </div>
               )}
               {branch.sign && (
@@ -359,7 +412,17 @@ const ViewBranchModal = ({ branch, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 shrink-0">
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 shrink-0">
+          <button
+            onClick={() => {
+              onNavigateToBranch(branch);
+              onClose();
+            }}
+            className="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition-all flex items-center gap-2"
+          >
+            <Building size={16} />
+            View Full Branch Profile
+          </button>
           <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
             Close
           </button>
@@ -388,6 +451,12 @@ export default function BranchManagement() {
   const lastFetchParams = useRef({ page: 1, limit: 20, search: "" });
 
   const { pagination, updatePagination, goToPage, changeLimit } = usePagination(1, 20);
+  const navigate = useNavigate();
+
+  // Navigate to branch profile page
+  const handleNavigateToBranch = useCallback((branch) => {
+    navigate(`/branch/${branch.branch_id}`);
+  }, [navigate]);
 
   // Debounce search
   useEffect(() => {
@@ -533,9 +602,24 @@ export default function BranchManagement() {
       label: 'Branch',
       render: (branch) => (
         <div className="flex items-center gap-3">
-          <BranchAvatar branch={branch} name={branch.name} />
+          <BranchAvatar 
+            branch={branch} 
+            name={branch.name} 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigateToBranch(branch);
+            }}
+          />
           <div>
-            <p className="font-semibold text-gray-800 text-sm">{branch.name}</p>
+            <p 
+              className="font-semibold text-gray-800 text-sm cursor-pointer hover:text-purple-600 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNavigateToBranch(branch);
+              }}
+            >
+              {branch.name}
+            </p>
             <p className="text-xs text-gray-500">ID: {branch.branch_id}</p>
           </div>
         </div>
@@ -621,7 +705,7 @@ export default function BranchManagement() {
         </div>
       ),
     },
-  ], []);
+  ], [handleNavigateToBranch]);
 
   // Show loading skeleton only on initial load
   if (loading && branches.length === 0) {
@@ -635,7 +719,6 @@ export default function BranchManagement() {
       description="View and manage all registered branches from a single workspace."
       accent="purple"
       onRefresh={handleRefresh}
-      
     >
       <div className="space-y-6 p-2 lg:p-0">
 
@@ -734,6 +817,12 @@ export default function BranchManagement() {
                       onClick: () => handleViewBranch(branch),
                       className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50',
                     },
+                    {
+                      label: 'View Branch Profile',
+                      icon: <Building size={12} />,
+                      onClick: () => handleNavigateToBranch(branch),
+                      className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50',
+                    },
                   ]}
                   accent="purple"
                 />
@@ -749,6 +838,7 @@ export default function BranchManagement() {
                         branch={branch}
                         index={index}
                         onView={handleViewBranch}
+                        onNavigateToBranch={handleNavigateToBranch}
                       />
                     ))}
                   </AnimatePresence>
@@ -782,6 +872,7 @@ export default function BranchManagement() {
               setModalOpen(false);
               setSelectedBranch(null);
             }}
+            onNavigateToBranch={handleNavigateToBranch}
           />
         )}
       </AnimatePresence>
