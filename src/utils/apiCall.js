@@ -1,4 +1,4 @@
-const API_BASE = "https://api.ooms.in/admin";
+const API_BASE = `${(process.env.REACT_APP_API_BASE_URL || 'http://localhost:8877').replace(/\/$/, '')}/admin`;
 
 /**
  * Unified API calling utility
