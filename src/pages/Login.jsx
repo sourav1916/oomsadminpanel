@@ -86,11 +86,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-6xl w-full mx-4">
+      <div className="max-w-4xl w-full mx-4">
         <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Left Section - Welcome */}
 
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 md:p-12 text-white min-h-[600px] flex flex-col">
+          <div className="hidden md:flex bg-gradient-to-br from-blue-600 to-indigo-700 p-8 md:p-12 text-white min-h-[600px] flex-col">
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
@@ -98,13 +98,13 @@ const Login = () => {
                 </div>
                 <span className="text-xl font-bold">OomsAdmin</span>
               </div>
-              
+
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 Welcome to OomsAdmin
               </h1>
-              
+
               <p className="text-blue-100 text-base md:text-lg mb-8">
-                Streamline your admin management with our secure, modern platform. 
+                Streamline your admin management with our secure, modern platform.
                 Experience the future of admin panel control.
               </p>
             </div>
@@ -141,8 +141,8 @@ const Login = () => {
             </div>
 
             <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Admin Login
+              <h2 className="text-2xl font-bold  text-gray-900 mb-2">
+                OomsAdmin Login
               </h2>
               <p className="text-gray-600 text-sm">
                 Access your admin account securely

@@ -2,10 +2,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
+import { ToastContainer } from 'react-toastify'; // Add this for react-toastify
+import 'react-toastify/dist/ReactToastify.css'; // Add this for styles
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
-
+import UserProfile from './pages/UserProfile';
 import MainLayout from "./components/layout/MainLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -14,12 +16,28 @@ import Branches from "./pages/Branches";
 import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
+import BranchDetails from './pages/BranchDetails';
+import BranchServices from "./pages/BranchServices";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ToastProvider> {/* Add ToastProvider here */}
+        <ToastProvider>
+          {/* Add ToastContainer for react-toastify */}
+          <ToastContainer 
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+          
           <Routes>
             {/* Public Routes */}
             <Route
@@ -34,18 +52,14 @@ function App() {
             {/* Server Unreachable - Public Route */}
             <Route path="/server-error" element={<ServerUnreachable />} />
 
-            {/* Protected Routes with MainLayout */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            >
+            {/* Protected Routes with MainLayout - CORRECTED */}
+            <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="users" element={<Users />} />
+              <Route path="user/profile/:username" element={<UserProfile />} />
+              <Route path="branch/:branchId" element={<BranchDetails />} />
+              <Route path="/branch/:branchId/services" element={<BranchServices />} />
               <Route path="branches" element={<Branches />} />
               <Route path="services" element={<Services />} />
             </Route>

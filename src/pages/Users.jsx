@@ -20,7 +20,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { toast } from 'react-toastify';
-import apiCall from '../utils/apiCall'; 
+import apiCall from '../utils/apiCall';
 import Skeleton from "../components/SkeletonComponent";
 import Pagination, { usePagination } from "../components/common/PaginationComponent";
 import ManagementGrid from '../components/common/ManagementGrid';
@@ -29,6 +29,7 @@ import ManagementTable from '../components/common/ManagementTable';
 import ManagementCard from '../components/common/ManagementCard';
 import ManagementHub from '../components/common/ManagementHub';
 import ModalScrollLock from "../components/common/ModalScrollLock";
+import { useNavigate } from 'react-router-dom';
 
 // ─── Constants & Helpers ─────────────────────────────────────────────────────
 
@@ -78,7 +79,7 @@ const StatusBadge = ({ status }) => {
 
 // ─── Profile Avatar Component ───────────────────────────────────────
 
-const ProfileAvatar = ({ record, name, className, children }) => {
+const ProfileAvatar = ({ record, name, className, children, onClick }) => {
   const getInitials = () => {
     if (!name) return 'U';
     return name.charAt(0).toUpperCase();
@@ -91,7 +92,8 @@ const ProfileAvatar = ({ record, name, className, children }) => {
       <img
         src={profileImage}
         alt={name}
-        className={`object-cover ${className}`}
+        className={`object-cover cursor-pointer hover:opacity-80 transition-opacity ${className}`}
+        onClick={onClick}
         onError={(e) => {
           e.target.style.display = 'none';
           e.target.parentElement.innerHTML = getInitials();
@@ -101,7 +103,10 @@ const ProfileAvatar = ({ record, name, className, children }) => {
   }
 
   return (
-    <div className={className}>
+    <div 
+      className={`cursor-pointer hover:opacity-80 transition-opacity ${className}`}
+      onClick={onClick}
+    >
       {children || getInitials()}
     </div>
   );
@@ -123,7 +128,7 @@ const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
 
 // ─── User Card Component ─────────────────────────────────────────────────────
 
-const UserCard = ({ user, index, onView }) => {
+const UserCard = ({ user, index, onView, onNavigateToProfile }) => {
   const hasBranches = user.branches && user.branches.length > 0;
   const profileComplete = user.profile?.name || user.profile?.mobile;
 
@@ -132,13 +137,27 @@ const UserCard = ({ user, index, onView }) => {
       delay={index * 0.05}
       accent="blue"
       eyebrow={`Joined: ${formatDateSimple(user.create_date)}`}
-      title={user.profile?.name || user.username || 'Unknown User'}
+      title={
+        <span 
+          className="cursor-pointer hover:text-blue-600 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNavigateToProfile(user);
+          }}
+        >
+          {user.profile?.name || user.username || 'Unknown User'}
+        </span>
+      }
       subtitle={user.login_id}
       icon={
         <ProfileAvatar
           record={user}
           name={user.profile?.name || user.username}
           className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold shrink-0"
+          onClick={(e) => {
+            e.stopPropagation();
+            onNavigateToProfile(user);
+          }}
         >
           {(user.profile?.name?.charAt(0) || user.username?.charAt(0) || 'U').toUpperCase()}
         </ProfileAvatar>
@@ -152,6 +171,12 @@ const UserCard = ({ user, index, onView }) => {
           icon: <Eye size={12} />,
           onClick: () => onView(user),
           className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
+        },
+        {
+          label: 'View Profile',
+          icon: <User size={12} />,
+          onClick: () => onNavigateToProfile(user),
+          className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50',
         },
       ]}
       menuId={`user-card-${user.username}`}
@@ -194,7 +219,7 @@ const UserCard = ({ user, index, onView }) => {
 
 // ─── View User Modal ─────────────────────────────────────────────────────────
 
-const ViewUserModal = ({ user, onClose }) => {
+const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
   const [showBranches, setShowBranches] = useState(false);
   const hasBranches = user.branches && user.branches.length > 0;
 
@@ -227,12 +252,24 @@ const ViewUserModal = ({ user, onClose }) => {
             <ProfileAvatar
               record={user}
               name={user.profile?.name || user.username}
-              className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold"
+              className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => {
+                onNavigateToProfile(user);
+                onClose();
+              }}
             >
               {(user.profile?.name?.charAt(0) || user.username?.charAt(0) || 'U').toUpperCase()}
             </ProfileAvatar>
             <div>
-              <h3 className="text-xl font-bold text-gray-800">{user.profile?.name || user.username}</h3>
+              <h3 
+                className="text-xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={() => {
+                  onNavigateToProfile(user);
+                  onClose();
+                }}
+              >
+                {user.profile?.name || user.username}
+              </h3>
               <p className="text-gray-600 flex items-center gap-2 mt-1">
                 <Mail className="text-blue-500" size={14} />
                 {user.login_id}
@@ -330,7 +367,17 @@ const ViewUserModal = ({ user, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 shrink-0">
+        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 shrink-0">
+          <button
+            onClick={() => {
+              onNavigateToProfile(user);
+              onClose();
+            }}
+            className="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2"
+          >
+            <User size={16} />
+            View Full Profile
+          </button>
           <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
             Close
           </button>
@@ -360,6 +407,19 @@ export default function UserManagement() {
 
   const { pagination, updatePagination, goToPage, changeLimit } = usePagination(1, 20);
 
+  const navigate = useNavigate();
+
+  // Navigate to profile page
+  const handleNavigateToProfile = useCallback((user) => {
+    navigate(`/user/profile/${user.username}`);
+  }, [navigate]);
+
+  // Open modal with user details
+  const handleViewUserModal = useCallback((user) => {
+    setSelectedUser(user);
+    setModalOpen(true);
+  }, []);
+
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -369,7 +429,7 @@ export default function UserManagement() {
   }, [searchTerm]);
 
   // Fetch users function with duplicate prevention
-  const fetchUsers = useCallback(async (page = pagination.page, resetLoading = true) => {
+  const fetchUsers = useCallback(async (page, resetLoading = true) => {
     // Prevent multiple simultaneous requests
     if (fetchInProgress.current) {
       console.log("Fetch already in progress, skipping...");
@@ -382,7 +442,7 @@ export default function UserManagement() {
       limit: pagination.limit,
       search: debouncedSearchTerm
     };
-    
+
     if (
       lastFetchParams.current.page === currentParams.page &&
       lastFetchParams.current.limit === currentParams.limit &&
@@ -395,31 +455,31 @@ export default function UserManagement() {
 
     fetchInProgress.current = true;
     if (resetLoading) setLoading(true);
-    
+
     // Generate unique request ID
     const requestId = ++currentRequestId.current;
-    
+
     try {
-      const params = new URLSearchParams({ 
-        page_no: page.toString(), 
-        limit: pagination.limit.toString() 
+      const params = new URLSearchParams({
+        page_no: page.toString(),
+        limit: pagination.limit.toString()
       });
       if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
 
       console.log(`Fetching users with params:`, params.toString());
-      
+
       const response = await apiCall(`/user/list?${params.toString()}`, 'GET');
-      
+
       // Check if this request is still the latest
       if (requestId !== currentRequestId.current) {
         console.log("Stale request ignored");
         return;
       }
-      
+
       if (!response.ok) throw new Error('Failed to fetch users');
 
       const result = await response.json();
-      
+
       if (result.success) {
         setUsers(result.data || []);
         updatePagination({
@@ -430,7 +490,7 @@ export default function UserManagement() {
           has_more: result.pagination.has_more,
         });
         setError(null);
-        
+
         // Update last fetch params
         lastFetchParams.current = currentParams;
       } else {
@@ -446,7 +506,7 @@ export default function UserManagement() {
         fetchInProgress.current = false;
       }
     }
-  }, [pagination.limit, pagination.page, debouncedSearchTerm, updatePagination]);
+  }, [pagination.limit, debouncedSearchTerm, updatePagination]);
 
   // Initial load - runs only once on mount
   useEffect(() => {
@@ -465,11 +525,6 @@ export default function UserManagement() {
     }
   }, [pagination.page, pagination.limit, debouncedSearchTerm, fetchUsers]);
 
-  const handleViewUser = (user) => {
-    setSelectedUser(user);
-    setModalOpen(true);
-  };
-
   const handlePageChange = useCallback((newPage) => {
     if (newPage !== pagination.page && !fetchInProgress.current) {
       goToPage(newPage);
@@ -484,7 +539,7 @@ export default function UserManagement() {
         goToPage(1);
       }
     }
-  }, [pagination.limit, changeLimit, goToPage]);
+  }, [pagination.limit, pagination.page, changeLimit, goToPage]);
 
   const handleRefresh = useCallback(() => {
     if (!fetchInProgress.current) {
@@ -503,17 +558,29 @@ export default function UserManagement() {
       key: 'user',
       label: 'User',
       render: (user) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full">
           <ProfileAvatar
             record={user}
             name={user.profile?.name || user.username}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold"
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleNavigateToProfile(user);
+            }}
           >
             {(user.profile?.name?.charAt(0) || user.username?.charAt(0) || 'U').toUpperCase()}
           </ProfileAvatar>
-          <div>
-            <p className="font-semibold text-gray-800 text-sm">{user.profile?.name || user.username}</p>
-            <p className="text-xs text-gray-500">{user.login_id}</p>
+          <div className="min-w-0 flex-1">
+            <p 
+              className="truncate font-semibold text-gray-800 text-sm cursor-pointer hover:text-blue-600 transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNavigateToProfile(user);
+              }}
+            >
+              {user.profile?.name || user.username}
+            </p>
+            <p className="truncate text-xs text-gray-500">{user.login_id}</p>
           </div>
         </div>
       ),
@@ -576,7 +643,7 @@ export default function UserManagement() {
         </div>
       ),
     },
-  ], []);
+  ], [handleNavigateToProfile]);
 
   // Show loading skeleton only on initial load
   if (loading && users.length === 0) {
@@ -590,13 +657,8 @@ export default function UserManagement() {
       description="View and manage all registered users from a single workspace."
       accent="blue"
       onRefresh={handleRefresh}
-      summary={
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
-          Total: <span className="font-semibold text-slate-900">{pagination.total}</span> users
-        </div>
-      }
     >
-      <div className="space-y-6 p-2 lg:p-0">
+      <div className="space-y-3">
 
         {/* Filters Bar */}
         <motion.div
@@ -616,8 +678,8 @@ export default function UserManagement() {
                 className="w-full pl-11 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm min-h-[42px]"
               />
               {searchTerm && (
-                <button 
-                  onClick={() => setSearchTerm('')} 
+                <button
+                  onClick={() => setSearchTerm('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                 >
                   <X size={14} />
@@ -685,13 +747,19 @@ export default function UserManagement() {
                   rows={users}
                   columns={tableColumns}
                   rowKey={(row) => row.username}
-                  onRowClick={(row) => handleViewUser(row)}
+                  onRowClick={(row) => handleViewUserModal(row)}
                   getActions={(user) => [
                     {
                       label: 'View Details',
                       icon: <Eye size={12} />,
-                      onClick: () => handleViewUser(user),
+                      onClick: () => handleViewUserModal(user),
                       className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
+                    },
+                    {
+                      label: 'View Profile',
+                      icon: <User size={12} />,
+                      onClick: () => handleNavigateToProfile(user),
+                      className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50',
                     },
                   ]}
                   accent="blue"
@@ -707,7 +775,8 @@ export default function UserManagement() {
                         key={user.username}
                         user={user}
                         index={index}
-                        onView={handleViewUser}
+                        onView={handleViewUserModal}
+                        onNavigateToProfile={handleNavigateToProfile}
                       />
                     ))}
                   </AnimatePresence>
@@ -741,6 +810,7 @@ export default function UserManagement() {
               setModalOpen(false);
               setSelectedUser(null);
             }}
+            onNavigateToProfile={handleNavigateToProfile}
           />
         )}
       </AnimatePresence>

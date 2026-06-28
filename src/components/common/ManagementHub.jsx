@@ -56,7 +56,7 @@ export default function ManagementHub({
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-0.5 rounded-lg sm:m-1 border border-slate-200 bg-white/90 p-2.5 shadow-sm shadow-slate-200/40 backdrop-blur md:p-3"
+          className="mb-4 rounded-lg border border-slate-200 bg-white/90 p-2.5 shadow-sm shadow-slate-200/40 backdrop-blur md:p-3"
         >
           <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
@@ -73,19 +73,22 @@ export default function ManagementHub({
             </div>
 
             {(summary || actions || onRefresh) && (
-              <div className="flex flex-wrap items-center justify-end gap-1.5">
+              <div className="flex flex-wrap items-center justify-between w-full gap-1.5">
                 {summary}
-                {onRefresh && (
-                  <RefreshButton
-                    type="button"
-                    loading={refreshing}
-                    onClick={onRefresh}
-                    title={refreshTitle || refreshLabel}
-                  >
-                    {refreshLabel}
-                  </RefreshButton>
-                )}
-                {actions}
+                <div className="flex w-full items-center justify-end gap-1.5">
+                  {onRefresh && (
+                    <RefreshButton
+                      type="button"
+                      loading={refreshing}
+                      onClick={onRefresh}
+                      title={refreshTitle || refreshLabel}
+                    >
+                      {refreshLabel}
+                    </RefreshButton>
+                  )}
+                  {actions}
+                </div>
+                
               </div>
             )}
           </div>
