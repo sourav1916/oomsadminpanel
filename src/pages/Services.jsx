@@ -12,7 +12,6 @@ import {
   Layers,
   ShieldCheck,
   Briefcase,
-  Trash2,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
@@ -39,8 +38,6 @@ const FREQUENCY_OPTIONS = [
   { value: "yearly", label: "Yearly" },
 ];
 
-const EMPTY_FIELD = { label: "", is_required: false };
-
 const EMPTY_FORM = {
   service_id: "",
   name: "",
@@ -50,7 +47,6 @@ const EMPTY_FORM = {
   default_amount: "",
   remark: "",
   due_day: "10",
-  fields: [],
 };
 
 const modalVariants = {
@@ -72,28 +68,6 @@ const formatAmount = (value) => {
     currency: "INR",
     maximumFractionDigits: 2,
   }).format(amount);
-};
-
-const normalizeServiceFields = (fields) => {
-  if (!fields) return [];
-  if (Array.isArray(fields)) return fields;
-  if (typeof fields === "string") {
-    try {
-      const parsed = JSON.parse(fields);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-};
-
-const formatFieldsSummary = (fields) => {
-  const items = normalizeServiceFields(fields);
-  if (!items.length) return "—";
-  return items
-    .map((item) => `${item.label}${item.is_required ? " *" : ""}`)
-    .join(", ");
 };
 
 const TypeBadge = ({ type }) => {
@@ -221,22 +195,6 @@ const ViewServiceModal = ({ service, onClose }) => (
             <p className="mt-1 text-sm text-gray-700">{service.remark}</p>
           </div>
         )}
-
-        {service.type === "compliance" && normalizeServiceFields(service.fields).length > 0 && (
-          <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50 p-3">
-            <div className="text-xs font-semibold uppercase tracking-wider text-violet-700">Custom Fields</div>
-            <ul className="mt-2 space-y-1">
-              {normalizeServiceFields(service.fields).map((field, index) => (
-                <li key={`${field.label}-${index}`} className="flex items-center justify-between text-sm text-gray-700">
-                  <span>{field.label}</span>
-                  <span className={`text-xs font-semibold ${field.is_required ? "text-violet-700" : "text-gray-400"}`}>
-                    {field.is_required ? "Required" : "Optional"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
 
       <div className="flex shrink-0 items-center justify-end border-t border-slate-100 bg-slate-50 px-6 py-4">
@@ -256,70 +214,9 @@ const inputClass =
 
 const labelClass = "mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500";
 
-const ComplianceFieldsEditor = ({ fields, onFieldChange, onAddField, onRemoveField }) => (
-  <div className="rounded-xl border border-violet-100 bg-violet-50/50 p-4">
-    <div className="mb-3 flex items-center justify-between gap-3">
-      <div>
-        <div className={labelClass}>Custom Fields</div>
-        <p className="text-xs text-gray-500">Add labels for compliance data collection.</p>
-      </div>
-      <ManagementButton
-        type="button"
-        tone="violet"
-        variant="soft"
-        size="sm"
-        leftIcon={<Plus size={12} />}
-        onClick={onAddField}
-      >
-        Add Field
-      </ManagementButton>
-    </div>
-
-    <div className="space-y-3">
-      {fields.map((field, index) => (
-        <div key={`field-${index}`} className="grid grid-cols-1 gap-3 rounded-xl border border-violet-100 bg-white p-3 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-          <div>
-            <label className={labelClass}>Field Label</label>
-            <input
-              type="text"
-              value={field.label}
-              onChange={(e) => onFieldChange(index, "label", e.target.value)}
-              placeholder="e.g. GST User ID"
-              className={inputClass}
-            />
-          </div>
-          <label className="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={Boolean(field.is_required)}
-              onChange={(e) => onFieldChange(index, "is_required", e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-violet-600 focus:ring-violet-500"
-            />
-            Required
-          </label>
-          <ManagementButton
-            type="button"
-            tone="rose"
-            variant="outline"
-            size="sm"
-            leftIcon={<Trash2 size={12} />}
-            onClick={() => onRemoveField(index)}
-            disabled={fields.length === 1}
-          >
-            Remove
-          </ManagementButton>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
 const AddServiceModal = ({
   form,
   onChange,
-  onFieldChange,
-  onAddField,
-  onRemoveField,
   onClose,
   onSubmit,
   submitting,
@@ -453,13 +350,6 @@ const AddServiceModal = ({
                   className={inputClass}
                 />
               </div>
-
-              <ComplianceFieldsEditor
-                fields={form.fields}
-                onFieldChange={onFieldChange}
-                onAddField={onAddField}
-                onRemoveField={onRemoveField}
-              />
             </>
           )}
 
@@ -671,7 +561,6 @@ export default function Services() {
       ...EMPTY_FORM,
       type: defaultType,
       frequency: defaultType === "compliance" ? "monthly" : "",
-      fields: defaultType === "compliance" ? [{ ...EMPTY_FIELD }] : [],
     });
     setCreateModalOpen(true);
   };
@@ -682,50 +571,14 @@ export default function Services() {
 
       if (field === "type") {
         if (value === "compliance") {
-          next.fields = prev.fields?.length ? prev.fields : [{ ...EMPTY_FIELD }];
           next.frequency = prev.frequency || "monthly";
         } else {
-          next.fields = [];
           next.frequency = "";
         }
       }
 
       return next;
     });
-  };
-
-  const handleFieldChange = (index, key, value) => {
-    setCreateForm((prev) => ({
-      ...prev,
-      fields: prev.fields.map((field, i) =>
-        i === index ? { ...field, [key]: value } : field
-      ),
-    }));
-  };
-
-  const handleAddField = () => {
-    setCreateForm((prev) => ({
-      ...prev,
-      fields: [...(prev.fields || []), { ...EMPTY_FIELD }],
-    }));
-  };
-
-  const handleRemoveField = (index) => {
-    setCreateForm((prev) => ({
-      ...prev,
-      fields: prev.fields.filter((_, i) => i !== index),
-    }));
-  };
-
-  const buildComplianceFieldsPayload = (fields) => {
-    const normalized = (fields || [])
-      .map((field) => ({
-        label: String(field.label || "").trim(),
-        is_required: Boolean(field.is_required),
-      }))
-      .filter((field) => field.label);
-
-    return normalized.length ? normalized : null;
   };
 
   const handleCreateService = async (e) => {
@@ -760,7 +613,6 @@ export default function Services() {
       if (createForm.type === "compliance") {
         payload.frequency = createForm.frequency || "monthly";
         payload.due_day = Number(createForm.due_day) || 10;
-        payload.fields = buildComplianceFieldsPayload(createForm.fields);
       }
 
       const response = await apiCall("/service/create", "POST", payload);
@@ -904,15 +756,6 @@ export default function Services() {
         label: "Default Amount",
         render: (service) => (
           <span className="text-sm font-medium text-gray-800">{formatAmount(service.default_amount)}</span>
-        ),
-      },
-      {
-        key: "fields",
-        label: "Fields",
-        render: (service) => (
-          <span className="line-clamp-2 max-w-xs text-sm text-gray-600">
-            {service.type === "compliance" ? formatFieldsSummary(service.fields) : "—"}
-          </span>
         ),
       },
       {
@@ -1131,9 +974,6 @@ export default function Services() {
           <AddServiceModal
             form={createForm}
             onChange={handleCreateFormChange}
-            onFieldChange={handleFieldChange}
-            onAddField={handleAddField}
-            onRemoveField={handleRemoveField}
             onClose={() => {
               if (!creating) setCreateModalOpen(false);
             }}

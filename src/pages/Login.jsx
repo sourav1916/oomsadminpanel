@@ -4,21 +4,25 @@ import Button from "../components/common/Button";
 import apiCall from "../utils/apiCall";
 import { toast } from "react-toastify";
 
+const COUNTRY_CODE = "+91";
+
 const Login = () => {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
 
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const sendOtp = async (e) => {
-    e.preventDefault();
+  const normalizeMobile = (value) => String(value || "").replace(/\D/g, "").slice(-10);
 
-    if (!email || !password) {
-      toast.error("Please fill in all fields");
+  const sendOtp = async (e) => {
+    e?.preventDefault?.();
+
+    const normalizedMobile = normalizeMobile(mobile);
+    if (!/^\d{10}$/.test(normalizedMobile)) {
+      toast.error("Please enter a valid 10-digit mobile number");
       return;
     }
 
@@ -26,17 +30,17 @@ const Login = () => {
       setLoading(true);
 
       const response = await apiCall("/auth/login/send-otp", "POST", {
-        email,
-        password,
+        country_code: COUNTRY_CODE,
+        mobile: normalizedMobile,
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || !data.success) {
         throw new Error(data.message || "Failed to send OTP");
       }
 
-      toast.success(data.message || "OTP sent successfully");
+      toast.success(data.message || "OTP sent to your mobile number");
       setOtpSent(true);
     } catch (error) {
       console.error(error);
@@ -49,6 +53,12 @@ const Login = () => {
   const verifyLogin = async (e) => {
     e.preventDefault();
 
+    const normalizedMobile = normalizeMobile(mobile);
+    if (!/^\d{10}$/.test(normalizedMobile)) {
+      toast.error("Please enter a valid 10-digit mobile number");
+      return;
+    }
+
     if (!otp || otp.length !== 6) {
       toast.error("Please enter a valid 6-digit OTP");
       return;
@@ -58,8 +68,8 @@ const Login = () => {
       setLoading(true);
 
       const response = await apiCall("/auth/login", "POST", {
-        email,
-        password,
+        country_code: COUNTRY_CODE,
+        mobile: normalizedMobile,
         otp,
       });
 
@@ -69,9 +79,8 @@ const Login = () => {
         throw new Error(data.message || "Login failed");
       }
 
-      // Store in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username || email.split('@')[0]);
+      localStorage.setItem("username", data.username || normalizedMobile);
 
       toast.success(data.message || "Login successful");
 
@@ -88,8 +97,6 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-4xl w-full mx-4">
         <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Left Section - Welcome */}
-
           <div className="hidden md:flex bg-gradient-to-br from-blue-600 to-indigo-700 p-8 md:p-12 text-white min-h-[600px] flex-col">
             <div className="mb-8">
               <div className="flex items-center gap-2 mb-6">
@@ -104,14 +111,13 @@ const Login = () => {
               </h1>
 
               <p className="text-blue-100 text-base md:text-lg mb-8">
-                Streamline your admin management with our secure, modern platform.
-                Experience the future of admin panel control.
+                Sign in securely with a one-time code sent to your registered mobile number.
               </p>
             </div>
 
             <div className="space-y-3 mb-8">
               {[
-                "🔒 End-to-end encryption",
+                "🔒 OTP-based authentication",
                 "📡 Real-time updates",
                 "🔄 Multi-device sync",
                 "✨ Intuitive interface",
@@ -129,9 +135,7 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Right Section - Login Form */}
           <div className="p-8 md:p-12 min-h-[600px] flex flex-col">
-            {/* Icon at the top of form */}
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,34 +145,25 @@ const Login = () => {
             </div>
 
             <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold  text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 OomsAdmin Login
               </h2>
               <p className="text-gray-600 text-sm">
-                Access your admin account securely
+                Enter your mobile number to receive an OTP
               </p>
             </div>
 
             {!otpSent ? (
               <form onSubmit={sendOtp} className="flex-1">
-                <div className="mb-4">
-                  <input
-                    type="email"
-                    placeholder="Email address"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-
                 <div className="mb-6">
                   <input
-                    type="password"
-                    placeholder="Password"
+                    type="tel"
+                    placeholder="10-digit mobile number"
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    inputMode="numeric"
+                    maxLength={10}
                     required
                   />
                 </div>
@@ -205,7 +200,7 @@ const Login = () => {
                     autoFocus
                   />
                   <p className="text-xs text-gray-500 mt-2 text-center">
-                    Enter the 6-digit code sent to your email
+                    Enter the 6-digit code sent to +91 {normalizeMobile(mobile)}
                   </p>
                 </div>
 
@@ -231,8 +226,20 @@ const Login = () => {
                   type="button"
                   className="w-full mt-3 text-sm text-blue-600 hover:text-blue-700 transition-colors"
                   onClick={sendOtp}
+                  disabled={loading}
                 >
                   Resend OTP
+                </button>
+
+                <button
+                  type="button"
+                  className="w-full mt-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  onClick={() => {
+                    setOtpSent(false);
+                    setOtp("");
+                  }}
+                >
+                  Change mobile number
                 </button>
               </form>
             )}

@@ -33,25 +33,27 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const sendOtp = async (email, password) => {
+  const sendOtp = async (mobile, countryCode = "+91") => {
+    const normalizedMobile = String(mobile || "").replace(/\D/g, "").slice(-10);
     const response = await apiCall("/auth/login/send-otp", "POST", {
-      email,
-      password,
+      country_code: countryCode,
+      mobile: normalizedMobile,
     });
 
     const data = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok || !data.success) {
       throw new Error(data.message || "Failed to send OTP");
     }
 
     return data;
   };
 
-  const login = async (email, password, otp) => {
+  const login = async (mobile, otp, countryCode = "+91") => {
+    const normalizedMobile = String(mobile || "").replace(/\D/g, "").slice(-10);
     const response = await apiCall("/auth/login", "POST", {
-      email,
-      password,
+      country_code: countryCode,
+      mobile: normalizedMobile,
       otp,
     });
 
@@ -62,11 +64,10 @@ export const AuthProvider = ({ children }) => {
     }
 
     const userData = {
-      email,
-      username: data.username || email.split('@')[0],
+      mobile: normalizedMobile,
+      username: data.username || normalizedMobile,
     };
 
-    // Store in localStorage
     localStorage.setItem("token", data.token);
     localStorage.setItem("username", userData.username);
     localStorage.setItem("user", JSON.stringify(userData));
