@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
 import BranchDetails from './pages/BranchDetails';
 import BranchServices from "./pages/BranchServices";
+import CompanyMail from "./pages/CompanyMail";
 
 function App() {
   return (
@@ -62,6 +63,8 @@ function App() {
               <Route path="/branch/:branchId/services" element={<BranchServices />} />
               <Route path="branches" element={<Branches />} />
               <Route path="services" element={<Services />} />
+              <Route path="settings" element={<CompanyMail />} />
+              <Route path="settings/mail" element={<CompanyMail />} />
             </Route>
 
             {/* 404 Not Found Route */}

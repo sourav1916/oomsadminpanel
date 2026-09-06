@@ -43,8 +43,8 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
     },
     {
       icon: Settings,
-      label: 'Settings',
-      path: '/settings',
+      label: 'Company Mail',
+      path: '/settings/mail',
     },
   ];
 
