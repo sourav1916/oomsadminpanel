@@ -68,14 +68,14 @@ export default function ManagementTable({
   const visibleColumns = getResponsiveColumns();
   const densityClasses = compact ? 'px-3 py-3' : 'px-4 lg:px-6 py-4';
   const cardAccentMap = {
-    slate: 'border-slate-200 shadow-slate-200/50',
-    blue: 'border-blue-100 shadow-blue-100/50',
-    green: 'border-green-100 shadow-green-100/50',
-    emerald: 'border-emerald-100 shadow-emerald-100/50',
-    indigo: 'border-indigo-100 shadow-indigo-100/50',
-    violet: 'border-violet-100 shadow-violet-100/50',
-    amber: 'border-amber-100 shadow-amber-100/50',
-    rose: 'border-rose-100 shadow-rose-100/50',
+    slate: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    blue: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    green: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    emerald: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    indigo: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    violet: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    amber: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
+    rose: 'border-slate-200 shadow-slate-200/50 dark:border-slate-800 dark:shadow-none',
   };
   const cardClass = cardAccentMap[accent] || cardAccentMap.slate;
 
@@ -88,12 +88,12 @@ export default function ManagementTable({
       ref={containerRef}
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
-      className={joinClasses('overflow-hidden rounded-xl bg-white w-full', cardClass, containerClassName, className)}
+      className={joinClasses('overflow-hidden rounded-xl bg-white w-full dark:bg-slate-900', cardClass, containerClassName, className)}
     >
       <div className={joinClasses('w-full overflow-x-auto', tableClassName)}>
-        <table className="w-full text-left text-sm text-gray-700">
+        <table className="w-full text-left text-sm text-gray-700 dark:text-slate-300">
           {showHeader && (
-            <thead className={joinClasses('hidden sm:table-header-group bg-gradient-to-r from-gray-100 to-gray-200 text-xs uppercase text-gray-600', headerClassName)}>
+            <thead className={joinClasses('hidden sm:table-header-group bg-gradient-to-r from-gray-100 to-gray-200 text-xs uppercase text-gray-600 dark:from-slate-800 dark:to-slate-800 dark:text-slate-400', headerClassName)}>
               <tr>
                 {visibleColumns.map((column) => (
                   <th
@@ -112,7 +112,7 @@ export default function ManagementTable({
             </thead>
           )}
 
-          <tbody className={joinClasses('divide-y divide-gray-100', bodyClassName)}>
+          <tbody className={joinClasses('divide-y divide-gray-100 dark:divide-slate-800', bodyClassName)}>
             {rows.map((row, index) => {
               const key = resolveRowKey(row, rowKey, index);
               const rowActions = typeof getActions === 'function' ? getActions(row, index) : actions;
@@ -125,7 +125,7 @@ export default function ManagementTable({
                   onClick={onRowClick ? () => onRowClick(row, index) : undefined}
                   className={joinClasses(
                     'align-middle text-left transition-all duration-200',
-                    onRowClick && 'cursor-pointer hover:bg-slate-50',
+                    onRowClick && 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/70',
                     rowClassName
                   )}
                 >

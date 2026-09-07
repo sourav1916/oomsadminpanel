@@ -6,12 +6,12 @@ const toneClasses = {
   slate: {
     solid: 'bg-slate-700 text-white hover:bg-slate-800 shadow-slate-200',
     soft: 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100',
-    outline: 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50',
+    outline: 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-800',
   },
   blue: {
     solid: 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200',
     soft: 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
-    outline: 'bg-white text-blue-700 border-blue-200 hover:bg-blue-50',
+    outline: 'bg-white text-blue-700 border-blue-200 hover:bg-blue-50 dark:bg-slate-900 dark:text-blue-300 dark:border-blue-800 dark:hover:bg-slate-800',
   },
   green: {
     solid: 'bg-green-600 text-white hover:bg-green-700 shadow-green-200',

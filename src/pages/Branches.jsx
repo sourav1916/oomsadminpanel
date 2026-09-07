@@ -23,12 +23,9 @@ import {
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall'; 
-import Skeleton from "../components/SkeletonComponent";
+import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
 import Pagination, { usePagination } from "../components/common/PaginationComponent";
-import ManagementGrid from '../components/common/ManagementGrid';
-import ManagementViewSwitcher from '../components/common/ManagementViewSwitcher';
 import ManagementTable from '../components/common/ManagementTable';
-import ManagementCard from '../components/common/ManagementCard';
 import ManagementHub from '../components/common/ManagementHub';
 import ModalScrollLock from "../components/common/ModalScrollLock";
 import { useNavigate } from 'react-router-dom';
@@ -64,9 +61,9 @@ const formatDateSimple = (date) => {
 
 const getStatusBadge = (status) => {
   if (status) {
-    return { icon: CheckCircle, text: 'Active', className: 'bg-green-100 text-green-800 border border-green-200' };
+    return { icon: CheckCircle, text: 'Active', className: 'bg-green-100 text-green-800 border border-green-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' };
   }
-  return { icon: Ban, text: 'Inactive', className: 'bg-red-100 text-red-800 border border-red-200' };
+  return { icon: Ban, text: 'Inactive', className: 'bg-red-100 text-red-800 border border-red-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' };
 };
 
 const StatusBadge = ({ status }) => {
@@ -117,109 +114,16 @@ const BranchAvatar = ({ branch, name, onClick }) => {
 // ─── Info Item Component ─────────────────────────────────────────────────────
 
 const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
-  <div className={`flex items-start gap-2 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 px-3 py-2 ${className}`}>
-    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/80 border border-gray-200">
+  <div className={`flex items-start gap-2 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 px-3 py-2 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800 ${className}`}>
+    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/80 border border-gray-200 dark:border-slate-600 dark:bg-slate-900">
       <Icon size={14} />
     </div>
     <div className="min-w-0 flex-1">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 leading-none mb-1">{label}</div>
-      <div className="text-sm font-medium text-gray-800 leading-snug break-words">{value || 'N/A'}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 leading-none mb-1 dark:text-slate-400">{label}</div>
+      <div className="text-sm font-medium text-gray-800 leading-snug break-words dark:text-slate-100">{value || 'N/A'}</div>
     </div>
   </div>
 );
-
-// ─── Branch Card Component ───────────────────────────────────────────────────
-
-const BranchCard = ({ branch, index, onView, onNavigateToBranch, onNavigateToServices }) => {
-  const hasTaxInfo = branch.tax_info?.pan || branch.tax_info?.gst;
-
-  return (
-    <ManagementCard
-      delay={index * 0.05}
-      accent="purple"
-      eyebrow={`Branch ID: ${branch.branch_id}`}
-      title={
-        <span 
-          className="cursor-pointer hover:text-purple-600 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onNavigateToBranch(branch);
-          }}
-        >
-          {branch.name}
-        </span>
-      }
-      subtitle={branch.owner?.login_id || 'No owner email'}
-      icon={
-        <BranchAvatar 
-          branch={branch} 
-          name={branch.name} 
-          onClick={(e) => {
-            e.stopPropagation();
-            onNavigateToBranch(branch);
-          }}
-        />
-      }
-      badge={<StatusBadge status={branch.status} />}
-      onClick={() => onView(branch)}
-      hoverable
-      actions={[
-        {
-          label: 'View Details',
-          icon: <Eye size={12} />,
-          onClick: () => onView(branch),
-          className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50',
-        },
-        {
-          label: 'View Branch Profile',
-          icon: <Building size={12} />,
-          onClick: () => onNavigateToBranch(branch),
-          className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50',
-        },
-        {
-          label: 'Services',
-          icon: <Settings size={12} />,
-          onClick: () => onNavigateToServices(branch),
-          className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
-        },
-      ]}
-      menuId={`branch-card-${branch.branch_id}`}
-      footer={
-        <div className="flex items-center justify-between w-full text-xs text-gray-500">
-          <span className="flex items-center gap-1">
-            <CreditCard size={10} className="text-green-400" />
-            {branch.tax_info?.gst ? 'GST Registered' : 'No GST'}
-          </span>
-          <span className="flex items-center gap-1">
-            <User size={10} className="text-blue-400" />
-            {branch.owner?.name || 'No Owner Name'}
-          </span>
-        </div>
-      }
-    >
-      <div className="space-y-2 mt-1">
-        <div className="flex flex-wrap gap-1.5">
-          {branch.contact?.mobile_1 && (
-            <span className="text-[11px] font-semibold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Phone size={8} /> {branch.contact.mobile_1}
-            </span>
-          )}
-          {hasTaxInfo && (
-            <span className="text-[11px] font-semibold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
-              Tax Info Available
-            </span>
-          )}
-        </div>
-        {branch.address?.city && (
-          <p className="text-xs text-gray-500 flex items-center gap-1.5">
-            <MapPin size={10} className="text-gray-400 shrink-0" />
-            <span className="truncate">{branch.address.city}, {branch.address.state || ''}</span>
-          </p>
-        )}
-      </div>
-    </ManagementCard>
-  );
-};
 
 // ─── View Branch Modal ───────────────────────────────────────────────────────
 
@@ -235,15 +139,15 @@ const ViewBranchModal = ({ branch, onClose, onNavigateToBranch, onNavigateToServ
       <ModalScrollLock />
       <motion.div
         variants={modalVariants} initial="hidden" animate="visible" exit="exit"
-        className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden m-auto"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden m-auto dark:bg-slate-900 dark:border dark:border-slate-800"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="shrink-0 flex justify-between items-center p-5 border-b bg-white rounded-t-xl">
-          <h2 className="text-lg font-bold flex items-center gap-2 text-slate-800">
+        <div className="shrink-0 flex justify-between items-center p-5 border-b bg-white rounded-t-xl dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">
             <Building className="text-purple-500" size={20} /> Branch Details
           </h2>
-          <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-all shadow-sm hover:shadow-md bg-white/50 border border-slate-100">
+          <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-all shadow-sm hover:shadow-md bg-white/50 border border-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
             <X size={18} />
           </button>
         </div>
@@ -400,7 +304,7 @@ const ViewBranchModal = ({ branch, onClose, onNavigateToBranch, onNavigateToServ
           )}
 
           {/* Metadata */}
-          <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+          <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs text-gray-500">Created By</p>
@@ -442,7 +346,7 @@ const ViewBranchModal = ({ branch, onClose, onNavigateToBranch, onNavigateToServ
               Manage Services
             </button>
           </div>
-          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all">
+          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
             Close
           </button>
         </div>
@@ -461,7 +365,6 @@ export default function BranchManagement() {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState("table");
 
   // Refs to prevent duplicate API calls
   const fetchInProgress = useRef(false);
@@ -733,15 +636,24 @@ export default function BranchManagement() {
 
   // Show loading skeleton only on initial load
   if (loading && branches.length === 0) {
-    return <Skeleton />;
+    return (
+      <ManagementHub
+        eyebrow="Directory"
+        title="Branches"
+        description="Tenant offices, owners, and subscription status."
+        accent="slate"
+      >
+        <ListPageSkeleton columns={5} />
+      </ManagementHub>
+    );
   }
 
   return (
     <ManagementHub
-      eyebrow={<><Building size={11} /> Branches</>}
-      title="Branch Management"
-      description="View and manage all registered branches from a single workspace."
-      accent="purple"
+      eyebrow="Directory"
+      title="Branches"
+      description="Tenant offices, owners, and subscription status."
+      accent="slate"
       onRefresh={handleRefresh}
     >
       <div className="space-y-3">
@@ -751,7 +663,7 @@ export default function BranchManagement() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm"
+          className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"
         >
           <div className="flex items-center gap-4 flex-1">
             <div className="relative flex-1 w-full">
@@ -761,7 +673,7 @@ export default function BranchManagement() {
                 placeholder="Search by branch name, branch ID, owner name, email, or mobile..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all text-sm min-h-[42px]"
+                className="w-full pl-11 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all text-sm min-h-[42px] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
               />
               {searchTerm && (
                 <button 
@@ -781,22 +693,14 @@ export default function BranchManagement() {
               </p>
             )}
           </div>
-
-          <div className="flex w-full lg:w-auto justify-end">
-            <ManagementViewSwitcher viewMode={viewMode} onChange={setViewMode} accent="purple" />
-          </div>
         </motion.div>
 
-        {/* Loading indicator for subsequent loads */}
         {loading && branches.length > 0 && (
-          <div className="flex justify-center py-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          </div>
+          <TableSkeleton columns={5} rows={6} />
         )}
 
-        {/* Error state */}
         {error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 bg-white rounded-xl shadow-xl">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900">
             <X className="text-6xl text-red-400 mx-auto mb-4" size={48} />
             <p className="text-xl text-gray-600">Error loading branches</p>
             <p className="text-gray-400 mt-2">{error}</p>
@@ -811,7 +715,7 @@ export default function BranchManagement() {
 
         {/* Empty state */}
         {!loading && !error && branches.length === 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16 bg-white rounded-xl shadow-xl">
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900">
             <Building className="text-8xl text-gray-300 mx-auto mb-4" size={64} />
             <p className="text-xl text-gray-500">No branches found</p>
             <p className="text-gray-400 mt-2">{searchTerm ? 'Try adjusting your search' : 'No branches registered yet'}</p>
@@ -825,11 +729,9 @@ export default function BranchManagement() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-xl bg-white shadow-xl"
+              className="rounded-xl bg-white shadow-xl dark:bg-slate-900"
             >
-              {/* Table View */}
-              {viewMode === 'table' && (
-                <ManagementTable
+              <ManagementTable
                   rows={branches}
                   columns={tableColumns}
                   rowKey={(row) => row.branch_id}
@@ -839,42 +741,23 @@ export default function BranchManagement() {
                       label: 'View Details',
                       icon: <Eye size={12} />,
                       onClick: () => handleViewBranch(branch),
-                      className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50',
+                      className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/40',
                     },
                     {
                       label: 'View Branch Profile',
                       icon: <Building size={12} />,
                       onClick: () => handleNavigateToBranch(branch),
-                      className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50',
+                      className: 'text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/40',
                     },
                     {
                       label: 'Services',
                       icon: <Settings size={12} />,
                       onClick: () => handleNavigateToServices(branch),
-                      className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50',
+                      className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/40',
                     },
                   ]}
-                  accent="purple"
+                  accent="slate"
                 />
-              )}
-
-              {/* Card View */}
-              {viewMode === 'card' && (
-                <ManagementGrid viewMode={viewMode} className="p-3 sm:p-4">
-                  <AnimatePresence>
-                    {branches.map((branch, index) => (
-                      <BranchCard
-                        key={branch.branch_id}
-                        branch={branch}
-                        index={index}
-                        onView={handleViewBranch}
-                        onNavigateToBranch={handleNavigateToBranch}
-                        onNavigateToServices={handleNavigateToServices}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </ManagementGrid>
-              )}
             </motion.div>
 
             {/* Pagination */}
@@ -885,7 +768,7 @@ export default function BranchManagement() {
                   totalItems={pagination.total}
                   itemsPerPage={pagination.limit}
                   onPageChange={handlePageChange}
-                  showInfo={viewMode !== 'card'}
+                  showInfo
                   onLimitChange={handleLimitChange}
                 />
               </motion.div>

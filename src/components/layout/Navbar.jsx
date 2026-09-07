@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Menu, 
-  X, 
-  User, 
-  ChevronDown, 
-  Settings, 
+import {
+  Menu,
+  X,
+  User,
+  ChevronDown,
+  Settings,
   LogOut,
+  Shield,
+  Sun,
+  Moon,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const Navbar = ({
   toggleSidebar,
@@ -17,124 +22,119 @@ const Navbar = ({
 }) => {
   const [openDropdown, setOpenDropdown] = useState(false);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
+  const handleLogout = async () => {
+    setOpenDropdown(false);
+    try {
+      await logout();
+    } catch {
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('user');
+    }
     navigate('/login');
   };
 
   const isSidebarOpen = isMobile ? sidebarOpen : isDesktopSidebarExpanded;
+  const displayName = user?.username || localStorage.getItem('username') || 'Admin';
+  const initial = String(displayName).charAt(0).toUpperCase();
 
   return (
-    <>
-      <nav className="sticky top-0 z-40 h-16 bg-white shadow-md border-b border-gray-200">
-        <div className="px-4 h-full">
-          <div className="flex items-center justify-between h-full">
+    <nav className="sticky top-0 z-40 h-14 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+      <div className="flex h-full items-center justify-between px-3 sm:px-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleSidebar}
+            className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            aria-label="Toggle menu"
+          >
+            {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
 
-            {/* Left section */}
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={toggleSidebar}
-                className={`w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 focus:outline-none flex-shrink-0
-                  ${isSidebarOpen ? 'text-gray-600' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
-                aria-label="Toggle menu"
-              >
-                {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2 rounded-lg transition-opacity duration-200 hover:opacity-90 focus:outline-none"
-              >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
-                  <span className="text-white font-bold text-sm">OA</span>
-                </div>
-                <div>
-                  <span className="text-xl font-bold text-gray-800 tracking-tight">
-                    Ooms<span className="font-light text-gray-600">Admin</span>
-                  </span>
-                </div>
-              </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2.5 rounded-md focus:outline-none"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sky-500 text-white shadow-sm">
+              <Shield className="h-4 w-4" />
             </div>
-
-            {/* Right section - User Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setOpenDropdown(!openDropdown)}
-                className="flex items-center space-x-3 p-1.5 pr-3 rounded-lg hover:bg-gray-100 transition-all duration-200 group"
-              >
-                {/* Avatar */}
-                <div className="relative">
-                  <div className="w-9 h-9 rounded-lg overflow-hidden flex items-center justify-center shadow-md bg-gradient-to-br from-blue-500 to-indigo-600">
-                    <span className="text-white font-bold text-sm">A</span>
-                  </div>
-                  {/* Online dot */}
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white rounded-full"></div>
-                </div>
-
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-semibold text-gray-800">
-                    Admin User
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Administrator
-                  </p>
-                </div>
-
-                <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors hidden md:block" />
-              </button>
-
-              {/* Dropdown Menu */}
-              {openDropdown && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setOpenDropdown(false)} />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
-                    {/* Mobile user info */}
-                    <div className="md:hidden p-4 border-b border-gray-200 bg-gray-50 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                        <span className="text-white font-bold">A</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-800">Admin User</p>
-                        <p className="text-xs text-gray-500">Administrator</p>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => { setOpenDropdown(false); navigate('/profile'); }}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
-                    >
-                      <User className="w-4 h-4 text-gray-500" />
-                      My Profile
-                    </button>
-
-                    <button
-                      onClick={() => { setOpenDropdown(false); navigate('/settings'); }}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-3"
-                    >
-                      <Settings className="w-4 h-4 text-gray-500" />
-                      Settings
-                    </button>
-
-                    <div className="border-t border-gray-200 my-1"></div>
-
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-3"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Logout
-                    </button>
-                  </div>
-                </>
-              )}
+            <div className="text-left leading-tight">
+              <p className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+                OOMS <span className="font-normal text-slate-500 dark:text-slate-400">Admin</span>
+              </p>
+              <p className="hidden text-[10px] uppercase tracking-[0.14em] text-slate-400 sm:block">
+                Control panel
+              </p>
             </div>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            aria-label="Toggle theme"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+
+          <div className="relative">
+            <button
+              onClick={() => setOpenDropdown(!openDropdown)}
+              className="flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-sky-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-sky-300 dark:ring-slate-700">
+                {initial}
+              </div>
+              <div className="hidden text-left md:block">
+                <p className="max-w-[10rem] truncate text-xs font-semibold text-slate-800 dark:text-slate-100">{displayName}</p>
+                <p className="text-[10px] uppercase tracking-wide text-slate-400">Administrator</p>
+              </div>
+              <ChevronDown className="hidden h-3.5 w-3.5 text-slate-400 md:block" />
+            </button>
+
+            {openDropdown && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setOpenDropdown(false)} />
+                <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                  <div className="border-b border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/60">
+                    <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</p>
+                    <p className="text-xs text-slate-500">Platform administrator</p>
+                  </div>
+                  <button
+                    onClick={() => { setOpenDropdown(false); navigate('/profile'); }}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    <User className="h-4 w-4 text-slate-400" />
+                    My Profile
+                  </button>
+                  <button
+                    onClick={() => { setOpenDropdown(false); navigate('/settings'); }}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                  >
+                    <Settings className="h-4 w-4 text-slate-400" />
+                    Settings
+                  </button>
+                  <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
 

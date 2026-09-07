@@ -4,8 +4,6 @@ import {
   Search,
   X,
   ConciergeBell,
-  IndianRupee,
-  Calendar,
   Eye,
   Plus,
   Pencil,
@@ -15,12 +13,9 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
-import Skeleton from "../components/SkeletonComponent";
+import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
 import Pagination, { usePagination } from "../components/common/PaginationComponent";
-import ManagementGrid from "../components/common/ManagementGrid";
-import ManagementViewSwitcher from "../components/common/ManagementViewSwitcher";
 import ManagementTable from "../components/common/ManagementTable";
-import ManagementCard from "../components/common/ManagementCard";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
 import ModalScrollLock from "../components/common/ModalScrollLock";
@@ -76,57 +71,14 @@ const TypeBadge = ({ type }) => {
     <span
       className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${
         isCompliance
-          ? "border-violet-200 bg-violet-100 text-violet-800"
-          : "border-blue-200 bg-blue-100 text-blue-800"
+          ? "border-violet-200 bg-violet-100 text-violet-800 dark:border-violet-800 dark:bg-violet-900/40 dark:text-violet-300"
+          : "border-blue-200 bg-blue-100 text-blue-800 dark:border-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
       }`}
     >
       {isCompliance ? "Compliance" : "General"}
     </span>
   );
 };
-
-const ServiceCard = ({ service, index, onView }) => (
-  <ManagementCard
-    delay={index * 0.05}
-    accent="emerald"
-    eyebrow={service.service_id}
-    title={service.name || "Unnamed Service"}
-    subtitle={service.sac_code ? `SAC: ${service.sac_code}` : "No SAC code"}
-    icon={
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-        <ConciergeBell size={18} />
-      </div>
-    }
-    badge={<TypeBadge type={service.type} />}
-    onClick={() => onView(service)}
-    hoverable
-    actions={[
-      {
-        label: "View Details",
-        icon: <Eye size={12} />,
-        onClick: () => onView(service),
-        className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700",
-      },
-    ]}
-    menuId={`service-card-${service.service_id}`}
-    footer={
-      <div className="flex w-full items-center justify-between text-xs text-gray-500">
-        <span className="flex items-center gap-1">
-          <IndianRupee size={10} className="text-emerald-500" />
-          {formatAmount(service.default_amount)}
-        </span>
-        <span className="flex items-center gap-1 capitalize">
-          <Calendar size={10} className="text-gray-400" />
-          {service.frequency || "monthly"}
-        </span>
-      </div>
-    }
-  >
-    {service.remark && (
-      <p className="mt-1 line-clamp-2 text-xs text-gray-500">{service.remark}</p>
-    )}
-  </ManagementCard>
-);
 
 const ViewServiceModal = ({ service, onClose }) => (
   <motion.div
@@ -143,17 +95,17 @@ const ViewServiceModal = ({ service, onClose }) => (
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="m-auto flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
+      className="m-auto flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-slate-900 dark:border dark:border-slate-800"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex shrink-0 items-center justify-between border-b p-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800 dark:text-white">
           <ConciergeBell className="text-emerald-500" size={20} />
           Service Details
         </h2>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
         >
           <X size={18} />
         </button>
@@ -162,45 +114,45 @@ const ViewServiceModal = ({ service, onClose }) => (
       <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
         <div className="flex items-start justify-between gap-4 border-b pb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-800">{service.name}</h3>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white">{service.name}</h3>
             <p className="mt-1 text-sm text-gray-500">{service.service_id}</p>
           </div>
           <TypeBadge type={service.type} />
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">SAC Code</div>
             <div className="mt-1 text-sm font-medium text-gray-800">{service.sac_code || "N/A"}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Default Amount</div>
             <div className="mt-1 text-sm font-medium text-gray-800">{formatAmount(service.default_amount)}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Frequency</div>
             <div className="mt-1 text-sm font-medium capitalize text-gray-800">
               {service.type === "general" && !service.frequency ? "N/A" : service.frequency || "monthly"}
             </div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
             <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Due Day</div>
             <div className="mt-1 text-sm font-medium text-gray-800">{service.due_day ?? "N/A"}</div>
           </div>
         </div>
 
         {service.remark && (
-          <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-3">
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
             <div className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Remark</div>
             <p className="mt-1 text-sm text-gray-700">{service.remark}</p>
           </div>
         )}
       </div>
 
-      <div className="flex shrink-0 items-center justify-end border-t border-slate-100 bg-slate-50 px-6 py-4">
+      <div className="flex shrink-0 items-center justify-end border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/60">
         <button
           onClick={onClose}
-          className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50"
+          className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
         >
           Close
         </button>
@@ -210,7 +162,7 @@ const ViewServiceModal = ({ service, onClose }) => (
 );
 
 const inputClass =
-  "w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10";
+  "w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
 
 const labelClass = "mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500";
 
@@ -235,17 +187,17 @@ const AddServiceModal = ({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="m-auto flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
+      className="m-auto flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-slate-900 dark:border dark:border-slate-800"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex shrink-0 items-center justify-between border-b p-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800 dark:text-white">
           <Plus className="text-emerald-500" size={20} />
           Add Service
         </h2>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
         >
           <X size={18} />
         </button>
@@ -398,17 +350,17 @@ const EditServiceModal = ({ service, name, sacCode, onNameChange, onSacCodeChang
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="m-auto w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl"
+      className="m-auto w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-slate-900 dark:border dark:border-slate-800"
       onClick={(e) => e.stopPropagation()}
     >
       <div className="flex items-center justify-between border-b p-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800 dark:text-white">
           <Pencil className="text-emerald-500" size={20} />
           Edit Service
         </h2>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
         >
           <X size={18} />
         </button>
@@ -471,7 +423,6 @@ export default function Services() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
-  const [viewMode, setViewMode] = useState("table");
 
   const fetchInProgress = useRef(false);
   const initialFetchDone = useRef(false);
@@ -770,19 +721,27 @@ export default function Services() {
   );
 
   if (loading && services.length === 0) {
-    return <Skeleton />;
+    return (
+      <ManagementHub
+        eyebrow="Directory"
+        title="Services"
+        description="Global catalog of general and compliance services available to branches."
+        accent="slate"
+        tabs={TYPE_TABS}
+        activeTab={typeFilter}
+        onTabChange={handleTypeFilterChange}
+      >
+        <ListPageSkeleton columns={6} />
+      </ManagementHub>
+    );
   }
 
   return (
     <ManagementHub
-      eyebrow={
-        <>
-          <ConciergeBell size={11} /> Services
-        </>
-      }
-      title="Service Management"
-      description="View all global services available across branches."
-      accent="emerald"
+      eyebrow="Directory"
+      title="Services"
+      description="Global catalog of general and compliance services available to branches."
+      accent="slate"
       onRefresh={handleRefresh}
       tabs={TYPE_TABS}
       activeTab={typeFilter}
@@ -797,8 +756,8 @@ export default function Services() {
         </ManagementButton>
       }
       summary={
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm">
-          Total: <span className="font-semibold text-slate-900">{pagination.total}</span> services
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+          Total: <span className="font-semibold text-slate-900 dark:text-white">{pagination.total}</span> services
         </div>
       }
     >
@@ -807,7 +766,7 @@ export default function Services() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col justify-between gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm lg:flex-row lg:items-center"
+          className="flex flex-col justify-between gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm lg:flex-row lg:items-center dark:border-slate-800 dark:bg-slate-900"
         >
           <div className="relative flex flex-1 items-center gap-4">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
@@ -816,7 +775,7 @@ export default function Services() {
               placeholder="Search by name, ID, SAC code, type..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="min-h-[42px] w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-11 pr-10 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10"
+              className="min-h-[42px] w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-11 pr-10 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             />
             {searchTerm && (
               <button
@@ -827,23 +786,17 @@ export default function Services() {
               </button>
             )}
           </div>
-
-          <div className="flex w-full justify-end lg:w-auto">
-            <ManagementViewSwitcher viewMode={viewMode} onChange={setViewMode} accent="emerald" />
-          </div>
         </motion.div>
 
         {loading && services.length > 0 && (
-          <div className="flex justify-center py-4">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-600" />
-          </div>
+          <TableSkeleton columns={6} rows={6} />
         )}
 
         {error && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-xl bg-white py-16 text-center shadow-xl"
+            className="rounded-xl bg-white py-16 text-center shadow-xl dark:bg-slate-900"
           >
             <X className="mx-auto mb-4 text-red-400" size={48} />
             <p className="text-xl text-gray-600">Error loading services</p>
@@ -861,7 +814,7 @@ export default function Services() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-xl bg-white py-16 text-center shadow-xl"
+            className="rounded-xl bg-white py-16 text-center shadow-xl dark:bg-slate-900"
           >
             <ConciergeBell className="mx-auto mb-4 text-gray-300" size={64} />
             <p className="text-xl text-gray-500">No services found</p>
@@ -889,10 +842,9 @@ export default function Services() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-xl bg-white shadow-xl"
+              className="rounded-xl bg-white shadow-xl dark:bg-slate-900"
             >
-              {viewMode === "table" && (
-                <ManagementTable
+              <ManagementTable
                   rows={services}
                   columns={tableColumns}
                   rowKey={(row) => row.service_id}
@@ -902,33 +854,17 @@ export default function Services() {
                       label: "View Details",
                       icon: <Eye size={12} />,
                       onClick: () => handleViewService(service),
-                      className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700",
+                      className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40",
                     },
                     {
                       label: "Edit",
                       icon: <Pencil size={12} />,
                       onClick: () => handleEditService(service),
-                      className: "text-blue-600 hover:bg-blue-50 hover:text-blue-700",
+                      className: "text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950/40",
                     },
                   ]}
-                  accent="emerald"
+                  accent="slate"
                 />
-              )}
-
-              {viewMode === "card" && (
-                <ManagementGrid viewMode={viewMode} className="p-3 sm:p-4">
-                  <AnimatePresence>
-                    {services.map((service, index) => (
-                      <ServiceCard
-                        key={service.service_id}
-                        service={service}
-                        index={index}
-                        onView={handleViewService}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </ManagementGrid>
-              )}
             </motion.div>
 
             <motion.div
@@ -942,7 +878,7 @@ export default function Services() {
                 totalItems={pagination.total}
                 itemsPerPage={pagination.limit}
                 onPageChange={handlePageChange}
-                showInfo={viewMode !== "card"}
+                showInfo
                 onLimitChange={handleLimitChange}
               />
             </motion.div>

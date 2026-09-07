@@ -65,7 +65,7 @@ const MainLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
       <Navbar
         toggleSidebar={toggleSidebar}
         isMobile={isMobile}
@@ -86,9 +86,9 @@ const MainLayout = ({ children }) => {
 
         {isMobile && sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-20 transition-opacity duration-300"
+            className="fixed inset-0 z-20 bg-slate-950/60 backdrop-blur-[2px] transition-opacity duration-300"
             onClick={handleOverlayClick}
-            style={{ top: '64px' }}
+            style={{ top: '56px' }}
           />
         )}
 
@@ -96,7 +96,7 @@ const MainLayout = ({ children }) => {
           className={`
             flex-1 transition-all duration-300 ease-out
             ${getContentMargin()}
-            min-h-[calc(100vh-64px)]
+            min-h-[calc(100vh-3.5rem)]
             overflow-x-hidden
           `}
           style={{
@@ -105,11 +105,11 @@ const MainLayout = ({ children }) => {
             maxWidth: isMobile ? '100%' : `calc(100vw - ${desktopSidebarCollapsed ? '64px' : '256px'})`,
           }}
         >
-          <div className="w-full max-w-8xl p-2">
+          <div className="w-full max-w-[1600px] p-3 sm:p-4">
             {children || <Outlet />}
           </div>
         </main>
-      </div> 
+      </div>
     </div>
   );
 };

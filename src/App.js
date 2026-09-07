@@ -1,46 +1,54 @@
-// src/App.js
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { ToastProvider } from "./contexts/ToastContext";
-import { ToastContainer } from 'react-toastify'; // Add this for react-toastify
-import 'react-toastify/dist/ReactToastify.css'; // Add this for styles
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
-import UserProfile from './pages/UserProfile';
 import MainLayout from "./components/layout/MainLayout";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
+import UserProfile from "./pages/UserProfile";
 import Branches from "./pages/Branches";
+import BranchDetails from "./pages/BranchDetails";
+import BranchServices from "./pages/BranchServices";
 import Services from "./pages/Services";
+import Settings from "./pages/Settings";
+import CompanyMail from "./pages/CompanyMail";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
-import BranchDetails from './pages/BranchDetails';
-import BranchServices from "./pages/BranchServices";
-import CompanyMail from "./pages/CompanyMail";
+
+function ThemedToasts() {
+  const { isDark } = useTheme();
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={4000}
+      hideProgressBar={false}
+      newestOnTop
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme={isDark ? "dark" : "light"}
+    />
+  );
+}
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          {/* Add ToastContainer for react-toastify */}
-          <ToastContainer 
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
-          
-          <Routes>
-            {/* Public Routes */}
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ToastProvider>
+            <ThemedToasts />
+
+            <Routes>
             <Route
               path="/login"
               element={
@@ -49,33 +57,32 @@ function App() {
                 </PublicRoute>
               }
             />
-
-            {/* Server Unreachable - Public Route */}
             <Route path="/server-error" element={<ServerUnreachable />} />
 
-            {/* Protected Routes with MainLayout - CORRECTED */}
             <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
-              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="dashboard" element={<Navigate to="/" replace />} />
+
               <Route path="users" element={<Users />} />
               <Route path="user/profile/:username" element={<UserProfile />} />
-              <Route path="branch/:branchId" element={<BranchDetails />} />
-              <Route path="/branch/:branchId/services" element={<BranchServices />} />
-              <Route path="branches" element={<Branches />} />
-              <Route path="services" element={<Services />} />
-              <Route path="settings" element={<CompanyMail />} />
-              <Route path="settings/mail" element={<CompanyMail />} />
-            </Route>
 
-            {/* 404 Not Found Route */}
-            <Route path="/404" element={<NotFound />} />
-            
-            {/* Catch all route - redirect to 404 */}
-            <Route path="*" element={<Navigate to="/404" replace />} />
+              <Route path="branches" element={<Branches />} />
+              <Route path="branch/:branchId" element={<BranchDetails />} />
+              <Route path="branch/:branchId/services" element={<BranchServices />} />
+
+              <Route path="services" element={<Services />} />
+
+              <Route path="settings" element={<Settings />} />
+              <Route path="settings/mail" element={<CompanyMail />} />
+              <Route path="profile" element={<Profile />} />
+
+              <Route path="*" element={<NotFound />} />
+            </Route>
           </Routes>
-        </ToastProvider>
-      </AuthProvider>
-    </BrowserRouter>
+          </ToastProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

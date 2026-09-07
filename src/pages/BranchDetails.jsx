@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
-import Skeleton from "../components/SkeletonComponent";
+import { DetailPageSkeleton } from "../components/SkeletonComponent";
 import RefreshButton from "../components/common/RefreshButton";
 import StatisticsCard from "../components/user/StatisticsCard";
 
@@ -38,24 +38,24 @@ import StatisticsCard from "../components/user/StatisticsCard";
 const StatusBadge = ({ status }) => {
     if (status) {
         return (
-            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-800 border border-green-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800">
                 <CheckCircle size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Active
             </span>
         );
     }
     return (
-        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
+        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-100 text-red-800 border border-red-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800">
             <Ban size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Inactive
         </span>
     );
 };
 
 const InfoCard = ({ icon: Icon, title, children, className = "" }) => (
-    <div className={`bg-white rounded-xl border border-gray-200 overflow-hidden ${className}`}>
-        <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200">
+    <div className={`bg-white rounded-xl border border-gray-200 overflow-hidden dark:border-slate-800 dark:bg-slate-900 ${className}`}>
+        <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-200 dark:border-slate-800 dark:from-slate-800 dark:to-slate-900">
             <div className="flex items-center gap-2">
                 <Icon size={16} className="text-blue-600" />
-                <h3 className="text-sm font-semibold text-gray-800">{title}</h3>
+                <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{title}</h3>
             </div>
         </div>
         <div className="p-4">{children}</div>
@@ -67,7 +67,7 @@ const InfoRow = ({ icon: Icon, label, value, className = "" }) => (
         <Icon size={12} className="text-gray-400 shrink-0 w-3 h-3 sm:w-3.5 sm:h-3.5" />
         <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
             <span className="text-[10px] sm:text-xs text-gray-500 shrink-0">{label}:</span>
-            <span className="text-[11px] sm:text-sm text-gray-800 font-medium truncate">{value || "N/A"}</span>
+            <span className="text-[11px] sm:text-sm text-gray-800 font-medium truncate dark:text-slate-200">{value || "N/A"}</span>
         </div>
     </div>
 );
@@ -485,7 +485,7 @@ function SubscriptionTab({ branchId }) {
             {adding ? (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/40" onClick={() => !saving && setAdding(null)} />
-                    <div className="relative w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-5">
+                    <div className="relative w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-5 dark:border-slate-800 dark:bg-slate-900">
                         <div className="flex items-start justify-between gap-3 mb-4">
                             <div>
                                 <h3 className="text-base font-semibold text-gray-900 m-0">Add plan manually</h3>
@@ -575,7 +575,7 @@ function SubscriptionTab({ branchId }) {
             {editing ? (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/40" onClick={() => !saving && setEditing(null)} />
-                    <div className="relative w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-5">
+                    <div className="relative w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-xl p-5 dark:border-slate-800 dark:bg-slate-900">
                         <div className="flex items-start justify-between gap-3 mb-4">
                             <div>
                                 <h3 className="text-base font-semibold text-gray-900 m-0">Update expiry</h3>
@@ -689,7 +689,7 @@ function BasicTab({ branch, statistics, address, contact, taxInfo, owner }) {
             )}
 
             {statistics?.tasks && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 dark:border-slate-800 dark:bg-slate-900">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
                         <FileText size={20} className="text-blue-600" />
                         Task Overview
@@ -789,7 +789,7 @@ function BasicTab({ branch, statistics, address, contact, taxInfo, owner }) {
             {(branch?.logo || branch?.sign) && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {branch?.logo && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 dark:border-slate-800 dark:bg-slate-900">
                             <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <Building size={16} className="text-blue-600" />
                                 Branch Logo
@@ -798,7 +798,7 @@ function BasicTab({ branch, statistics, address, contact, taxInfo, owner }) {
                         </div>
                     )}
                     {branch?.sign && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 dark:border-slate-800 dark:bg-slate-900">
                             <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
                                 <FileText size={16} className="text-blue-600" />
                                 Signature
@@ -899,16 +899,16 @@ export default function BranchDetails() {
     };
 
     if (loading) {
-        return <Skeleton />;
+        return <DetailPageSkeleton />;
     }
 
     if (error || !branchData) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-transparent flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-6xl mb-4">😕</div>
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">Branch Not Found</h2>
-                    <p className="text-gray-600 mb-6">{error || "Unable to load branch details"}</p>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-2 dark:text-white">Branch Not Found</h2>
+                    <p className="text-gray-600 mb-6 dark:text-slate-400">{error || "Unable to load branch details"}</p>
                     <button
                         onClick={handleBack}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -931,19 +931,19 @@ export default function BranchDetails() {
         <div className="min-h-screen mx-auto">
             {/* Header Section */}
             <div className="lg:mb-6 mb-2">
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
+                    <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
                         <div className="flex items-center gap-2 min-w-0">
                             <button
                                 onClick={handleBack}
-                                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
+                                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0 dark:hover:bg-slate-800"
                             >
-                                <ArrowLeft size={18} className="text-gray-600" />
+                                <ArrowLeft size={18} className="text-gray-600 dark:text-slate-300" />
                             </button>
                             <StoreIcon size={16} className="text-purple-500 shrink-0" />
-                            <span className="text-sm font-medium text-gray-600 shrink-0 hidden sm:inline">Branch</span>
+                            <span className="text-sm font-medium text-gray-600 shrink-0 hidden sm:inline dark:text-slate-400">Branch</span>
                             <span className="text-xs text-gray-400 shrink-0 hidden sm:inline">/</span>
-                            <span className="text-sm text-gray-900 font-semibold truncate">{branch?.name || 'Branch Details'}</span>
+                            <span className="text-sm text-gray-900 font-semibold truncate dark:text-white">{branch?.name || 'Branch Details'}</span>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                             <button
@@ -1031,7 +1031,7 @@ export default function BranchDetails() {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
                 <div className="border-b border-gray-200">
                     <nav className="flex overflow-x-auto scrollbar-hide">
                         {TABS.map((tab) => {

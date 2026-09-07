@@ -7,14 +7,14 @@ function joinClasses(...classes) {
 }
 
 const accentStyles = {
-  slate: 'from-slate-600 to-slate-800 text-slate-700 border-slate-200',
-  blue: 'from-blue-600 to-indigo-600 text-blue-700 border-blue-200',
-  green: 'from-green-600 to-emerald-600 text-green-700 border-green-200',
-  emerald: 'from-emerald-600 to-teal-600 text-emerald-700 border-emerald-200',
-  indigo: 'from-indigo-600 to-violet-600 text-indigo-700 border-indigo-200',
-  violet: 'from-violet-600 to-fuchsia-600 text-violet-700 border-violet-200',
-  amber: 'from-amber-600 to-orange-600 text-amber-700 border-amber-200',
-  rose: 'from-rose-600 to-red-600 text-rose-700 border-rose-200',
+  slate: 'from-slate-600 to-slate-800 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  blue: 'from-blue-600 to-indigo-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  green: 'from-green-600 to-emerald-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  emerald: 'from-emerald-600 to-teal-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  indigo: 'from-indigo-600 to-violet-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  violet: 'from-violet-600 to-fuchsia-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  amber: 'from-amber-600 to-orange-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
+  rose: 'from-rose-600 to-red-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
 };
 
 const activeButtonStyles = {
@@ -56,7 +56,7 @@ export default function ManagementHub({
           initial={{ opacity: 0, y: -14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="mb-4 rounded-lg border border-slate-200 bg-white/90 p-2.5 shadow-sm shadow-slate-200/40 backdrop-blur md:p-3"
+          className="mb-4 rounded-lg border border-slate-200 bg-white/90 p-2.5 shadow-sm shadow-slate-200/40 backdrop-blur md:p-3 dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none"
         >
           <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
@@ -68,8 +68,8 @@ export default function ManagementHub({
                   {eyebrow}
                 </div>
               )}
-              {title && <h1 className="mt-1 text-lg font-bold text-slate-900 md:text-xl">{title}</h1>}
-              {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
+              {title && <h1 className="mt-1 text-lg font-bold text-slate-900 md:text-xl dark:text-white">{title}</h1>}
+              {description && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{description}</p>}
             </div>
 
             {(summary || actions || onRefresh) && (
@@ -112,8 +112,8 @@ export default function ManagementHub({
                       isActive
                         ? activeButtonStyles[accent] || activeButtonStyles.slate
                         : disabled
-                          ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                          ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
                     )}
                   >
                     {Icon && <Icon size={13} />}

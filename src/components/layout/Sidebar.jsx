@@ -1,224 +1,297 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  House, 
-  Users, 
-  Building2, 
-  ConciergeBell, 
-  LifeBuoy, 
-  BarChart3, 
+import React, { useEffect, useState } from 'react';
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  ConciergeBell,
   Settings,
+  Mail,
+  ChevronDown,
+  SlidersHorizontal,
 } from 'lucide-react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, NavLink } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+
+const menuSections = [
+  {
+    id: 'overview',
+    label: 'Overview',
+    items: [
+      { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    ],
+  },
+  {
+    id: 'directory',
+    label: 'Directory',
+    items: [
+      { icon: Users, label: 'Users', path: '/users', match: ['/users', '/user/'] },
+      { icon: Building2, label: 'Branches', path: '/branches', match: ['/branches', '/branch/'] },
+      { icon: ConciergeBell, label: 'Services', path: '/services' },
+    ],
+  },
+  {
+    id: 'configuration',
+    label: 'Configuration',
+    items: [
+      {
+        icon: Settings,
+        label: 'Settings',
+        path: '/settings',
+        children: [
+          { icon: SlidersHorizontal, label: 'Overview', path: '/settings' },
+          { icon: Mail, label: 'Company Mail', path: '/settings/mail' },
+        ],
+      },
+    ],
+  },
+];
+
+const isPathActive = (currentPath, item) => {
+  if (item.children?.length) {
+    return currentPath === item.path || currentPath.startsWith(`${item.path}/`);
+  }
+  if (item.path === '/' || item.path === '/dashboard') {
+    return currentPath === '/' || currentPath === '/dashboard';
+  }
+  if (item.match) {
+    return item.match.some((m) => currentPath === m || currentPath.startsWith(m));
+  }
+  return currentPath === item.path || currentPath.startsWith(`${item.path}/`);
+};
+
+const isChildActive = (currentPath, child) => {
+  if (child.path === '/settings') return currentPath === '/settings';
+  return currentPath === child.path || currentPath.startsWith(`${child.path}/`);
+};
 
 const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [collapsedFlyout, setCollapsedFlyout] = useState(null);
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const menuItems = [
-    {
-      icon: House,
-      label: 'Dashboard',
-      path: '/',
-    },
-    {
-      icon: Users,
-      label: 'Users',
-      path: '/users',
-    },
-    {
-      icon: Building2,
-      label: 'Branches',
-      path: '/branches',
-    },
-    {
-      icon: ConciergeBell,
-      label: 'Services',
-      path: '/services',
-    },
-    {
-      icon: BarChart3,
-      label: 'Reports',
-      path: '/reports',
-    },
-    {
-      icon: Settings,
-      label: 'Company Mail',
-      path: '/settings/mail',
-    },
-  ];
-
-  const isActiveRoute = (itemPath) => {
-    return currentPath === itemPath || currentPath.startsWith(itemPath + '/');
-  };
+  const settingsOpenByRoute = currentPath === '/settings' || currentPath.startsWith('/settings/');
+  const [openMenus, setOpenMenus] = useState(() => (settingsOpenByRoute ? { Settings: true } : {}));
 
   useEffect(() => {
-    if (onHover && !isMobile) {
-      onHover(isHovered);
+    if (settingsOpenByRoute) {
+      setOpenMenus((prev) => ({ ...prev, Settings: true }));
     }
+  }, [settingsOpenByRoute]);
+
+  useEffect(() => {
+    if (onHover && !isMobile) onHover(isHovered);
   }, [isHovered, onHover, isMobile]);
 
-  // ================= MOBILE SIDEBAR =================
-  if (isMobile) {
+  const expanded = isMobile ? true : isExpanded;
+
+  useEffect(() => {
+    if (expanded) setCollapsedFlyout(null);
+  }, [expanded]);
+
+  const toggleMenu = (label) => {
+    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const itemClass = (active) => `
+    relative flex w-full items-center rounded-xl transition-all duration-150
+    ${expanded ? 'px-2.5 py-2 gap-2.5' : 'justify-center px-0 py-2'}
+    ${active
+      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
+      : 'text-slate-600 hover:bg-slate-900/5 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100'
+    }
+  `;
+
+  const iconWrap = (active) =>
+    `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+      active
+        ? 'bg-white/20 text-white'
+        : 'bg-slate-200/80 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+    }`;
+
+  const renderLeaf = (item) => {
+    const active = isPathActive(currentPath, item);
+    const Icon = item.icon;
     return (
-      <>
-        <div className={`
-          fixed left-0 top-16 z-30 w-72 h-[calc(100vh-4rem)]
-          bg-white transform transition-transform duration-300 ease-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          overflow-y-auto overflow-x-hidden shadow-2xl
-        `}>
-          <div className="p-4">
-            {/* User Profile Section */}
-            <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                  A
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-800">Admin User</p>
-                  <p className="text-xs text-gray-500">admin@oomsadmin.com</p>
-                </div>
-              </div>
-            </div>
-
-            <nav className="space-y-1">
-              {menuItems.map((item) => {
-                const isActive = isActiveRoute(item.path);
-                const Icon = item.icon;
-
-                return (
-                  <Link
-                    key={item.label}
-                    to={item.path}
-                    onClick={() => toggleSidebar()}
-                    className={`
-                      flex items-center px-3 py-3 rounded-xl transition-all duration-200 mb-1
-                      ${isActive
-                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-                      }
-                    `}
-                  >
-                    <div className={`
-                      p-2 rounded-lg mr-3
-                      ${isActive
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600'
-                      }
-                    `}>
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Help Section */}
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
-                <LifeBuoy className="text-blue-600 mb-2" size={20} />
-                <p className="text-xs font-semibold text-gray-700 mb-1">Need Help?</p>
-                <p className="text-xs text-gray-500">Contact our support team</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
+      <NavLink
+        key={item.path}
+        to={item.path}
+        end={item.path === '/'}
+        onClick={() => isMobile && toggleSidebar()}
+        title={!expanded ? item.label : ''}
+        className={itemClass(active)}
+      >
+        <span className={iconWrap(active)}>
+          <Icon className="h-4 w-4" />
+        </span>
+        {expanded && (
+          <span className={`text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
+        )}
+      </NavLink>
     );
-  }
+  };
 
-  // ================= DESKTOP SIDEBAR =================
-  const isSidebarExpanded = isExpanded;
+  const renderChildren = (item, compact = false) => (
+    <div className={compact ? 'space-y-0.5 p-1.5' : 'relative ml-5 space-y-0.5 border-l border-slate-200 pl-3 dark:border-slate-700'}>
+      {item.children.map((child, index) => {
+        const childActive = isChildActive(currentPath, child);
+        const ChildIcon = child.icon;
+        return (
+          <motion.div
+            key={child.path}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.18, delay: index * 0.04, ease: 'easeOut' }}
+          >
+            <Link
+              to={child.path}
+              onClick={() => {
+                if (isMobile) toggleSidebar();
+                setCollapsedFlyout(null);
+              }}
+              className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[12.5px] transition-colors ${
+                childActive
+                  ? 'bg-sky-50 font-semibold text-sky-800 dark:bg-sky-500/15 dark:text-sky-200'
+                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+              }`}
+            >
+              <ChildIcon className="h-3.5 w-3.5" />
+              {child.label}
+            </Link>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
 
-  const renderMenuItem = (item, isExpandedState) => {
-    const isActive = isActiveRoute(item.path);
+  const renderParent = (item) => {
+    const parentActive = isPathActive(currentPath, item);
+    const open = Boolean(openMenus[item.label]);
     const Icon = item.icon;
 
-    return (
-      <Link
-        key={item.label}
-        to={item.path}
-        className={`
-          flex items-center rounded-xl transition-all duration-200 group
-          ${isExpandedState ? 'px-3 py-2.5 gap-3' : 'px-0 py-2.5 justify-center'}
-          ${isActive
-            ? 'bg-blue-50 text-blue-700'
-            : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600'
-          }
-        `}
-        title={!isExpandedState ? item.label : ''}
-      >
-        <div className={`
-          p-2 rounded-lg transition-all duration-200
-          ${isExpandedState ? '' : 'mx-auto'}
-          ${isActive
-            ? 'bg-blue-100 text-blue-700'
-            : 'bg-gray-100 text-gray-600 group-hover:bg-blue-50 group-hover:text-blue-600'
-          }
-        `}>
-          <Icon className="w-4 h-4" />
-        </div>
-        {isExpandedState && (
-          <>
-            <span className={`flex-1 text-sm font-medium ${isActive ? 'font-semibold' : ''}`}>
-              {item.label}
+    if (!expanded) {
+      return (
+        <div
+          key={item.label}
+          className="relative"
+          onMouseEnter={() => setCollapsedFlyout(item.label)}
+          onMouseLeave={() => setCollapsedFlyout(null)}
+        >
+          <Link
+            to={item.path}
+            title={item.label}
+            onClick={() => isMobile && toggleSidebar()}
+            className={itemClass(parentActive)}
+          >
+            <span className={iconWrap(parentActive)}>
+              <Icon className="h-4 w-4" />
             </span>
-            {isActive && (
-              <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-            )}
-          </>
-        )}
-        {!isExpandedState && isActive && (
-          <span className="absolute left-0 w-1 h-8 bg-blue-600 rounded-r-full"></span>
-        )}
-      </Link>
+          </Link>
+          {collapsedFlyout === item.label && (
+            <motion.div
+              initial={{ opacity: 0, x: -6 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="absolute left-full top-0 z-50 ml-3 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            >
+              <p className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                {item.label}
+              </p>
+              {renderChildren(item, true)}
+            </motion.div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div key={item.label} className="space-y-0.5">
+        <button
+          type="button"
+          onClick={() => toggleMenu(item.label)}
+          className={itemClass(parentActive)}
+        >
+          <span className={iconWrap(parentActive)}>
+            <Icon className="h-4 w-4" />
+          </span>
+          <span className={`flex-1 text-left text-[13px] ${parentActive ? 'font-semibold' : 'font-medium'}`}>
+            {item.label}
+          </span>
+          <ChevronDown className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${open ? 'rotate-0' : '-rotate-90'}`} />
+        </button>
+
+        <AnimatePresence initial={false}>
+          {open && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="pt-0.5 pb-0.5">
+                {renderChildren(item)}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     );
   };
 
-  const handleMouseEnter = () => {
-    if (!isSidebarExpanded) {
-      setIsHovered(true);
-      if (onHover) onHover(true);
-    }
-  };
+  const navBody = (
+    <nav className={`h-full space-y-5 overflow-y-auto ${expanded ? 'p-2.5' : 'p-1.5'}`}>
+      {menuSections.map((section) => (
+        <div key={section.id}>
+          {expanded && (
+            <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
+              {section.label}
+            </p>
+          )}
+          <div className="space-y-1">
+            {section.items.map((item) => (item.children ? renderParent(item) : renderLeaf(item)))}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    if (onHover) onHover(false);
-  };
+  const shell = 'bg-transparent';
+
+  if (isMobile) {
+    return (
+      <div className={`
+        fixed left-0 top-14 z-30 h-[calc(100vh-3.5rem)] w-[17.5rem]
+        ${shell}
+        transform transition-transform duration-300 ease-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="m-2 h-[calc(100%-1rem)] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
+          {navBody}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       className={`
-        fixed left-0 top-16 z-20 bg-white
-        transition-all duration-300 ease-out
-        ${isSidebarExpanded ? 'w-64' : 'w-16'}
-        h-[calc(100vh-4rem)]
-        shadow-lg border-r border-gray-200
-        overflow-y-auto overflow-x-hidden
+        fixed left-0 top-14 z-20 h-[calc(100vh-3.5rem)]
+        transition-all duration-300 ease-out ${shell}
+        ${expanded ? 'w-64' : 'w-16'}
       `}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => {
+        if (!isExpanded) {
+          setIsHovered(true);
+          if (onHover) onHover(true);
+        }
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        if (onHover) onHover(false);
+      }}
     >
-      <div className="flex flex-col h-full">
-
-
-        <nav className="flex-1 py-6 px-2">
-          {menuItems.map((item) => renderMenuItem(item, isSidebarExpanded))}
-        </nav>
-
-        {/* Footer Section */}
-        {isSidebarExpanded && (
-          <div className="p-4 border-t border-gray-200">
-            <div className="bg-gray-50 rounded-xl p-3">
-              <LifeBuoy className="text-blue-600 mb-2" size={16} />
-              <p className="text-xs font-semibold text-gray-700">Need Help?</p>
-              <p className="text-xs text-gray-500">Support</p>
-            </div>
-          </div>
-        )}
+      <div className={`h-[calc(100%-1rem)] overflow-visible rounded-2xl border border-slate-200/80 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900 ${expanded ? 'm-2' : 'm-1.5'}`}>
+        {navBody}
       </div>
     </div>
   );

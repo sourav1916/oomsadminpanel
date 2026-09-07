@@ -2,12 +2,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { 
-  Clock, LogOut, Calendar, Globe, Activity, X, Search, 
-  Smartphone, Monitor, Shield, CheckCircle, Ban, User, Mail, Phone 
+  Clock, LogOut, Calendar, Globe, X, Search, 
+  CheckCircle, Ban, User, Mail, Phone 
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../../utils/apiCall';
 import Pagination, { usePagination } from "../common/PaginationComponent";
+import { TableSkeleton } from "../SkeletonComponent";
 
 const SessionStatusBadge = ({ isActive, isExpired }) => {
   if (isActive && !isExpired) {
@@ -156,9 +157,7 @@ export default function SessionsTab({ username }) {
 
   if (loading && sessions.length === 0) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <TableSkeleton columns={4} rows={5} showActions={false} />
     );
   }
 
@@ -196,9 +195,7 @@ export default function SessionsTab({ username }) {
 
       {/* Loading indicator for subsequent loads */}
       {loading && sessions.length > 0 && (
-        <div className="flex justify-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-        </div>
+        <TableSkeleton columns={4} rows={4} showActions={false} />
       )}
 
       {/* Sessions List */}
@@ -209,7 +206,7 @@ export default function SessionsTab({ username }) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="border border-gray-200 rounded-xl hover:shadow-md transition-shadow bg-white overflow-hidden"
+            className="border border-gray-200 rounded-xl hover:shadow-md transition-shadow bg-white overflow-hidden dark:border-slate-800 dark:bg-slate-900"
           >
             <div className="p-4">
               <div className="flex items-start justify-between">
@@ -218,7 +215,7 @@ export default function SessionsTab({ username }) {
                   <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-1.5">
                       <Globe size={14} className="text-blue-500" />
-                      <span className="text-sm font-mono font-medium text-gray-700">
+                      <span className="text-sm font-mono font-medium text-gray-700 dark:text-slate-200">
                         {session.create_ip || 'Unknown IP'}
                       </span>
                     </div>
@@ -228,7 +225,7 @@ export default function SessionsTab({ username }) {
 
                   {/* User Info */}
                   {session.user && (
-                    <div className="flex items-center gap-4 flex-wrap text-sm bg-gray-50 p-2 rounded-lg">
+                    <div className="flex items-center gap-4 flex-wrap text-sm bg-gray-50 p-2 rounded-lg dark:bg-slate-800">
                       <div className="flex items-center gap-1.5">
                         <User size={12} className="text-gray-400" />
                         <span className="text-gray-600">{session.user.name || session.user.login_id}</span>

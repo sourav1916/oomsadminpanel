@@ -1,4 +1,3 @@
-// src/pages/NotFound.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Home, AlertCircle, ArrowLeft } from 'lucide-react';
@@ -7,47 +6,32 @@ const NotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full text-center">
-        {/* Animated 404 Illustration */}
-        <div className="relative mb-8">
-          <div className="text-8xl font-bold text-gray-200 animate-pulse">404</div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <AlertCircle className="w-20 h-20 text-blue-500 animate-bounce" />
-          </div>
+    <div className="flex min-h-[60vh] items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+          <AlertCircle className="h-7 w-7 text-slate-500" />
         </div>
-
-        {/* Error Message */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-3">
-          Page Not Found
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Oops! The page you're looking for doesn't exist or has been moved.
+        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-slate-400">404</p>
+        <h1 className="mt-2 text-xl font-bold text-slate-900 dark:text-white">Page not found</h1>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+          This route is not part of the admin console. Use the sidebar to open a working page.
         </p>
-
-        {/* Action Buttons */}
-        <div className="space-y-3">
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+            onClick={() => navigate('/')}
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800"
           >
-            <Home className="w-4 h-4" />
-            Go to Dashboard
+            <Home className="h-4 w-4" />
+            Dashboard
           </button>
-          
           <button
             onClick={() => navigate(-1)}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Go Back
+            <ArrowLeft className="h-4 w-4" />
+            Go back
           </button>
         </div>
-
-        {/* Help Text */}
-        <p className="text-sm text-gray-500 mt-8">
-          Need assistance? <button onClick={() => navigate('/settings')} className="text-blue-600 hover:text-blue-700 font-semibold">Contact Support</button>
-        </p>
       </div>
     </div>
   );

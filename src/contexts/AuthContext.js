@@ -23,11 +23,13 @@ export const AuthProvider = ({ children }) => {
     const userData = localStorage.getItem("user");
 
     if (token && userData) {
-      setUser(JSON.parse(userData));
+      try {
+        setUser(JSON.parse(userData));
+      } catch {
+        setUser(username ? { username } : null);
+      }
     } else if (token && username) {
-      // Fallback to create userData from username if user object doesn't exist
-      const userData = { username };
-      setUser(userData);
+      setUser({ username });
     }
 
     setLoading(false);

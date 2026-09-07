@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Shield, Lock, Smartphone, KeyRound, Sun, Moon } from "lucide-react";
 import Button from "../components/common/Button";
-import apiCall from "../utils/apiCall";
+import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 import { toast } from "react-toastify";
 
 const COUNTRY_CODE = "+91";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { sendOtp: sendOtpRequest, login } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const [mobile, setMobile] = useState("");
   const [otp, setOtp] = useState("");
-
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -28,22 +31,10 @@ const Login = () => {
 
     try {
       setLoading(true);
-
-      const response = await apiCall("/auth/login/send-otp", "POST", {
-        country_code: COUNTRY_CODE,
-        mobile: normalizedMobile,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to send OTP");
-      }
-
+      const data = await sendOtpRequest(normalizedMobile, COUNTRY_CODE);
       toast.success(data.message || "OTP sent to your mobile number");
       setOtpSent(true);
     } catch (error) {
-      console.error(error);
       toast.error(error.message || "Failed to send OTP");
     } finally {
       setLoading(false);
@@ -66,27 +57,10 @@ const Login = () => {
 
     try {
       setLoading(true);
-
-      const response = await apiCall("/auth/login", "POST", {
-        country_code: COUNTRY_CODE,
-        mobile: normalizedMobile,
-        otp,
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username || normalizedMobile);
-
+      const data = await login(normalizedMobile, otp, COUNTRY_CODE);
       toast.success(data.message || "Login successful");
-
       navigate("/");
     } catch (error) {
-      console.error(error);
       toast.error(error.message || "Login failed");
     } finally {
       setLoading(false);
@@ -94,72 +68,74 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-4xl w-full mx-4">
-        <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="hidden md:flex bg-gradient-to-br from-blue-600 to-indigo-700 p-8 md:p-12 text-white min-h-[600px] flex-col">
-            <div className="mb-8">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">📊</span>
-                </div>
-                <span className="text-xl font-bold">OomsAdmin</span>
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+      <div className="grid min-h-screen lg:grid-cols-2">
+        <div className="relative hidden overflow-hidden border-r border-slate-800 bg-slate-950 lg:flex lg:flex-col lg:justify-between p-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.18),_transparent_42%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,1),_transparent_40%)]" />
+          <div className="relative">
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-sky-500 text-white">
+                <Shield className="h-4 w-4" />
               </div>
-
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                Welcome to OomsAdmin
-              </h1>
-
-              <p className="text-blue-100 text-base md:text-lg mb-8">
-                Sign in securely with a one-time code sent to your registered mobile number.
-              </p>
+              <div>
+                <p className="text-lg font-semibold text-white">OOMS Admin</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-slate-500">Control panel</p>
+              </div>
             </div>
-
-            <div className="space-y-3 mb-8">
-              {[
-                "🔒 OTP-based authentication",
-                "📡 Real-time updates",
-                "🔄 Multi-device sync",
-                "✨ Intuitive interface",
-              ].map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-blue-50">
-                  <span>{feature}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-auto pt-8 border-t border-white/20">
-              <p className="text-sm text-blue-200 flex items-center gap-2">
-                <span>🔒</span> 256-bit encrypted connection
-              </p>
-            </div>
+            <h1 className="mt-16 max-w-md text-4xl font-semibold leading-tight text-white">
+              Platform administration for OOMS tenants.
+            </h1>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-400">
+              Manage users, branches, the service catalog, and company mail from a dedicated operator console.
+            </p>
           </div>
+          <ul className="relative space-y-3 text-sm text-slate-400">
+            {[
+              "OTP-secured operator access",
+              "Directory of users and branches",
+              "Service catalog and SMTP controls",
+            ].map((item) => (
+              <li key={item} className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
 
-          <div className="p-8 md:p-12 min-h-[600px] flex flex-col">
-            <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        <div className="relative flex items-center justify-center bg-slate-100 px-4 py-12 dark:bg-slate-950">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="mb-8 flex items-center gap-3 lg:hidden">
+              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-900 text-sky-300">
+                <Shield className="h-4 w-4" />
               </div>
+              <p className="text-lg font-semibold text-slate-900 dark:text-white">OOMS Admin</p>
             </div>
 
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                OomsAdmin Login
-              </h2>
-              <p className="text-gray-600 text-sm">
-                Enter your mobile number to receive an OTP
-              </p>
-            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Sign in</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              Use the registered admin mobile number. A one-time code will be sent.
+            </p>
 
             {!otpSent ? (
-              <form onSubmit={sendOtp} className="flex-1">
-                <div className="mb-6">
+              <form onSubmit={sendOtp} className="mt-8">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Mobile number
+                </label>
+                <div className="relative mb-6">
+                  <Smartphone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
                     type="tel"
-                    placeholder="10-digit mobile number"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="10-digit mobile"
+                    className="w-full rounded-md border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-800"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
                     inputMode="numeric"
@@ -167,73 +143,53 @@ const Login = () => {
                     required
                   />
                 </div>
-
                 <Button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  className="w-full rounded-md bg-slate-900 py-2.5 font-semibold text-white hover:bg-slate-800"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Sending OTP...
-                    </div>
-                  ) : (
-                    "Request OTP"
-                  )}
+                  {loading ? "Sending OTP…" : "Request OTP"}
                 </Button>
               </form>
             ) : (
-              <form onSubmit={verifyLogin} className="flex-1">
-                <div className="mb-6">
+              <form onSubmit={verifyLogin} className="mt-8">
+                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  One-time code
+                </label>
+                <div className="relative mb-2">
+                  <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     maxLength={6}
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-center text-2xl tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    placeholder="6-digit OTP"
+                    className="w-full rounded-md border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-center font-mono text-xl tracking-[0.4em] text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-800"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     required
                     autoFocus
                   />
-                  <p className="text-xs text-gray-500 mt-2 text-center">
-                    Enter the 6-digit code sent to +91 {normalizeMobile(mobile)}
-                  </p>
                 </div>
-
+                <p className="mb-6 text-center text-xs text-slate-500">
+                  Sent to +91 {normalizeMobile(mobile)}
+                </p>
                 <Button
                   type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-all duration-200 transform hover:scale-[1.02]"
+                  className="w-full rounded-md bg-slate-900 py-2.5 font-semibold text-white hover:bg-slate-800"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Verifying...
-                    </div>
-                  ) : (
-                    "Verify & Login"
-                  )}
+                  {loading ? "Verifying…" : "Verify and continue"}
                 </Button>
-
                 <button
                   type="button"
-                  className="w-full mt-3 text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  className="mt-3 w-full text-sm font-medium text-sky-700 hover:underline disabled:opacity-50"
                   onClick={sendOtp}
                   disabled={loading}
                 >
                   Resend OTP
                 </button>
-
                 <button
                   type="button"
-                  className="w-full mt-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                  className="mt-2 w-full text-sm text-slate-500 hover:text-slate-700"
                   onClick={() => {
                     setOtpSent(false);
                     setOtp("");
@@ -244,14 +200,9 @@ const Login = () => {
               </form>
             )}
 
-            <div className="mt-6 text-center text-sm text-gray-600">
-              Don't have an account?{" "}
-              <button
-                onClick={() => toast.info("Contact admin to create account")}
-                className="text-blue-600 hover:text-blue-700 font-semibold"
-              >
-                Contact Admin
-              </button>
+            <div className="mt-8 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-500">
+              <Lock className="h-3.5 w-3.5" />
+              Restricted to authorized platform operators.
             </div>
           </div>
         </div>

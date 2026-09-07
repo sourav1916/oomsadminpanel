@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
-import Skeleton from "../components/SkeletonComponent";
+import { DetailPageSkeleton } from "../components/SkeletonComponent";
 import ProfileTab from "../components/user/ProfileTab";
 import BranchesTab from "../components/user/BranchesTab";
 import SessionsTab from "../components/user/SessionsTab";
@@ -32,13 +32,13 @@ import StatisticsCard from "../components/user/StatisticsCard";
 const StatusBadge = ({ status }) => {
   if (status) {
     return (
-      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-800 border border-green-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800">
         <CheckCircle size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Active
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
+    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-100 text-red-800 border border-red-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800">
       <Ban size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Inactive
     </span>
   );
@@ -49,7 +49,7 @@ const DetailItem = ({ icon: Icon, label, value, className = "" }) => (
     <Icon size={12} className="text-gray-400 shrink-0 w-3 h-3 sm:w-3.5 sm:h-3.5" />
     <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
       <span className="text-[10px] sm:text-xs text-gray-500 shrink-0">{label}:</span>
-      <span className="text-[11px] sm:text-sm text-gray-800 font-medium truncate">{value || "N/A"}</span>
+      <span className="text-[11px] sm:text-sm text-gray-800 font-medium truncate dark:text-slate-200">{value || "N/A"}</span>
     </div>
   </div>
 );
@@ -155,16 +155,16 @@ export default function UserProfile() {
   };
 
   if (loading) {
-    return <Skeleton />;
+    return <DetailPageSkeleton />;
   }
 
   if (error || !userData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">😕</div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">User Not Found</h2>
-          <p className="text-gray-600 mb-6">{error || "Unable to load user profile"}</p>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2 dark:text-white">User Not Found</h2>
+          <p className="text-gray-600 mb-6 dark:text-slate-400">{error || "Unable to load user profile"}</p>
           <button
             onClick={handleBack}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -182,20 +182,20 @@ export default function UserProfile() {
     <div className="min-h-screen mx-auto">
       {/* Header Section */}
       <div className="mb-2 lg:mb-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
           {/* Top Bar with Eyebrow and Refresh */}
-          <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+          <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
             <div className="flex items-center gap-2 min-w-0">
               <button
                 onClick={handleBack}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0 dark:hover:bg-slate-800"
               >
-                <ArrowLeft size={18} className="text-gray-600" />
+                <ArrowLeft size={18} className="text-gray-600 dark:text-slate-300" />
               </button>
               <UserCircle size={16} className="text-blue-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-600 shrink-0 hidden sm:inline">Profile</span>
+              <span className="text-sm font-medium text-gray-600 shrink-0 hidden sm:inline dark:text-slate-400">Profile</span>
               <span className="text-xs text-gray-400 shrink-0 hidden sm:inline">/</span>
-              <span className="text-sm text-gray-900 font-semibold truncate">{profile?.name || user?.username}</span>
+              <span className="text-sm text-gray-900 font-semibold truncate dark:text-white">{profile?.name || user?.username}</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <RefreshButton
@@ -229,19 +229,19 @@ export default function UserProfile() {
               {/* User Details */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
-                  <h1 className="text-base sm:text-2xl font-bold text-gray-900 truncate leading-tight">
+                  <h1 className="text-base sm:text-2xl font-bold text-gray-900 truncate leading-tight dark:text-white">
                     {profile?.name || user?.username}
                   </h1>
                   <StatusBadge status={user?.status} />
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 mb-1.5 sm:mb-3">
-                  <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full">
+                  <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full dark:border-slate-700 dark:bg-slate-800">
                     <Mail size={10} className="text-gray-400 shrink-0 sm:w-3 sm:h-3" />
                     <span className="text-[10px] sm:text-sm text-gray-600 truncate leading-none">{user?.login_id}</span>
                   </div>
                   {profile?.mobile && (
-                    <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full">
+                    <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full dark:border-slate-700 dark:bg-slate-800">
                       <Phone size={10} className="text-gray-400 shrink-0 sm:w-3 sm:h-3" />
                       <span className="text-[10px] sm:text-sm text-gray-600 truncate leading-none">+{profile.country_code || '91'} {profile.mobile}</span>
                     </div>
@@ -324,9 +324,9 @@ export default function UserProfile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6"
+          className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6 dark:border-slate-800 dark:bg-slate-900"
         >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 dark:text-white">
             <FileText size={20} className="text-blue-600" />
             Task Overview
           </h3>
@@ -360,9 +360,9 @@ export default function UserProfile() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+        className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900"
       >
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-200 dark:border-slate-800">
           <nav className="flex overflow-x-auto scrollbar-hide">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -373,8 +373,8 @@ export default function UserProfile() {
                   className={`
                       flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative whitespace-nowrap
                       ${activeTab === tab.id
-                      ? "text-blue-600"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                      ? "text-blue-600 dark:text-sky-300"
+                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
                     }
                     `}
                 >

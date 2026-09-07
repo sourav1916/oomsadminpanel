@@ -7,21 +7,19 @@ import {
   ArrowLeft,
   Search,
   X,
-  Eye,
   Calendar,
   Tag,
   Clock,
   CheckCircle,
   Ban,
   BookOpen,
-  TrendingUp,
-  Hash,
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
-import Skeleton from "../components/SkeletonComponent";
+import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
 import RefreshButton from "../components/common/RefreshButton";
 import Pagination, { usePagination } from "../components/common/PaginationComponent";
+import ManagementTable from "../components/common/ManagementTable";
 
 // ─── Helper Components ─────────────────────────────────────────────────────
 
@@ -45,10 +43,10 @@ const formatDate = (date) => {
 
 const getFrequencyBadge = (frequency) => {
   const badges = {
-    monthly: { icon: Calendar, text: 'Monthly', className: 'bg-blue-100 text-blue-800' },
-    quarterly: { icon: Calendar, text: 'Quarterly', className: 'bg-purple-100 text-purple-800' },
-    yearly: { icon: Calendar, text: 'Yearly', className: 'bg-green-100 text-green-800' },
-    one_time: { icon: Clock, text: 'One Time', className: 'bg-gray-100 text-gray-800' },
+    monthly: { icon: Calendar, text: 'Monthly', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
+    quarterly: { icon: Calendar, text: 'Quarterly', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' },
+    yearly: { icon: Calendar, text: 'Yearly', className: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' },
+    one_time: { icon: Clock, text: 'One Time', className: 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-slate-300' },
   };
   const badge = badges[frequency?.toLowerCase()] || badges.monthly;
   const Icon = badge.icon;
@@ -62,147 +60,71 @@ const getFrequencyBadge = (frequency) => {
 const getTypeBadge = (type, isCompliance) => {
   if (isCompliance || type === 'compliance') {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-emerald-900/40 dark:text-emerald-300">
         <CheckCircle size={10} /> Compliance
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-slate-300">
       <Tag size={10} /> General
     </span>
   );
 };
 
-// ─── Service Card Component ─────────────────────────────────────────────────
-
-const ServiceCard = ({ service, index }) => {
-  const [showDetails, setShowDetails] = useState(false);
-  const totalAmount = parseFloat(service.fees) + parseFloat(service.gst_value);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.05 }}
-      className="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all overflow-hidden"
-    >
-      <div className="p-5">
-        {/* Header */}
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg text-gray-800">
-              {service.name}
-            </h3>
-            <div className="flex items-center gap-2 mt-1">
-              <Hash size={12} className="text-gray-400" />
-              <span className="text-xs text-gray-500 font-mono">
-                SAC: {service.sac_code || 'N/A'}
-              </span>
-            </div>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-2">
-              {getTypeBadge(service.type, service.compliance)}
-              {getFrequencyBadge(service.frequency)}
-            </div>
-          </div>
-        </div>
-
-        {/* Pricing Section */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-3">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">Base Fees</span>
-            <span className="text-lg font-bold text-gray-800">{formatCurrency(service.fees)}</span>
-          </div>
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">GST ({service.gst_rate}%)</span>
-            <span className="text-lg font-bold text-gray-800">{formatCurrency(service.gst_value)}</span>
-          </div>
-          <div className="border-t border-blue-200 pt-2 mt-2">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-semibold text-gray-700">Total Amount</span>
-              <span className="text-xl font-bold text-green-600">{formatCurrency(totalAmount)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="space-y-2 mb-3">
-          {service.due_day && (
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar size={14} className="text-orange-500" />
-              <span className="text-gray-600">Due Day:</span>
-              <span className="font-medium text-gray-800">Day {service.due_day} of month/period</span>
-            </div>
-          )}
-          {service.default_amount && parseFloat(service.default_amount) > 0 && (
-            <div className="flex items-center gap-2 text-sm">
-              <TrendingUp size={14} className="text-purple-500" />
-              <span className="text-gray-600">Default Amount:</span>
-              <span className="font-medium text-gray-800">{formatCurrency(service.default_amount)}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Remark */}
-        {service.service_remark && (
-          <div className="bg-yellow-50 rounded-lg p-2 mb-3">
-            <p className="text-xs text-yellow-800">{service.service_remark}</p>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <Clock size={12} />
-            <span>Created: {formatDate(service.create_date)}</span>
-          </div>
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
-          >
-            <Eye size={14} />
-            {showDetails ? 'Hide Details' : 'View Details'}
-          </button>
-        </div>
-
-        {/* Expanded Details */}
-        {showDetails && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-4 pt-4 border-t border-gray-200 space-y-2"
-          >
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-gray-500">Service ID</p>
-                <p className="text-xs font-mono text-gray-700 break-all">{service.service_id}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Created By</p>
-                <p className="text-sm font-medium text-gray-800">{service.create_by}</p>
-              </div>
-              {service.modify_by && service.modify_date !== service.create_date && (
-                <>
-                  <div>
-                    <p className="text-xs text-gray-500">Modified By</p>
-                    <p className="text-sm font-medium text-gray-800">{service.modify_by}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Modified Date</p>
-                    <p className="text-sm text-gray-800">{formatDate(service.modify_date)}</p>
-                  </div>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
+const tableColumns = [
+  {
+    key: 'name',
+    label: 'Service',
+    render: (service) => (
+      <div>
+        <p className="font-semibold text-slate-800 dark:text-slate-100">{service.name}</p>
+        <p className="text-xs font-mono text-slate-500">{service.service_id}</p>
       </div>
-    </motion.div>
-  );
-};
+    ),
+  },
+  {
+    key: 'sac_code',
+    label: 'SAC',
+    render: (service) => (
+      <span className="font-mono text-xs text-slate-600 dark:text-slate-400">{service.sac_code || 'N/A'}</span>
+    ),
+  },
+  {
+    key: 'type',
+    label: 'Type',
+    render: (service) => getTypeBadge(service.type, service.compliance),
+  },
+  {
+    key: 'frequency',
+    label: 'Frequency',
+    render: (service) => getFrequencyBadge(service.frequency),
+  },
+  {
+    key: 'fees',
+    label: 'Fees',
+    render: (service) => (
+      <span className="font-semibold text-slate-800 dark:text-slate-100">{formatCurrency(service.fees)}</span>
+    ),
+  },
+  {
+    key: 'gst_value',
+    label: 'GST',
+    render: (service) => (
+      <span className="text-slate-600 dark:text-slate-300">
+        {formatCurrency(service.gst_value)}
+        {service.gst_rate ? ` (${service.gst_rate}%)` : ''}
+      </span>
+    ),
+  },
+  {
+    key: 'create_date',
+    label: 'Created',
+    render: (service) => (
+      <span className="text-sm text-slate-600 dark:text-slate-400">{formatDate(service.create_date)}</span>
+    ),
+  },
+];
 
 // ─── Main Component ─────────────────────────────────────────────────────────
 
@@ -350,28 +272,28 @@ export default function BranchServices() {
   };
 
   if (loading && services.length === 0) {
-    return <Skeleton />;
+    return <ListPageSkeleton columns={4} />;
   }
 
   return (
     <div className="min-h-screen mx-auto">
       {/* Header Section */}
       <div className="mb-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
           {/* Top Bar */}
-          <div className="flex items-center justify-between px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+          <div className="flex items-center justify-between px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
             <div className="flex items-center gap-4">
               <button
                 onClick={handleBack}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors dark:hover:bg-slate-800"
               >
-                <ArrowLeft size={18} className="text-gray-600" />
+                <ArrowLeft size={18} className="text-gray-600 dark:text-slate-300" />
               </button>
               <div className="flex items-center gap-2">
                 <Building size={16} className="text-purple-500" />
-                <span className="text-sm font-medium text-gray-600">Branch Services</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-slate-400">Branch Services</span>
                 <span className="text-xs text-gray-400">/</span>
-                <span className="text-sm text-gray-900">{branchInfo?.name || 'Services'}</span>
+                <span className="text-sm text-gray-900 dark:text-white">{branchInfo?.name || 'Services'}</span>
               </div>
             </div>
             <RefreshButton onClick={handleRefresh} loading={refreshing}  className="justify-center px-3 sm:px-4">
@@ -381,7 +303,7 @@ export default function BranchServices() {
 
           {/* Branch Info */}
           {branchInfo && (
-            <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-pink-50">
+            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
                   {branchInfo.logo ? (
@@ -409,7 +331,7 @@ export default function BranchServices() {
             placeholder="Search services by name, SAC code, or type..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all text-sm"
+            className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
           />
           {searchTerm && (
             <button
@@ -424,9 +346,7 @@ export default function BranchServices() {
 
       {/* Loading indicator for subsequent loads */}
       {refreshing && services.length > 0 && (
-        <div className="flex justify-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600"></div>
-        </div>
+        <TableSkeleton columns={6} rows={6} showActions={false} />
       )}
 
       {/* Error state */}
@@ -434,10 +354,10 @@ export default function BranchServices() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center py-16 bg-white rounded-xl shadow-xl"
+          className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900"
         >
           <Ban className="text-6xl text-red-400 mx-auto mb-4" size={48} />
-          <p className="text-xl text-gray-600">Error loading services</p>
+          <p className="text-xl text-gray-600 dark:text-slate-300">Error loading services</p>
           <p className="text-gray-400 mt-2">{error}</p>
           <button
             onClick={handleRefresh}
@@ -453,24 +373,25 @@ export default function BranchServices() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-16 bg-white rounded-xl shadow-xl"
+          className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900"
         >
           <BookOpen className="text-8xl text-gray-300 mx-auto mb-4" size={64} />
-          <p className="text-xl text-gray-500">No Services Found</p>
+          <p className="text-xl text-gray-500 dark:text-slate-400">No Services Found</p>
           <p className="text-gray-400 mt-2">
             {searchTerm ? 'Try adjusting your search' : 'No services available for this branch'}
           </p>
         </motion.div>
       )}
 
-      {/* Services Grid */}
-      {!loading && !error && services.length > 0 && (
+      {!loading && !error && services.length > 0 && !refreshing && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {services.map((service, index) => (
-              <ServiceCard key={service.service_id} service={service} index={index} />
-            ))}
-          </div>
+          <ManagementTable
+            rows={services}
+            columns={tableColumns}
+            rowKey={(row) => row.service_id}
+            showActionsColumn={false}
+            accent="slate"
+          />
 
           {/* Pagination */}
           {pagination.total > 0 && (

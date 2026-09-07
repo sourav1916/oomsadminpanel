@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { 
   Building, MapPin, Phone, Mail, Calendar, CheckCircle, Ban, 
-  Search, X, IdCard, User, ChevronRight, Eye 
+  Search, X, ChevronRight, Eye 
 } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../../utils/apiCall';
+import { TableSkeleton } from "../SkeletonComponent";
 
 const StatusBadge = ({ status }) => {
   if (status) {
@@ -30,7 +31,7 @@ const BranchCard = ({ branch, index, onViewDetails }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="border border-gray-200 rounded-xl hover:shadow-md transition-all bg-white overflow-hidden group cursor-pointer"
+      className="border border-gray-200 rounded-xl hover:shadow-md transition-all bg-white overflow-hidden group cursor-pointer dark:border-slate-800 dark:bg-slate-900"
       onClick={() => onViewDetails(branch.branch_id)}
     >
       <div className="p-4">
@@ -38,7 +39,7 @@ const BranchCard = ({ branch, index, onViewDetails }) => {
           <div className="flex items-center gap-2 flex-1">
             <Building size={18} className="text-purple-600 shrink-0" />
             <div>
-              <h3 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors">
+              <h3 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors dark:text-slate-100">
                 {branch.name}
               </h3>
               <p className="text-xs text-gray-400 font-mono mt-0.5">ID: {branch.branch_id}</p>
@@ -145,9 +146,7 @@ export default function BranchesTab({ username }) {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <TableSkeleton columns={4} rows={5} showActions={false} />
     );
   }
 
@@ -155,7 +154,7 @@ export default function BranchesTab({ username }) {
     return (
       <div className="text-center py-12">
         <Building className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-        <h3 className="text-lg font-medium text-gray-900">No Branches Found</h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">No Branches Found</h3>
         <p className="text-gray-500 mt-1">This user hasn't created any branches yet.</p>
       </div>
     );

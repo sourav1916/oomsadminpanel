@@ -10,17 +10,21 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  body {
+    @apply bg-slate-100 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
   ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 3px;
+    @apply rounded bg-slate-300 dark:bg-slate-700;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    @apply bg-slate-400 dark:bg-slate-600;
   }
 }

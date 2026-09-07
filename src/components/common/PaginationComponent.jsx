@@ -72,18 +72,18 @@ const Pagination = ({
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={`w-full lg:flex lg:justify-between lg:items-center bg-white rounded-xl border border-slate-200 mt-6 p-3 sm:p-4 ${className}`.trim()}
+            className={`w-full lg:flex lg:justify-between lg:items-center bg-white rounded-xl border border-slate-200 mt-6 p-3 sm:p-4 dark:bg-slate-900 dark:border-slate-800 ${className}`.trim()}
         >
             {/* ── ROW 1 (mobile): Info + Page controls side by side ── */}
             <div className="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
 
                 {/* Showing X–Y of Z — hidden on very small if needed, but kept visible */}
                 {showInfo && (
-                    <p className="text-xs sm:text-sm text-slate-600 font-medium whitespace-nowrap shrink-0">
+                    <p className="text-xs sm:text-sm text-slate-600 font-medium whitespace-nowrap shrink-0 dark:text-slate-400">
                         Showing{' '}
-                        <span className="text-slate-900 font-semibold">{startItem}–{endItem}</span>
+                        <span className="text-slate-900 font-semibold dark:text-white">{startItem}–{endItem}</span>
                         {' '}of{' '}
-                        <span className="text-slate-900 font-semibold">{totalItems}</span>
+                        <span className="text-slate-900 font-semibold dark:text-white">{totalItems}</span>
                     </p>
                 )}
 
@@ -92,7 +92,7 @@ const Pagination = ({
                     <button
                         onClick={() => onPageChange(1)}
                         disabled={currentPage === 1}
-                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                         title="First Page"
                     >
                         <FaAngleDoubleLeft size={11} />
@@ -101,7 +101,7 @@ const Pagination = ({
                     <button
                         onClick={() => onPageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                         title="Previous Page"
                     >
                         <FaChevronLeft size={11} />
@@ -119,7 +119,7 @@ const Pagination = ({
                                         min-w-[28px] h-7 sm:min-w-[36px] sm:h-9 rounded-lg text-xs sm:text-sm font-bold transition-all
                                         ${currentPage === page
                                             ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                                            : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600'
+                                            : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-slate-800'
                                         }
                                     `}
                                 >
@@ -132,7 +132,7 @@ const Pagination = ({
                     <button
                         onClick={() => onPageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                         title="Next Page"
                     >
                         <FaChevronRight size={11} />
@@ -141,7 +141,7 @@ const Pagination = ({
                     <button
                         onClick={() => onPageChange(totalPages)}
                         disabled={currentPage === totalPages}
-                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                        className="p-1.5 rounded-lg border border-slate-100 text-slate-400 hover:bg-slate-50 hover:text-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                         title="Last Page"
                     >
                         <FaAngleDoubleRight size={11} />
@@ -150,7 +150,7 @@ const Pagination = ({
             </div>
 
             {/* ── ROW 2 (mobile): Show limit + Go to ── */}
-            <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-100 sm:mt-0 sm:pt-0 sm:border-0 sm:hidden">
+            <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-100 sm:mt-0 sm:pt-0 sm:border-0 sm:hidden dark:border-slate-800">
 
                 {/* Show limit */}
                 {onLimitChange && (
@@ -179,7 +179,7 @@ const Pagination = ({
                                 const val = e.target.value.replace(/[^0-9]/g, '');
                                 setJumpPage(val);
                             }}
-                            className="w-14 bg-white border border-slate-200 rounded-lg px-2 py-1 pr-7 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center"
+                            className="w-14 bg-white border border-slate-200 rounded-lg px-2 py-1 pr-7 text-xs font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                         />
                         <button
                             type="submit"
@@ -188,12 +188,12 @@ const Pagination = ({
                             <FaLevelDownAlt size={8} className="rotate-90" />
                         </button>
                     </form>
-                    <span className="text-xs text-slate-500">of <span className="text-slate-900 font-bold">{totalPages}</span></span>
+                    <span className="text-xs text-slate-500">of <span className="text-slate-900 font-bold dark:text-white">{totalPages}</span></span>
                 </div>
             </div>
 
             {/* ── Desktop layout (sm+): original single row ── */}
-            <div className="hidden sm:flex items-center justify-between gap-4 mt-3 pt-3 border-t border-slate-100 lg:mt-0 lg:pt-0">
+            <div className="hidden sm:flex items-center justify-between gap-4 mt-3 pt-3 border-t border-slate-100 lg:mt-0 lg:pt-0 dark:border-slate-800">
                 {onLimitChange && (
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-slate-500 font-medium">Show:</span>
@@ -219,7 +219,7 @@ const Pagination = ({
                                 setJumpPage(val);
                             }}
                             placeholder="Page No"
-                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 pr-10 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center"
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 pr-10 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
                         />
                         <button
                             type="submit"
@@ -228,7 +228,7 @@ const Pagination = ({
                             <FaLevelDownAlt size={10} className="rotate-90" />
                         </button>
                     </form>
-                    <span className="text-sm text-slate-500 font-medium">of <span className="text-slate-900 font-bold">{totalPages}</span> pages</span>
+                    <span className="text-sm text-slate-500 font-medium">of <span className="text-slate-900 font-bold dark:text-white">{totalPages}</span> pages</span>
                 </div>
             </div>
         </motion.div>

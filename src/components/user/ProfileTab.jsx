@@ -9,7 +9,7 @@ import {
 
 const InfoSection = ({ title, icon: Icon, children }) => (
   <div className="mb-6">
-    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 dark:text-slate-200">
       <Icon size={16} className="text-blue-500" />
       {title}
     </h3>
@@ -20,9 +20,9 @@ const InfoSection = ({ title, icon: Icon, children }) => (
 );
 
 const InfoField = ({ label, value }) => (
-  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100">
-    <p className="text-xs text-gray-500 mb-1">{label}</p>
-    <p className="text-sm font-medium text-gray-800 break-words">{value || "N/A"}</p>
+  <div className="bg-gray-50 rounded-lg p-3 border border-gray-100 dark:border-slate-700 dark:bg-slate-800">
+    <p className="text-xs text-gray-500 mb-1 dark:text-slate-400">{label}</p>
+    <p className="text-sm font-medium text-gray-800 break-words dark:text-slate-100">{value || "N/A"}</p>
   </div>
 );
 
