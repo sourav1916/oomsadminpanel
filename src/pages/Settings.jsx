@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, User, Shield, ArrowRight } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, User, Shield, ArrowRight } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
   {
@@ -7,6 +7,24 @@ const SETTINGS_ITEMS = [
     icon: Mail,
     title: 'Company Mail',
     description: 'SMTP host, sender identity, and the active outbound mail config used for OTP and notifications.',
+  },
+  {
+    to: '/settings/wp-system-templates',
+    icon: MessageSquareText,
+    title: 'System WhatsApp Templates',
+    description: 'Manage global OOMS System WhatsApp template content for all notification types.',
+  },
+  {
+    to: '/settings/sms-system-config',
+    icon: Smartphone,
+    title: 'System SMS Config',
+    description: 'Platform Fast2SMS credentials for the OOMS System SMS channel (separate from OTP).',
+  },
+  {
+    to: '/settings/sms-system-templates',
+    icon: MessageSquare,
+    title: 'System SMS Templates',
+    description: 'Manage global OOMS System SMS / DLT templates by notification type.',
   },
   {
     to: '/profile',

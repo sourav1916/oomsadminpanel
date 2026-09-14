@@ -6,6 +6,9 @@ import {
   ConciergeBell,
   Settings,
   Mail,
+  MessageSquareText,
+  Smartphone,
+  MessageSquare,
   ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -40,6 +43,21 @@ const menuSections = [
         children: [
           { icon: SlidersHorizontal, label: 'Overview', path: '/settings' },
           { icon: Mail, label: 'Company Mail', path: '/settings/mail' },
+          {
+            icon: MessageSquareText,
+            label: 'System WhatsApp',
+            path: '/settings/wp-system-templates',
+          },
+          {
+            icon: Smartphone,
+            label: 'System SMS Config',
+            path: '/settings/sms-system-config',
+          },
+          {
+            icon: MessageSquare,
+            label: 'System SMS Templates',
+            path: '/settings/sms-system-templates',
+          },
         ],
       },
     ],

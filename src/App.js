@@ -18,6 +18,9 @@ import BranchServices from "./pages/BranchServices";
 import Services from "./pages/Services";
 import Settings from "./pages/Settings";
 import CompanyMail from "./pages/CompanyMail";
+import WpSystemTemplates from "./pages/WpSystemTemplates";
+import SmsSystemConfig from "./pages/SmsSystemConfig";
+import SmsSystemTemplates from "./pages/SmsSystemTemplates";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
@@ -74,6 +77,9 @@ function App() {
 
               <Route path="settings" element={<Settings />} />
               <Route path="settings/mail" element={<CompanyMail />} />
+              <Route path="settings/wp-system-templates" element={<WpSystemTemplates />} />
+              <Route path="settings/sms-system-config" element={<SmsSystemConfig />} />
+              <Route path="settings/sms-system-templates" element={<SmsSystemTemplates />} />
               <Route path="profile" element={<Profile />} />
 
               <Route path="*" element={<NotFound />} />
