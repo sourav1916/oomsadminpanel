@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, User, Shield, ArrowRight } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, User, Shield, ArrowRight } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
   {
@@ -25,6 +25,12 @@ const SETTINGS_ITEMS = [
     icon: MessageSquare,
     title: 'System SMS Templates',
     description: 'Manage global OOMS System SMS / DLT templates by notification type.',
+  },
+  {
+    to: '/settings/call-system-config',
+    icon: Phone,
+    title: 'System Call Config',
+    description: 'Platform PBX API URL for the OOMS System Call channel (branch tokens are per office).',
   },
   {
     to: '/profile',

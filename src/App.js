@@ -21,6 +21,7 @@ import CompanyMail from "./pages/CompanyMail";
 import WpSystemTemplates from "./pages/WpSystemTemplates";
 import SmsSystemConfig from "./pages/SmsSystemConfig";
 import SmsSystemTemplates from "./pages/SmsSystemTemplates";
+import CallSystemConfig from "./pages/CallSystemConfig";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
@@ -80,6 +81,7 @@ function App() {
               <Route path="settings/wp-system-templates" element={<WpSystemTemplates />} />
               <Route path="settings/sms-system-config" element={<SmsSystemConfig />} />
               <Route path="settings/sms-system-templates" element={<SmsSystemTemplates />} />
+              <Route path="settings/call-system-config" element={<CallSystemConfig />} />
               <Route path="profile" element={<Profile />} />
 
               <Route path="*" element={<NotFound />} />

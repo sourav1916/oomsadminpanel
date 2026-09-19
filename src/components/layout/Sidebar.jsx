@@ -9,6 +9,7 @@ import {
   MessageSquareText,
   Smartphone,
   MessageSquare,
+  Phone,
   ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -57,6 +58,11 @@ const menuSections = [
             icon: MessageSquare,
             label: 'System SMS Templates',
             path: '/settings/sms-system-templates',
+          },
+          {
+            icon: Phone,
+            label: 'System Call Config',
+            path: '/settings/call-system-config',
           },
         ],
       },
