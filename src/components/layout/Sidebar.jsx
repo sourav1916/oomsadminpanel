@@ -10,6 +10,8 @@ import {
   Smartphone,
   MessageSquare,
   Phone,
+  CreditCard,
+  Landmark,
   ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -63,6 +65,16 @@ const menuSections = [
             icon: Phone,
             label: 'System Call Config',
             path: '/settings/call-system-config',
+          },
+          {
+            icon: CreditCard,
+            label: 'Razorpay',
+            path: '/settings/razorpay',
+          },
+          {
+            icon: Landmark,
+            label: 'Wallet Payments',
+            path: '/settings/wallet-payments',
           },
         ],
       },

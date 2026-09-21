@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, User, Shield, ArrowRight } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, User, Shield, ArrowRight } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
   {
@@ -31,6 +31,18 @@ const SETTINGS_ITEMS = [
     icon: Phone,
     title: 'System Call Config',
     description: 'Platform PBX API URL for the OOMS System Call channel (branch tokens are per office).',
+  },
+  {
+    to: '/settings/razorpay',
+    icon: CreditCard,
+    title: 'Razorpay Payment Gateway',
+    description: 'API keys, webhook secret, and wallet gateway charges for Razorpay top-ups.',
+  },
+  {
+    to: '/settings/wallet-payments',
+    icon: Landmark,
+    title: 'Wallet Payments',
+    description: 'Bank accounts for manual transfers and approve/reject payment requests (no gateway fee).',
   },
   {
     to: '/profile',
