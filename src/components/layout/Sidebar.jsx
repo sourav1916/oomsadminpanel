@@ -12,6 +12,7 @@ import {
   Phone,
   CreditCard,
   Landmark,
+  LifeBuoy,
   ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -75,6 +76,11 @@ const menuSections = [
             icon: Landmark,
             label: 'Wallet Payments',
             path: '/settings/wallet-payments',
+          },
+          {
+            icon: LifeBuoy,
+            label: 'Help & Support',
+            path: '/settings/help-support',
           },
         ],
       },
