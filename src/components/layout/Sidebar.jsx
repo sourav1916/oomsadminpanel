@@ -13,6 +13,7 @@ import {
   CreditCard,
   Landmark,
   LifeBuoy,
+  Globe,
   ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -81,6 +82,11 @@ const menuSections = [
             icon: LifeBuoy,
             label: 'Help & Support',
             path: '/settings/help-support',
+          },
+          {
+            icon: Globe,
+            label: 'Website Contact',
+            path: '/settings/website-contact',
           },
         ],
       },

@@ -25,6 +25,7 @@ import CallSystemConfig from "./pages/CallSystemConfig";
 import RazorpayConfig from "./pages/RazorpayConfig";
 import WalletPayments from "./pages/WalletPayments";
 import HelpSupportConfig from "./pages/HelpSupportConfig";
+import WebsiteContactConfig from "./pages/WebsiteContactConfig";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
@@ -88,6 +89,7 @@ function App() {
               <Route path="settings/razorpay" element={<RazorpayConfig />} />
               <Route path="settings/wallet-payments" element={<WalletPayments />} />
               <Route path="settings/help-support" element={<HelpSupportConfig />} />
+              <Route path="settings/website-contact" element={<WebsiteContactConfig />} />
               <Route path="profile" element={<Profile />} />
 
               <Route path="*" element={<NotFound />} />
