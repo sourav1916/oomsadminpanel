@@ -14,7 +14,8 @@ import {
 import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
 import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
-import Pagination, { usePagination } from "../components/common/PaginationComponent";
+import { usePagination } from "../components/common/PaginationComponent";
+import TablePagination from "../components/common/TablePagination";
 import ManagementTable from "../components/common/ManagementTable";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
@@ -69,10 +70,10 @@ const TypeBadge = ({ type }) => {
   const isCompliance = type === "compliance";
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${
+      className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
         isCompliance
-          ? "border-violet-200 bg-violet-100 text-violet-800 dark:border-violet-800 dark:bg-violet-900/40 dark:text-violet-300"
-          : "border-blue-200 bg-blue-100 text-blue-800 dark:border-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
+          ? "bg-admin-accent-soft text-admin-accent-text"
+          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
       }`}
     >
       {isCompliance ? "Compliance" : "General"}
@@ -95,64 +96,64 @@ const ViewServiceModal = ({ service, onClose }) => (
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="m-auto flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-slate-900 dark:border dark:border-slate-800"
+      className="admin-panel m-auto flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="flex shrink-0 items-center justify-between border-b p-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800 dark:text-white">
-          <ConciergeBell className="text-emerald-500" size={20} />
+      <div className="flex shrink-0 items-center justify-between border-b border-admin-border p-5">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-admin-text">
+          <ConciergeBell className="text-admin-accent-text" size={20} />
           Service Details
         </h2>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-admin-border bg-admin-raised text-admin-muted transition-colors hover:text-admin-text"
         >
           <X size={18} />
         </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
-        <div className="flex items-start justify-between gap-4 border-b pb-4">
+        <div className="flex items-start justify-between gap-4 border-b border-admin-border pb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-800 dark:text-white">{service.name}</h3>
-            <p className="mt-1 text-sm text-gray-500">{service.service_id}</p>
+            <h3 className="text-xl font-bold text-admin-text">{service.name}</h3>
+            <p className="mt-1 text-sm text-admin-muted">{service.service_id}</p>
           </div>
           <TypeBadge type={service.type} />
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">SAC Code</div>
-            <div className="mt-1 text-sm font-medium text-gray-800">{service.sac_code || "N/A"}</div>
+          <div className="rounded-lg border border-admin-border bg-admin-raised px-3 py-2">
+            <div className="admin-label mb-0">SAC Code</div>
+            <div className="mt-1 text-sm font-medium text-admin-text">{service.sac_code || "N/A"}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Default Amount</div>
-            <div className="mt-1 text-sm font-medium text-gray-800">{formatAmount(service.default_amount)}</div>
+          <div className="rounded-lg border border-admin-border bg-admin-raised px-3 py-2">
+            <div className="admin-label mb-0">Default Amount</div>
+            <div className="mt-1 text-sm font-medium text-admin-text">{formatAmount(service.default_amount)}</div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Frequency</div>
-            <div className="mt-1 text-sm font-medium capitalize text-gray-800">
+          <div className="rounded-lg border border-admin-border bg-admin-raised px-3 py-2">
+            <div className="admin-label mb-0">Frequency</div>
+            <div className="mt-1 text-sm font-medium capitalize text-admin-text">
               {service.type === "general" && !service.frequency ? "N/A" : service.frequency || "monthly"}
             </div>
           </div>
-          <div className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Due Day</div>
-            <div className="mt-1 text-sm font-medium text-gray-800">{service.due_day ?? "N/A"}</div>
+          <div className="rounded-lg border border-admin-border bg-admin-raised px-3 py-2">
+            <div className="admin-label mb-0">Due Day</div>
+            <div className="mt-1 text-sm font-medium text-admin-text">{service.due_day ?? "N/A"}</div>
           </div>
         </div>
 
         {service.remark && (
-          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
-            <div className="text-xs font-semibold uppercase tracking-wider text-emerald-700">Remark</div>
-            <p className="mt-1 text-sm text-gray-700">{service.remark}</p>
+          <div className="mt-4 rounded-lg border border-admin-border bg-admin-raised p-3">
+            <div className="text-xs font-semibold uppercase tracking-wider text-admin-accent-text">Remark</div>
+            <p className="mt-1 text-sm text-admin-text-sub">{service.remark}</p>
           </div>
         )}
       </div>
 
-      <div className="flex shrink-0 items-center justify-end border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-slate-800/60">
+      <div className="flex shrink-0 items-center justify-end border-t border-admin-border bg-admin-raised px-6 py-4">
         <button
           onClick={onClose}
-          className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+          className="rounded-lg border border-admin-border bg-admin-surface px-5 py-2.5 text-sm font-semibold text-admin-text-sub transition-colors hover:bg-admin-raised"
         >
           Close
         </button>
@@ -161,10 +162,9 @@ const ViewServiceModal = ({ service, onClose }) => (
   </motion.div>
 );
 
-const inputClass =
-  "w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100";
+const inputClass = "admin-input";
 
-const labelClass = "mb-1 block text-xs font-semibold uppercase tracking-wider text-gray-500";
+const labelClass = "admin-label";
 
 const AddServiceModal = ({
   form,
@@ -187,17 +187,17 @@ const AddServiceModal = ({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="m-auto flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-slate-900 dark:border dark:border-slate-800"
+      className="admin-panel m-auto flex max-h-[90vh] w-full max-w-xl flex-col overflow-hidden"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="flex shrink-0 items-center justify-between border-b p-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800 dark:text-white">
-          <Plus className="text-emerald-500" size={20} />
+      <div className="flex shrink-0 items-center justify-between border-b border-admin-border p-5">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-admin-text">
+          <Plus className="text-admin-accent-text" size={20} />
           Add Service
         </h2>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-admin-border bg-admin-raised text-admin-muted transition-colors hover:text-admin-text"
         >
           <X size={18} />
         </button>
@@ -218,7 +218,7 @@ const AddServiceModal = ({
               className={inputClass}
               required
             />
-            <p className="mt-1 text-xs text-gray-500">Spaces are not allowed in service ID.</p>
+            <p className="mt-1 text-xs text-admin-muted">Spaces are not allowed in service ID.</p>
           </div>
 
           <div>
@@ -278,11 +278,16 @@ const AddServiceModal = ({
             <div>
               <label className={labelClass}>Default Amount</label>
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
                 value={form.default_amount}
-                onChange={(e) => onChange("default_amount", e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value
+                    .replace(/[^\d.]/g, "")
+                    .replace(/(\..*)\./g, "$1");
+                  onChange("default_amount", v);
+                }}
                 placeholder="0.00"
                 className={inputClass}
               />
@@ -294,11 +299,14 @@ const AddServiceModal = ({
               <div>
                 <label className={labelClass}>Due Day (of month)</label>
                 <input
-                  type="number"
-                  min="1"
-                  max="31"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
                   value={form.due_day}
-                  onChange={(e) => onChange("due_day", e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^\d]/g, "");
+                    onChange("due_day", v);
+                  }}
                   className={inputClass}
                 />
               </div>
@@ -312,18 +320,18 @@ const AddServiceModal = ({
               onChange={(e) => onChange("remark", e.target.value)}
               placeholder="Optional remark"
               rows={3}
-              className={`${inputClass} resize-none`}
+              className="admin-textarea resize-none"
             />
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-admin-border bg-admin-raised px-6 py-4">
           <ManagementButton tone="slate" variant="outline" onClick={onClose} disabled={submitting}>
             Cancel
           </ManagementButton>
           <ManagementButton
             type="submit"
-            tone="emerald"
+            tone="teal"
             leftIcon={<Plus size={14} />}
             loading={submitting}
           >
@@ -350,25 +358,25 @@ const EditServiceModal = ({ service, name, sacCode, onNameChange, onSacCodeChang
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="m-auto w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-slate-900 dark:border dark:border-slate-800"
+      className="admin-panel m-auto w-full max-w-md overflow-hidden"
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="flex items-center justify-between border-b p-5">
-        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-800 dark:text-white">
-          <Pencil className="text-emerald-500" size={20} />
+      <div className="flex items-center justify-between border-b border-admin-border p-5">
+        <h2 className="flex items-center gap-2 text-lg font-bold text-admin-text">
+          <Pencil className="text-admin-accent-text" size={20} />
           Edit Service
         </h2>
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-100 bg-white/50 text-slate-500 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+          className="flex h-9 w-9 items-center justify-center rounded-md border border-admin-border bg-admin-raised text-admin-muted transition-colors hover:text-admin-text"
         >
           <X size={18} />
         </button>
       </div>
 
       <form onSubmit={onSubmit} className="p-5">
-        <div className="mb-2 text-sm text-gray-500">
-          Service ID: <span className="font-medium text-gray-700">{service.service_id}</span>
+        <div className="mb-2 text-sm text-admin-muted">
+          Service ID: <span className="font-medium text-admin-text">{service.service_id}</span>
         </div>
         <div>
           <label className={labelClass}>Service Name *</label>
@@ -397,7 +405,7 @@ const EditServiceModal = ({ service, name, sacCode, onNameChange, onSacCodeChang
           <ManagementButton tone="slate" variant="outline" onClick={onClose} disabled={submitting}>
             Cancel
           </ManagementButton>
-          <ManagementButton type="submit" tone="emerald" loading={submitting}>
+          <ManagementButton type="submit" tone="teal" loading={submitting}>
             Save Changes
           </ManagementButton>
         </div>
@@ -663,21 +671,14 @@ export default function Services() {
   const tableColumns = useMemo(
     () => [
       {
-        key: "serial",
-        label: "S.No",
-        headerClassName: "w-16",
-        className: "text-gray-500 font-medium",
-        render: (_service, index) => (pagination.page - 1) * pagination.limit + index + 1,
-      },
-      {
         key: "name",
         label: "Service",
         headerClassName: "text-left",
         className: "text-left",
         render: (service) => (
           <div className="text-left">
-            <p className="text-sm font-semibold text-gray-800">{service.name}</p>
-            <p className="text-xs text-gray-500">{service.service_id}</p>
+            <p className="text-sm font-semibold text-admin-text">{service.name}</p>
+            <p className="text-xs text-admin-muted">{service.service_id}</p>
           </div>
         ),
       },
@@ -690,14 +691,14 @@ export default function Services() {
         key: "sac_code",
         label: "SAC Code",
         render: (service) => (
-          <span className="text-sm text-gray-700">{service.sac_code || "—"}</span>
+          <span className="text-sm text-admin-text-sub">{service.sac_code || "—"}</span>
         ),
       },
       {
         key: "frequency",
         label: "Frequency",
         render: (service) => (
-          <span className="text-sm capitalize text-gray-700">
+          <span className="text-sm capitalize text-admin-text-sub">
             {service.type === "general" && !service.frequency ? "—" : service.frequency || "monthly"}
           </span>
         ),
@@ -706,18 +707,18 @@ export default function Services() {
         key: "default_amount",
         label: "Default Amount",
         render: (service) => (
-          <span className="text-sm font-medium text-gray-800">{formatAmount(service.default_amount)}</span>
+          <span className="text-sm font-medium text-admin-text">{formatAmount(service.default_amount)}</span>
         ),
       },
       {
         key: "remark",
         label: "Remark",
         render: (service) => (
-          <span className="line-clamp-2 max-w-xs text-sm text-gray-600">{service.remark || "—"}</span>
+          <span className="line-clamp-2 max-w-xs text-sm text-admin-text-sub">{service.remark || "—"}</span>
         ),
       },
     ],
-    [pagination.page, pagination.limit]
+    []
   );
 
   if (loading && services.length === 0) {
@@ -748,7 +749,7 @@ export default function Services() {
       onTabChange={handleTypeFilterChange}
       actions={
         <ManagementButton
-          tone="emerald"
+          tone="teal"
           leftIcon={<Plus size={14} />}
           onClick={handleOpenCreateModal}
         >
@@ -756,31 +757,31 @@ export default function Services() {
         </ManagementButton>
       }
       summary={
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-          Total: <span className="font-semibold text-slate-900 dark:text-white">{pagination.total}</span> services
+        <div className="inline-flex items-center gap-2 rounded-md border border-admin-border bg-admin-surface px-4 py-2 text-sm text-admin-text-sub">
+          Total: <span className="font-semibold text-admin-text">{pagination.total}</span> services
         </div>
       }
     >
-      <div className="space-y-6 p-2 lg:p-0">
+      <div className="space-y-3">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col justify-between gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm lg:flex-row lg:items-center dark:border-slate-800 dark:bg-slate-900"
+          className="admin-panel flex flex-col justify-between gap-4 p-4 lg:flex-row lg:items-center"
         >
           <div className="relative flex flex-1 items-center gap-4">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" size={18} />
             <input
               type="text"
               placeholder="Search by name, ID, SAC code, type..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="min-h-[42px] w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-11 pr-10 text-sm outline-none transition-all focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="admin-input pl-10 pr-10"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-admin-muted hover:text-admin-text"
               >
                 <X size={14} />
               </button>
@@ -796,14 +797,14 @@ export default function Services() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="rounded-xl bg-white py-16 text-center shadow-xl dark:bg-slate-900"
+            className="admin-panel py-16 text-center"
           >
-            <X className="mx-auto mb-4 text-red-400" size={48} />
-            <p className="text-xl text-gray-600">Error loading services</p>
-            <p className="mt-2 text-gray-400">{error}</p>
+            <X className="mx-auto mb-4 text-rose-400" size={48} />
+            <p className="text-xl text-admin-text-sub">Error loading services</p>
+            <p className="mt-2 text-admin-muted">{error}</p>
             <button
               onClick={handleRefresh}
-              className="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-white transition-colors hover:bg-emerald-700"
+              className="mt-4 rounded-lg bg-teal-600 px-4 py-2 text-white transition-colors hover:bg-teal-700"
             >
               Try Again
             </button>
@@ -814,18 +815,18 @@ export default function Services() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-xl bg-white py-16 text-center shadow-xl dark:bg-slate-900"
+            className="admin-panel py-16 text-center"
           >
-            <ConciergeBell className="mx-auto mb-4 text-gray-300" size={64} />
-            <p className="text-xl text-gray-500">No services found</p>
-            <p className="mt-2 text-gray-400">
+            <ConciergeBell className="mx-auto mb-4 text-admin-muted" size={64} />
+            <p className="text-xl text-admin-text-sub">No services found</p>
+            <p className="mt-2 text-admin-muted">
               {searchTerm || typeFilter !== "all"
                 ? "Try adjusting your search or filters"
                 : "No services have been created yet"}
             </p>
             {!searchTerm && typeFilter === "all" && (
               <ManagementButton
-                tone="emerald"
+                tone="teal"
                 className="mt-4"
                 leftIcon={<Plus size={14} />}
                 onClick={handleOpenCreateModal}
@@ -842,45 +843,40 @@ export default function Services() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-xl bg-white shadow-xl dark:bg-slate-900"
             >
               <ManagementTable
                   rows={services}
                   columns={tableColumns}
                   rowKey={(row) => row.service_id}
                   onRowClick={handleViewService}
+                  showSerial
+                  serialStart={(pagination.page - 1) * pagination.limit + 1}
                   getActions={(service) => [
                     {
                       label: "View Details",
                       icon: <Eye size={12} />,
                       onClick: () => handleViewService(service),
-                      className: "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40",
+                      className: "text-admin-accent-text hover:bg-admin-accent-soft",
                     },
                     {
                       label: "Edit",
                       icon: <Pencil size={12} />,
                       onClick: () => handleEditService(service),
-                      className: "text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-950/40",
+                      className: "text-admin-text-sub hover:bg-admin-raised hover:text-admin-text",
                     },
                   ]}
                   accent="slate"
+                  footer={
+                    <TablePagination
+                      page={pagination.page}
+                      limit={pagination.limit}
+                      total={pagination.total}
+                      totalPages={pagination.total_pages}
+                      onPageChange={handlePageChange}
+                      onLimitChange={handleLimitChange}
+                    />
+                  }
                 />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="mt-6"
-            >
-              <Pagination
-                currentPage={pagination.page}
-                totalItems={pagination.total}
-                itemsPerPage={pagination.limit}
-                onPageChange={handlePageChange}
-                showInfo
-                onLimitChange={handleLimitChange}
-              />
             </motion.div>
           </>
         )}

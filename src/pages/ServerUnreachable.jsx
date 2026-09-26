@@ -1,14 +1,7 @@
-// src/pages/ServerUnreachable.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  WifiOff, 
-  RefreshCw, 
-  Home, 
-  AlertTriangle,
-  Globe,
-  Server
-} from 'lucide-react';
+import { WifiOff, RefreshCw, Home, AlertTriangle, Globe, Server } from 'lucide-react';
+import ManagementButton from '../components/common/ManagementButton';
 
 const ServerUnreachable = () => {
   const navigate = useNavigate();
@@ -28,14 +21,11 @@ const ServerUnreachable = () => {
   const handleRetry = async () => {
     setIsRetrying(true);
     try {
-      // Try to ping the server
       const response = await fetch('/api/health-check', {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      
+
       if (response.ok) {
         window.location.reload();
       } else {
@@ -54,75 +44,72 @@ const ServerUnreachable = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4 dark:from-slate-950 dark:to-slate-900">
-      <div className="max-w-md w-full text-center">
-        {/* Server Error Illustration */}
-        <div className="relative mb-8">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-32 h-32 bg-red-100 rounded-full animate-ping opacity-20"></div>
-            </div>
-            <div className="relative bg-gradient-to-br from-red-500 to-orange-500 w-32 h-32 rounded-full flex items-center justify-center mx-auto shadow-2xl">
-              <Server className="w-16 h-16 text-white" />
-            </div>
-            <div className="absolute -top-2 -right-2 bg-red-500 rounded-full p-2 shadow-lg">
-              <WifiOff className="w-6 h-6 text-white" />
-            </div>
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-admin-bg px-4 font-sans">
+      <div className="admin-panel w-full max-w-md p-8 text-center">
+        <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+          <Server className="h-10 w-10" />
+          <span className="absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-lg bg-rose-600 text-white">
+            <WifiOff className="h-3.5 w-3.5" />
+          </span>
         </div>
 
-        {/* Error Message */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-3 dark:text-white">
-          Server Unreachable
+        <h1 className="text-2xl font-bold tracking-tight text-admin-text">
+          Server unreachable
         </h1>
-        <p className="text-gray-600 mb-4 dark:text-slate-400">
+        <p className="mt-2 text-sm text-admin-text-sub">
           Unable to connect to the server. This could be due to:
         </p>
-        
-        {/* Reasons List */}
-        <div className="bg-white/50 rounded-xl p-4 mb-6 text-left space-y-2 dark:bg-slate-800/60">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Globe className="w-4 h-4 text-red-500" />
+
+        <div className="mt-5 space-y-2 rounded-lg border border-admin-border bg-admin-raised p-4 text-left">
+          <div className="flex items-center gap-2 text-sm text-admin-text-sub">
+            <Globe className="h-4 w-4 text-rose-500" />
             <span>Network connectivity issues</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Server className="w-4 h-4 text-red-500" />
+          <div className="flex items-center gap-2 text-sm text-admin-text-sub">
+            <Server className="h-4 w-4 text-rose-500" />
             <span>Server is down or under maintenance</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <AlertTriangle className="w-4 h-4 text-red-500" />
+          <div className="flex items-center gap-2 text-sm text-admin-text-sub">
+            <AlertTriangle className="h-4 w-4 text-rose-500" />
             <span>Firewall or proxy blocking the connection</span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-3">
-          <button
+        <div className="mt-6 space-y-2">
+          <ManagementButton
+            tone="rose"
+            fullWidth
+            loading={isRetrying}
             onClick={handleManualRetry}
-            disabled={isRetrying}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl hover:from-red-700 hover:to-orange-700 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            leftIcon={!isRetrying ? <RefreshCw className="h-4 w-4" /> : undefined}
           >
-            <RefreshCw className={`w-4 h-4 ${isRetrying ? 'animate-spin' : ''}`} />
-            {isRetrying ? 'Retrying...' : `Retry Connection ${countdown > 0 ? `(${countdown}s)` : ''}`}
-          </button>
-          
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all duration-200 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+            {isRetrying
+              ? 'Retrying…'
+              : `Retry connection${countdown > 0 ? ` (${countdown}s)` : ''}`}
+          </ManagementButton>
+
+          <ManagementButton
+            tone="slate"
+            variant="outline"
+            fullWidth
+            onClick={() => navigate('/')}
+            leftIcon={<Home className="h-4 w-4" />}
           >
-            <Home className="w-4 h-4" />
             Go to Dashboard
-          </button>
+          </ManagementButton>
         </div>
 
-        {/* Help Text */}
-        <div className="mt-8 p-4 bg-white/50 rounded-xl dark:bg-slate-800/60">
-          <p className="text-sm text-gray-600 dark:text-slate-400">
-            If the problem persists, please check your internet connection or contact your system administrator.
+        <div className="mt-6 border-t border-admin-border pt-4">
+          <p className="text-sm text-admin-muted">
+            If the problem persists, check your internet connection or contact your system
+            administrator.
           </p>
-          <button 
-            onClick={() => window.location.href = '/login'}
-            className="text-sm text-blue-600 hover:text-blue-700 font-semibold mt-2"
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = '/login';
+            }}
+            className="mt-2 text-sm font-semibold text-admin-accent-text hover:underline"
           >
             Try logging in again →
           </button>

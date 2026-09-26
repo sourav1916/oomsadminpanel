@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
+import { DetailPageSkeleton } from "../components/SkeletonComponent";
 
 export default function CallSystemConfig() {
   const [loading, setLoading] = useState(true);
@@ -87,51 +88,51 @@ export default function CallSystemConfig() {
         </ManagementButton>
       }
     >
-      <div className="mx-auto max-w-2xl space-y-4 rounded-xl border border-slate-200 bg-white p-5">
-        <div>
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            PBX API URL
-          </label>
-          <input
-            type="url"
-            value={form.api_base_url}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, api_base_url: e.target.value }))
-            }
-            placeholder="https://ipbx.example.com/api/pbx/calls"
-            className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400"
-            disabled={loading || saving}
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            Full endpoint for call initiate (POST). Do not hardcode in the client apps.
-          </p>
-        </div>
+      {loading ? (
+        <DetailPageSkeleton />
+      ) : (
+        <div className="admin-panel space-y-4 p-5">
+          <div>
+            <label className="admin-label">PBX API URL</label>
+            <input
+              type="url"
+              value={form.api_base_url}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, api_base_url: e.target.value }))
+              }
+              placeholder="https://ipbx.example.com/api/pbx/calls"
+              className="admin-input"
+              disabled={loading || saving}
+            />
+            <p className="mt-1 text-xs text-admin-muted">
+              Full endpoint for call initiate (POST). Do not hardcode in the client apps.
+            </p>
+          </div>
 
-        <div>
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Status
-          </label>
-          <select
-            value={form.status}
-            onChange={(e) =>
-              setForm((prev) => ({ ...prev, status: e.target.value }))
-            }
-            className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400"
-            disabled={loading || saving}
-          >
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+          <div>
+            <label className="admin-label">Status</label>
+            <select
+              value={form.status}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, status: e.target.value }))
+              }
+              className="admin-input"
+              disabled={loading || saving}
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
 
-        {meta.configured ? (
-          <p className="text-xs text-emerald-700">API URL is configured.</p>
-        ) : (
-          <p className="text-xs text-amber-700">
-            Not configured yet — branches cannot place calls until this URL is saved.
-          </p>
-        )}
-      </div>
+          {meta.configured ? (
+            <p className="text-xs text-emerald-700">API URL is configured.</p>
+          ) : (
+            <p className="text-xs text-amber-700">
+              Not configured yet — branches cannot place calls until this URL is saved.
+            </p>
+          )}
+        </div>
+      )}
     </ManagementHub>
   );
 }

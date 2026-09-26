@@ -8,17 +8,17 @@ import { TableSkeleton } from "../SkeletonComponent";
 
 const ServiceStatusBadge = ({ status }) => {
   const variants = {
-    completed: { icon: CheckCircle, text: 'Completed', className: 'bg-green-100 text-green-800' },
-    pending: { icon: Clock, text: 'Pending', className: 'bg-yellow-100 text-yellow-800' },
-    cancelled: { icon: XCircle, text: 'Cancelled', className: 'bg-red-100 text-red-800' },
-    active: { icon: CheckCircle, text: 'Active', className: 'bg-blue-100 text-blue-800' },
+    completed: { icon: CheckCircle, text: 'Completed', className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
+    pending: { icon: Clock, text: 'Pending', className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
+    cancelled: { icon: XCircle, text: 'Cancelled', className: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300' },
+    active: { icon: CheckCircle, text: 'Active', className: 'bg-admin-accent-soft text-admin-accent-text' },
   };
   
   const variant = variants[status?.toLowerCase()] || variants.pending;
   const Icon = variant.icon;
   
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${variant.className}`}>
+    <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${variant.className}`}>
       <Icon size={10} /> {variant.text}
     </span>
   );
@@ -68,10 +68,10 @@ export default function ServicesTab({ username }) {
 
   if (services.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">No Services Found</h3>
-        <p className="text-gray-500 mt-1">This user hasn't subscribed to any services yet.</p>
+      <div className="py-12 text-center">
+        <Briefcase className="mx-auto mb-3 h-12 w-12 text-admin-muted" />
+        <h3 className="text-lg font-medium text-admin-text">No Services Found</h3>
+        <p className="mt-1 text-admin-muted">This user hasn't subscribed to any services yet.</p>
       </div>
     );
   }
@@ -79,34 +79,34 @@ export default function ServicesTab({ username }) {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" size={16} />
           <input
             type="text"
             placeholder="Search services..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="admin-input pl-9 pr-8"
           />
           {searchTerm && (
             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X size={14} className="text-gray-400 hover:text-gray-600" />
+              <X size={14} className="text-admin-muted hover:text-admin-text" />
             </button>
           )}
         </div>
 
         {/* Status Filter */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {["all", "active", "pending", "completed", "cancelled"].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors capitalize ${
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
                 filter === status
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                  ? "bg-teal-600 text-white"
+                  : "bg-admin-raised text-admin-text-sub hover:bg-admin-accent-soft hover:text-admin-accent-text"
               }`}
             >
               {status}
@@ -123,21 +123,21 @@ export default function ServicesTab({ username }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow bg-white dark:border-slate-800 dark:bg-slate-900"
+            className="admin-panel p-4"
           >
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <Briefcase size={18} className="text-blue-500" />
-                  <h3 className="font-semibold text-gray-800">{service.service_name}</h3>
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <Briefcase size={18} className="text-admin-accent-text" />
+                  <h3 className="font-semibold text-admin-text">{service.service_name}</h3>
                   <ServiceStatusBadge status={service.status} />
                 </div>
                 
                 {service.description && (
-                  <p className="text-sm text-gray-600 mb-3">{service.description}</p>
+                  <p className="mb-3 text-sm text-admin-text-sub">{service.description}</p>
                 )}
                 
-                <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                <div className="flex flex-wrap gap-3 text-xs text-admin-muted">
                   {service.start_date && (
                     <span className="flex items-center gap-1">
                       <Calendar size={12} />
@@ -151,7 +151,7 @@ export default function ServicesTab({ username }) {
                     </span>
                   )}
                   {service.price && (
-                    <span className="flex items-center gap-1 text-green-600 font-medium">
+                    <span className="flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-300">
                       <DollarSign size={12} />
                       ₹{service.price}
                     </span>
@@ -159,7 +159,7 @@ export default function ServicesTab({ username }) {
                 </div>
               </div>
               
-              <button className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+              <button className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-xs font-semibold text-admin-accent-text transition-colors hover:bg-admin-accent-soft">
                 <Eye size={12} />
                 View Details
               </button>
@@ -169,8 +169,8 @@ export default function ServicesTab({ username }) {
       </div>
 
       {filteredServices.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No services match your filters.</p>
+        <div className="py-8 text-center">
+          <p className="text-admin-muted">No services match your filters.</p>
         </div>
       )}
     </div>

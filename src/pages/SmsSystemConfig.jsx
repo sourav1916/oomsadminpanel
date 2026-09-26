@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
+import { DetailPageSkeleton } from "../components/SkeletonComponent";
 
 const ROUTE_OPTIONS = [
   { value: "dlt", label: "DLT" },
@@ -101,20 +102,19 @@ export default function SmsSystemConfig() {
         <ManagementButton
           onClick={handleSave}
           leftIcon={saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-          tone="indigo"
           disabled={saving || loading}
         >
           {saving ? "Saving…" : "Save config"}
         </ManagementButton>
       }
     >
-      <div className="mx-auto max-w-2xl rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        {loading ? (
-          <p className="text-sm text-slate-500">Loading…</p>
-        ) : (
+      {loading ? (
+        <DetailPageSkeleton />
+      ) : (
+      <div className="admin-panel p-5">
           <div className="space-y-4">
-            <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Auth token
+            <div>
+              <label className="admin-label">Auth token</label>
               <input
                 type="password"
                 value={form.auth_token}
@@ -126,13 +126,13 @@ export default function SmsSystemConfig() {
                     ? `Current: ${meta.auth_token_masked} (leave blank to keep)`
                     : "Fast2SMS authorization token"
                 }
-                className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                className="admin-input"
               />
-            </label>
+            </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Sender ID
+              <div>
+                <label className="admin-label">Sender ID</label>
                 <input
                   type="text"
                   value={form.sender_id}
@@ -142,31 +142,31 @@ export default function SmsSystemConfig() {
                       sender_id: e.target.value.toUpperCase(),
                     }))
                   }
-                  className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  className="admin-input"
                 />
-              </label>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Entity ID
+              </div>
+              <div>
+                <label className="admin-label">Entity ID</label>
                 <input
                   type="text"
                   value={form.entity_id}
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, entity_id: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  className="admin-input"
                 />
-              </label>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Route
+              <div>
+                <label className="admin-label">Route</label>
                 <select
                   value={form.route}
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, route: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  className="admin-input"
                 >
                   {ROUTE_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -174,24 +174,24 @@ export default function SmsSystemConfig() {
                     </option>
                   ))}
                 </select>
-              </label>
-              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Status
+              </div>
+              <div>
+                <label className="admin-label">Status</label>
                 <select
                   value={form.status}
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, status: e.target.value }))
                   }
-                  className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                  className="admin-input"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
-              </label>
+              </div>
             </div>
           </div>
-        )}
       </div>
+      )}
     </ManagementHub>
   );
 }

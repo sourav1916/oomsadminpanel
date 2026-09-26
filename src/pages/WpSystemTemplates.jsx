@@ -21,6 +21,7 @@ import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
 import ModalScrollLock from "../components/common/ModalScrollLock";
 import { TableSkeleton } from "../components/SkeletonComponent";
+import ActionMenu from "../components/common/ActionMenu";
 
 const EMPTY_FORM = {
   template_id: "",
@@ -49,7 +50,7 @@ function StatusBadge({ status }) {
   const active = String(status).toLowerCase() === "active";
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+      className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
         active
           ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
           : "border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
@@ -535,25 +536,25 @@ export default function WpSystemTemplates() {
       onRefresh={() => fetchList(true)}
       refreshing={refreshing}
       actions={
-        <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />} tone="indigo">
+        <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />}>
           Import template
         </ManagementButton>
       }
     >
       <div className="space-y-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="admin-panel p-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates…"
-              className="w-full max-w-md rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="admin-input w-full max-w-md"
             />
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="admin-input w-full sm:w-auto"
             >
               <option value="">All types</option>
               {typeOptions.map((item) => (
@@ -565,7 +566,7 @@ export default function WpSystemTemplates() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="admin-panel overflow-hidden">
           {loading ? (
             <TableSkeleton columns={5} rows={8} />
           ) : rows.length === 0 ? (
@@ -579,7 +580,7 @@ export default function WpSystemTemplates() {
               <p className="text-sm text-slate-500">
                 Import an APPROVED template from OneChatting and map its variables.
               </p>
-              <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />} tone="indigo">
+              <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />}>
                 Import template
               </ManagementButton>
             </div>
@@ -588,6 +589,7 @@ export default function WpSystemTemplates() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-400">
+                    <th className="px-4 py-3 w-12">S.No</th>
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Template</th>
                     <th className="px-4 py-3">Preview</th>
@@ -595,17 +597,18 @@ export default function WpSystemTemplates() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {rows.map((row) => (
+                <tbody className="divide-y divide-admin-border">
+                  {rows.map((row, index) => (
                     <tr key={row.template_id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/70">
+                      <td className="px-4 py-3 text-slate-500">{index + 1}</td>
                       <td className="px-4 py-3">
-                        <p className="font-semibold capitalize text-slate-900 dark:text-white">
+                        <p className="font-semibold capitalize text-admin-text">
                           {row.type}
                         </p>
                         <p className="text-xs text-slate-400">{row.category}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <p className="font-medium text-slate-800 dark:text-slate-200">
+                        <p className="font-medium text-admin-text">
                           {row.template_name}
                         </p>
                         <p className="text-xs text-slate-400">{row.template_id}</p>
@@ -618,35 +621,32 @@ export default function WpSystemTemplates() {
                       <td className="px-4 py-3">
                         <StatusBadge status={row.status} />
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={() => toggleStatus(row)}
-                            disabled={statusBusyId === row.template_id}
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
-                          >
-                            <Power size={12} />
-                            {String(row.status).toLowerCase() === "active"
-                              ? "Deactivate"
-                              : "Activate"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => openEdit(row)}
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-                          >
-                            <Pencil size={12} /> Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(row)}
-                            disabled={deleteBusyId === row.template_id}
-                            className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-                          >
-                            <Trash2 size={12} /> Delete
-                          </button>
-                        </div>
+                      <td className="px-4 py-3 text-right">
+                        <ActionMenu
+                          actions={[
+                            {
+                              label:
+                                String(row.status).toLowerCase() === "active"
+                                  ? "Deactivate"
+                                  : "Activate",
+                              icon: <Power size={12} />,
+                              disabled: statusBusyId === row.template_id,
+                              onClick: () => toggleStatus(row),
+                            },
+                            {
+                              label: "Edit",
+                              icon: <Pencil size={12} />,
+                              onClick: () => openEdit(row),
+                            },
+                            {
+                              label: "Delete",
+                              icon: <Trash2 size={12} />,
+                              danger: true,
+                              disabled: deleteBusyId === row.template_id,
+                              onClick: () => handleDelete(row),
+                            },
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -672,17 +672,17 @@ export default function WpSystemTemplates() {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="wp-system-import-title"
-                className="flex h-[min(96vh,980px)] w-full max-w-[1400px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+                className="admin-panel flex h-[min(96vh,980px)] w-full max-w-[1400px] flex-col overflow-hidden"
                 variants={modalVariants}
               >
-                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+                <div className="flex shrink-0 items-start justify-between gap-4 border-b border-admin-border px-5 py-4">
                   <div className="min-w-0">
                     <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
                       OOMS System WhatsApp
                     </p>
                     <h3
                       id="wp-system-import-title"
-                      className="mt-0.5 text-xl font-bold text-slate-900 dark:text-white"
+                      className="mt-0.5 text-xl font-bold text-admin-text"
                     >
                       {isEdit ? "Update template" : "Import template"}
                     </h3>
@@ -699,15 +699,15 @@ export default function WpSystemTemplates() {
                 </div>
 
                 <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(320px,42%)_minmax(0,58%)]">
-                  <aside className="flex min-h-0 flex-col border-b border-slate-200 lg:border-b-0 lg:border-r dark:border-slate-800">
-                    <div className="shrink-0 space-y-3 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+                  <aside className="flex min-h-0 flex-col border-b border-admin-border lg:border-b-0 lg:border-r">
+                    <div className="shrink-0 space-y-3 border-b border-admin-border px-4 py-3">
                       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <label className="block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                          Notification type
+                        <div>
+                          <label className="admin-label">Notification type</label>
                           <select
                             value={form.type}
                             onChange={(e) => handleTypeChange(e.target.value)}
-                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                            className="admin-input font-medium"
                           >
                             {typeOptions.map((item) => (
                               <option key={item.name} value={item.name}>
@@ -715,20 +715,20 @@ export default function WpSystemTemplates() {
                               </option>
                             ))}
                           </select>
-                        </label>
-                        <label className="block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                          Status
+                        </div>
+                        <div>
+                          <label className="admin-label">Status</label>
                           <select
                             value={form.status}
                             onChange={(e) =>
                               setForm((prev) => ({ ...prev, status: e.target.value }))
                             }
-                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                            className="admin-input font-medium"
                           >
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                           </select>
-                        </label>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -737,13 +737,13 @@ export default function WpSystemTemplates() {
                           value={ocSearch}
                           onChange={(e) => setOcSearch(e.target.value)}
                           placeholder="Search OneChatting templates…"
-                          className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                          className="admin-input min-w-0 flex-1"
                         />
                         <button
                           type="button"
                           onClick={fetchOneChattingTemplates}
                           disabled={ocLoading}
-                          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-admin-border text-admin-text-sub transition-colors hover:bg-admin-raised disabled:opacity-50"
                           title="Refresh templates"
                         >
                           {ocLoading ? (
@@ -767,7 +767,7 @@ export default function WpSystemTemplates() {
                           <button
                             type="button"
                             onClick={fetchOneChattingTemplates}
-                            className="mt-3 text-xs font-semibold text-indigo-600 hover:underline"
+                            className="mt-3 text-xs font-semibold text-admin-accent-text hover:underline"
                           >
                             Try again
                           </button>
@@ -777,7 +777,7 @@ export default function WpSystemTemplates() {
                           No APPROVED templates found.
                         </div>
                       ) : (
-                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <div className="divide-y divide-admin-border">
                           {filteredOcTemplates.map((item) => {
                             const selected =
                               item.template_id === form.onechatting_template_id ||
@@ -789,14 +789,14 @@ export default function WpSystemTemplates() {
                                 onClick={() => applyOneChattingSelection(item)}
                                 className={`flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors ${
                                   selected
-                                    ? "bg-indigo-50 dark:bg-indigo-950/35"
-                                    : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                    ? "bg-admin-accent-soft dark:bg-teal-950/35"
+                                    : "hover:bg-admin-raised/50"
                                 }`}
                               >
                                 <span
                                   className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
                                     selected
-                                      ? "border-indigo-600 bg-indigo-600 text-white"
+                                      ? "border-teal-600 bg-teal-600 text-white"
                                       : "border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-900"
                                   }`}
                                 >
@@ -804,7 +804,7 @@ export default function WpSystemTemplates() {
                                 </span>
                                 <div className="min-w-0 flex-1">
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <span className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                                    <span className="truncate text-sm font-semibold text-admin-text">
                                       {item.template_name}
                                     </span>
                                     {item.category ? (
@@ -836,7 +836,7 @@ export default function WpSystemTemplates() {
                         <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
                           <MessageSquareText className="h-6 w-6 text-slate-400" />
                         </div>
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                        <p className="text-sm font-semibold text-admin-text">
                           Select a template
                         </p>
                       </div>
@@ -844,17 +844,17 @@ export default function WpSystemTemplates() {
                       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
                         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_280px]">
                           <div className="space-y-4">
-                            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                            <div className="admin-panel p-4">
                               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                                 <div>
                                   <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
                                     Message preview
                                   </p>
-                                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                  <p className="text-sm font-semibold text-admin-text">
                                     {selectedOcTemplate.template_name}
                                   </p>
                                 </div>
-                                <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-800">
+                                <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-800">
                                   {selectedOcTemplate.status || "APPROVED"}
                                 </span>
                               </div>
@@ -878,7 +878,7 @@ export default function WpSystemTemplates() {
                                   href={activeHeaderMedia}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="mb-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-medium text-indigo-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-indigo-300"
+                                  className="mb-3 flex items-center gap-2 rounded-lg border border-admin-border bg-admin-raised px-3 py-2.5 text-xs font-medium text-admin-accent-text hover:bg-admin-accent-soft dark:text-teal-300"
                                 >
                                   <FileText size={14} />
                                   Open document
@@ -902,7 +902,7 @@ export default function WpSystemTemplates() {
                             </div>
 
                             {hasMediaHeader ? (
-                              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                              <div className="admin-panel p-4">
                                 <div className="mb-3 flex items-center gap-2">
                                   {headerFormat === "VIDEO" ? (
                                     <Film size={15} className="text-slate-500" />
@@ -911,7 +911,7 @@ export default function WpSystemTemplates() {
                                   ) : (
                                     <ImageIcon size={15} className="text-slate-500" />
                                   )}
-                                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                  <p className="text-sm font-semibold text-admin-text">
                                     Header {headerFormat || "media"}
                                   </p>
                                 </div>
@@ -928,7 +928,7 @@ export default function WpSystemTemplates() {
                                     }
                                     className={`rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors ${
                                       form.header_media_mode !== "custom"
-                                        ? "border-indigo-400 bg-indigo-50 text-indigo-800 ring-2 ring-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-200 dark:ring-indigo-800"
+                                        ? "border-teal-400 bg-admin-accent-soft text-teal-800 ring-2 ring-teal-200 dark:bg-teal-950/40 dark:text-teal-200 dark:ring-teal-800"
                                         : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                                     }`}
                                   >
@@ -944,7 +944,7 @@ export default function WpSystemTemplates() {
                                     }
                                     className={`rounded-lg border px-3 py-2 text-left text-xs font-semibold transition-colors ${
                                       form.header_media_mode === "custom"
-                                        ? "border-indigo-400 bg-indigo-50 text-indigo-800 ring-2 ring-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-200 dark:ring-indigo-800"
+                                        ? "border-teal-400 bg-admin-accent-soft text-teal-800 ring-2 ring-teal-200 dark:bg-teal-950/40 dark:text-teal-200 dark:ring-teal-800"
                                         : "border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
                                     }`}
                                   >
@@ -965,7 +965,7 @@ export default function WpSystemTemplates() {
                                       type="button"
                                       disabled={headerUploading}
                                       onClick={() => headerFileInputRef.current?.click()}
-                                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 disabled:opacity-50 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-200 dark:hover:border-indigo-600"
+                                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-admin-border bg-admin-raised px-3 py-3 text-sm font-semibold text-admin-text-sub transition-colors hover:border-teal-400 hover:bg-admin-accent-soft hover:text-admin-accent-text disabled:opacity-50"
                                     >
                                       {headerUploading ? (
                                         <Loader2 size={15} className="animate-spin" />
@@ -992,9 +992,9 @@ export default function WpSystemTemplates() {
                               </div>
                             ) : null}
 
-                            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                            <div className="admin-panel p-4">
                               <div className="mb-3">
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                <p className="text-sm font-semibold text-admin-text">
                                   Variable placement
                                 </p>
                               </div>
@@ -1025,7 +1025,7 @@ export default function WpSystemTemplates() {
                                         }}
                                         className={`rounded-xl border p-3 transition-all ${
                                           isActive
-                                            ? "border-indigo-400 bg-indigo-50/70 ring-2 ring-indigo-200 dark:bg-indigo-950/30 dark:ring-indigo-800"
+                                            ? "border-teal-400 bg-admin-accent-soft/70 ring-2 ring-teal-200 dark:bg-teal-950/30 dark:ring-teal-800"
                                             : "border-slate-200 bg-slate-50/80 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-950/50"
                                         }`}
                                       >
@@ -1058,7 +1058,7 @@ export default function WpSystemTemplates() {
                                           }}
                                           onFocus={() => setActiveSlot(index)}
                                           onClick={(e) => e.stopPropagation()}
-                                          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                                          className="admin-input w-full"
                                         >
                                           <option value="">
                                             Select variable for “{form.type}”…
@@ -1078,12 +1078,12 @@ export default function WpSystemTemplates() {
                           </div>
 
                           <div className="space-y-3 xl:sticky xl:top-0 xl:self-start">
-                            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                            <div className="admin-panel p-4">
                               <div className="mb-3 flex items-center justify-between gap-2">
-                                <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                                <p className="text-sm font-semibold text-admin-text">
                                   Type variables
                                 </p>
-                                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                <span className="rounded-md bg-admin-raised px-2 py-0.5 text-[10px] font-bold uppercase text-admin-muted">
                                   {availableVariables.length}
                                 </span>
                               </div>
@@ -1106,10 +1106,10 @@ export default function WpSystemTemplates() {
                                         className={`rounded-lg border px-2.5 py-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                                           used
                                             ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/40"
-                                            : "border-slate-200 bg-slate-50 hover:border-indigo-300 hover:bg-indigo-50 dark:border-slate-700 dark:bg-slate-950 dark:hover:border-indigo-700"
+                                            : "border-slate-200 bg-slate-50 hover:border-teal-300 hover:bg-admin-accent-soft dark:border-slate-700 dark:bg-slate-950 dark:hover:border-teal-700"
                                         }`}
                                       >
-                                        <span className="block text-xs font-semibold text-slate-800 dark:text-slate-100">
+                                        <span className="block text-xs font-semibold text-admin-text">
                                           {variable.label}
                                         </span>
                                         <span className="mt-0.5 block font-mono text-[10px] text-slate-500">
@@ -1128,13 +1128,13 @@ export default function WpSystemTemplates() {
                   </section>
                 </div>
 
-                <div className="flex shrink-0 flex-col gap-3 border-t border-slate-200 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-end dark:border-slate-800 dark:bg-slate-900">
+                <div className="flex shrink-0 flex-col gap-3 border-t border-admin-border bg-admin-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-end">
                   <div className="flex items-center justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => setModalOpen(false)}
                       disabled={saving}
-                      className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                      className="rounded-lg border border-admin-border px-4 py-2.5 text-sm font-semibold text-admin-text-sub transition-colors hover:bg-admin-raised disabled:opacity-50"
                     >
                       Cancel
                     </button>
@@ -1142,7 +1142,7 @@ export default function WpSystemTemplates() {
                       type="button"
                       onClick={handleSave}
                       disabled={saving || ocLoading || !form.template_name || headerUploading}
-                      className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+                      className="rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-50"
                     >
                       {saving ? "Saving…" : isEdit ? "Save changes" : "Import & save"}
                     </button>

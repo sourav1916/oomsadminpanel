@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
+import { DetailPageSkeleton } from "../components/SkeletonComponent";
 
 const EMPTY_FORM = {
   company_name: "",
@@ -60,9 +61,7 @@ function TypedListEditor({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-          {title}
-        </label>
+        <span className="admin-label">{title}</span>
         <button
           type="button"
           onClick={addRow}
@@ -81,7 +80,7 @@ function TypedListEditor({
               value={row.type || ""}
               onChange={(e) => updateRow(index, "type", e.target.value)}
               placeholder={typePlaceholder}
-              className="h-10 w-32 shrink-0 rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+              className="admin-input w-32 shrink-0"
               disabled={disabled}
             />
             <input
@@ -89,7 +88,7 @@ function TypedListEditor({
               value={row[valueKey] || ""}
               onChange={(e) => updateRow(index, valueKey, e.target.value)}
               placeholder={valuePlaceholder}
-              className="h-10 min-w-0 flex-1 rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+              className="admin-input min-w-0 flex-1"
               disabled={disabled}
             />
             <button
@@ -234,12 +233,12 @@ export default function WebsiteContactConfig() {
         </ManagementButton>
       }
     >
-      <div className="mx-auto max-w-3xl space-y-5 rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        {loading ? (
-          <p className="text-sm text-slate-500">Loading…</p>
-        ) : (
+      {loading ? (
+        <DetailPageSkeleton />
+      ) : (
+      <div className="admin-panel space-y-5 p-5">
           <>
-            <p className="flex items-center gap-2 text-xs text-slate-500">
+            <p className="flex items-center gap-2 text-xs text-admin-muted">
               <Globe className="h-3.5 w-3.5" />
               {configured
                 ? "Published via /public/contact for the marketing website."
@@ -248,40 +247,34 @@ export default function WebsiteContactConfig() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Company name
-                </label>
+                <label className="admin-label">Company name</label>
                 <input
                   type="text"
                   value={form.company_name}
                   onChange={(e) => setField("company_name", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input"
                   disabled={loading || saving}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Short name
-                </label>
+                <label className="admin-label">Short name</label>
                 <input
                   type="text"
                   value={form.short_name}
                   onChange={(e) => setField("short_name", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input"
                   disabled={loading || saving}
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Website URL
-              </label>
+              <label className="admin-label">Website URL</label>
               <input
                 type="url"
                 value={form.website_url}
                 onChange={(e) => setField("website_url", e.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-input"
                 disabled={loading || saving}
               />
             </div>
@@ -317,14 +310,12 @@ export default function WebsiteContactConfig() {
             />
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Default WhatsApp message
-              </label>
+              <label className="admin-label">Default WhatsApp message</label>
               <textarea
                 value={form.whatsapp_message}
                 onChange={(e) => setField("whatsapp_message", e.target.value)}
                 rows={2}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-textarea"
                 disabled={loading || saving}
               />
             </div>
@@ -340,9 +331,7 @@ export default function WebsiteContactConfig() {
             />
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Google Maps embed URL
-              </label>
+              <label className="admin-label">Google Maps embed URL</label>
               <textarea
                 value={form.google_maps_embed_url}
                 onChange={(e) =>
@@ -350,15 +339,13 @@ export default function WebsiteContactConfig() {
                 }
                 rows={2}
                 placeholder="https://www.google.com/maps/embed?…"
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-textarea"
                 disabled={loading || saving}
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Business hours
-              </label>
+              <label className="admin-label">Business hours</label>
               {["weekdays", "saturday", "sunday"].map((key) => (
                 <input
                   key={key}
@@ -366,16 +353,14 @@ export default function WebsiteContactConfig() {
                   value={form.business_hours[key]}
                   onChange={(e) => setHours(key, e.target.value)}
                   placeholder={key}
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input"
                   disabled={loading || saving}
                 />
               ))}
             </div>
 
             <div className="space-y-2">
-              <label className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Social links
-              </label>
+              <label className="admin-label">Social links</label>
               {["linkedin", "twitter", "facebook", "youtube"].map((key) => (
                 <input
                   key={key}
@@ -383,20 +368,18 @@ export default function WebsiteContactConfig() {
                   value={form.social_links[key]}
                   onChange={(e) => setSocial(key, e.target.value)}
                   placeholder={key}
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input"
                   disabled={loading || saving}
                 />
               ))}
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Status
-              </label>
+              <label className="admin-label">Status</label>
               <select
                 value={form.status}
                 onChange={(e) => setField("status", e.target.value)}
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-input"
                 disabled={loading || saving}
               >
                 <option value="active">Active</option>
@@ -404,8 +387,8 @@ export default function WebsiteContactConfig() {
               </select>
             </div>
           </>
-        )}
       </div>
+      )}
     </ManagementHub>
   );
 }

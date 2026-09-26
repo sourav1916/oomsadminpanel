@@ -42,12 +42,12 @@ const Navbar = ({
   const initial = String(displayName).charAt(0).toUpperCase();
 
   return (
-    <nav className="sticky top-0 z-40 h-14 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+    <nav className="sticky top-0 z-40 h-14 border-b border-admin-border bg-admin-surface">
       <div className="flex h-full items-center justify-between px-3 sm:px-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={toggleSidebar}
-            className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-raised hover:text-admin-text"
             aria-label="Toggle menu"
           >
             {isSidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -56,16 +56,17 @@ const Navbar = ({
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="flex items-center gap-2.5 rounded-md focus:outline-none"
+            className="flex items-center gap-2.5 rounded-lg focus:outline-none"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sky-500 text-white shadow-sm">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 text-white">
               <Shield className="h-4 w-4" />
             </div>
             <div className="text-left leading-tight">
-              <p className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
-                OOMS <span className="font-normal text-slate-500 dark:text-slate-400">Admin</span>
+              <p className="text-sm font-bold tracking-tight text-admin-text">
+                OOMS{' '}
+                <span className="font-medium text-admin-muted">Admin</span>
               </p>
-              <p className="hidden text-[10px] uppercase tracking-[0.14em] text-slate-400 sm:block">
+              <p className="hidden text-[10px] font-medium uppercase tracking-[0.14em] text-admin-muted sm:block">
                 Control panel
               </p>
             </div>
@@ -76,7 +77,7 @@ const Navbar = ({
           <button
             type="button"
             onClick={toggleTheme}
-            className="flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-raised hover:text-admin-text"
             aria-label="Toggle theme"
             title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
@@ -86,44 +87,56 @@ const Navbar = ({
           <div className="relative">
             <button
               onClick={() => setOpenDropdown(!openDropdown)}
-              className="flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="flex items-center gap-2 rounded-lg px-1.5 py-1 transition-colors hover:bg-admin-raised"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-xs font-bold text-sky-700 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-sky-300 dark:ring-slate-700">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-admin-accent-soft text-xs font-bold text-admin-accent-text ring-1 ring-admin-border">
                 {initial}
               </div>
               <div className="hidden text-left md:block">
-                <p className="max-w-[10rem] truncate text-xs font-semibold text-slate-800 dark:text-slate-100">{displayName}</p>
-                <p className="text-[10px] uppercase tracking-wide text-slate-400">Administrator</p>
+                <p className="max-w-[10rem] truncate text-xs font-semibold text-admin-text">
+                  {displayName}
+                </p>
+                <p className="text-[10px] uppercase tracking-wide text-admin-muted">
+                  Administrator
+                </p>
               </div>
-              <ChevronDown className="hidden h-3.5 w-3.5 text-slate-400 md:block" />
+              <ChevronDown className="hidden h-3.5 w-3.5 text-admin-muted md:block" />
             </button>
 
             {openDropdown && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setOpenDropdown(false)} />
-                <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                  <div className="border-b border-slate-100 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/60">
-                    <p className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</p>
-                    <p className="text-xs text-slate-500">Platform administrator</p>
+                <div className="absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-admin-border bg-admin-surface shadow-panel">
+                  <div className="border-b border-admin-border bg-admin-raised px-4 py-3">
+                    <p className="truncate text-sm font-semibold text-admin-text">
+                      {displayName}
+                    </p>
+                    <p className="text-xs text-admin-muted">Platform administrator</p>
                   </div>
                   <button
-                    onClick={() => { setOpenDropdown(false); navigate('/profile'); }}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                    onClick={() => {
+                      setOpenDropdown(false);
+                      navigate('/profile');
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-admin-text-sub transition-colors hover:bg-admin-raised"
                   >
-                    <User className="h-4 w-4 text-slate-400" />
+                    <User className="h-4 w-4 text-admin-muted" />
                     My Profile
                   </button>
                   <button
-                    onClick={() => { setOpenDropdown(false); navigate('/settings'); }}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                    onClick={() => {
+                      setOpenDropdown(false);
+                      navigate('/settings');
+                    }}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-admin-text-sub transition-colors hover:bg-admin-raised"
                   >
-                    <Settings className="h-4 w-4 text-slate-400" />
+                    <Settings className="h-4 w-4 text-admin-muted" />
                     Settings
                   </button>
-                  <div className="my-1 border-t border-slate-100 dark:border-slate-800" />
+                  <div className="my-1 border-t border-admin-border" />
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-rose-600 transition-colors hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40"
                   >
                     <LogOut className="h-4 w-4" />
                     Logout

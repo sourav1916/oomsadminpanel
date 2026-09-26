@@ -13,6 +13,8 @@ import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
 import ModalScrollLock from "../components/common/ModalScrollLock";
+import { DetailPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
+import ActionMenu from "../components/common/ActionMenu";
 
 const EMPTY_CONTACT = {
   page_title: "Help & Support",
@@ -241,10 +243,10 @@ export default function HelpSupportConfig() {
         <button
           type="button"
           onClick={() => setTab("contact")}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             tab === "contact"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              ? "bg-admin-accent-soft text-admin-accent-text"
+              : "text-admin-text-sub hover:bg-admin-raised hover:text-admin-text"
           }`}
         >
           <Phone className="h-3.5 w-3.5" />
@@ -253,10 +255,10 @@ export default function HelpSupportConfig() {
         <button
           type="button"
           onClick={() => setTab("faqs")}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             tab === "faqs"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              ? "bg-admin-accent-soft text-admin-accent-text"
+              : "text-admin-text-sub hover:bg-admin-raised hover:text-admin-text"
           }`}
         >
           <HelpCircle className="h-3.5 w-3.5" />
@@ -265,35 +267,31 @@ export default function HelpSupportConfig() {
       </div>
 
       {tab === "contact" ? (
-        <div className="mx-auto max-w-2xl space-y-4 rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          {loading ? (
-            <p className="text-sm text-slate-500">Loading…</p>
-          ) : (
+        loading ? (
+          <DetailPageSkeleton />
+        ) : (
+        <div className="admin-panel space-y-4 p-5">
             <>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-admin-muted">
                 {meta.configured
                   ? "Contact details are configured for CLIENT users."
                   : "Not configured yet — add at least one contact method."}
               </p>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Page title
-                </label>
+                <label className="admin-label">Page title</label>
                 <input
                   type="text"
                   value={form.page_title}
                   onChange={(e) => setField("page_title", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input"
                   disabled={loading || saving}
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Intro text
-                </label>
-                <p className="mb-1.5 text-[11px] text-slate-400">
+                <label className="admin-label">Intro text</label>
+                <p className="mb-1.5 text-[11px] text-admin-muted">
                   Shown above the contact cards on the CLIENT help page.
                 </p>
                 <textarea
@@ -301,22 +299,20 @@ export default function HelpSupportConfig() {
                   onChange={(e) => setField("intro_text", e.target.value)}
                   rows={4}
                   placeholder="e.g. Need help? Reach our support team using the options below."
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-textarea"
                   disabled={loading || saving}
                 />
               </div>
 
               {contactFields.map(([key, label, type]) => (
                 <div key={key}>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    {label}
-                  </label>
+                  <label className="admin-label">{label}</label>
                   {type === "textarea" ? (
                     <textarea
                       value={form[key]}
                       onChange={(e) => setField(key, e.target.value)}
                       rows={2}
-                      className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      className="admin-textarea"
                       disabled={loading || saving}
                     />
                   ) : (
@@ -324,7 +320,7 @@ export default function HelpSupportConfig() {
                       type={type}
                       value={form[key]}
                       onChange={(e) => setField(key, e.target.value)}
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      className="admin-input"
                       disabled={loading || saving}
                     />
                   )}
@@ -332,13 +328,11 @@ export default function HelpSupportConfig() {
               ))}
 
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Status
-                </label>
+                <label className="admin-label">Status</label>
                 <select
                   value={form.status}
                   onChange={(e) => setField("status", e.target.value)}
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input"
                   disabled={loading || saving}
                 >
                   <option value="active">Active</option>
@@ -346,33 +340,35 @@ export default function HelpSupportConfig() {
                 </select>
               </div>
             </>
-          )}
         </div>
+        )
       ) : (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="overflow-hidden admin-panel">
           {loading ? (
-            <p className="p-4 text-sm text-slate-500">Loading…</p>
+            <TableSkeleton columns={4} rows={6} />
           ) : faqs.length === 0 ? (
-            <p className="p-6 text-sm text-slate-500">
+            <p className="p-6 text-sm text-admin-muted">
               No FAQs yet. Add questions users commonly ask.
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-950">
+                <thead className="border-b border-admin-border bg-admin-raised text-[11px] uppercase tracking-wide text-admin-muted">
                   <tr>
+                    <th className="px-4 py-3 w-12">S.No</th>
                     <th className="px-4 py-3 w-16">Order</th>
                     <th className="px-4 py-3">Question</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {faqs.map((row) => (
+                <tbody className="divide-y divide-admin-border">
+                  {faqs.map((row, index) => (
                     <tr key={row.faq_id}>
+                      <td className="px-4 py-3 text-slate-500">{index + 1}</td>
                       <td className="px-4 py-3 text-slate-500">{row.sort_order}</td>
                       <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-admin-text">
                           {row.question}
                         </p>
                         <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">
@@ -381,7 +377,7 @@ export default function HelpSupportConfig() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          className={`inline-flex rounded-md px-2 py-0.5 text-[11px] font-semibold ${
                             row.status === "active"
                               ? "bg-emerald-50 text-emerald-700"
                               : "bg-slate-100 text-slate-500"
@@ -390,25 +386,22 @@ export default function HelpSupportConfig() {
                           {row.status}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() => openEditFaq(row)}
-                            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800"
-                            title="Edit"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeFaq(row.faq_id)}
-                            className="rounded-lg p-2 text-rose-500 hover:bg-rose-50"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
+                      <td className="px-4 py-3 text-right">
+                        <ActionMenu
+                          actions={[
+                            {
+                              label: "Edit",
+                              icon: <Pencil className="h-3.5 w-3.5" />,
+                              onClick: () => openEditFaq(row),
+                            },
+                            {
+                              label: "Delete",
+                              icon: <Trash2 className="h-3.5 w-3.5" />,
+                              danger: true,
+                              onClick: () => removeFaq(row.faq_id),
+                            },
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -429,67 +422,62 @@ export default function HelpSupportConfig() {
               onClick={() => !savingFaq && setFaqModal(false)}
               aria-label="Close"
             />
-            <div className="relative w-full max-w-lg rounded-xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
-              <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+            <div className="admin-panel relative w-full max-w-lg p-5">
+              <h3 className="text-base font-semibold text-admin-text">
                 {faqForm.faq_id ? "Edit FAQ" : "Add FAQ"}
               </h3>
               <div className="mt-4 space-y-3">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Question
-                  </label>
+                  <label className="admin-label">Question</label>
                   <input
                     type="text"
                     value={faqForm.question}
                     onChange={(e) =>
                       setFaqForm((p) => ({ ...p, question: e.target.value }))
                     }
-                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                    className="admin-input"
                     disabled={savingFaq}
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Answer
-                  </label>
+                  <label className="admin-label">Answer</label>
                   <textarea
                     value={faqForm.answer}
                     onChange={(e) =>
                       setFaqForm((p) => ({ ...p, answer: e.target.value }))
                     }
                     rows={5}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                    className="admin-textarea"
                     disabled={savingFaq}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Sort order
-                    </label>
+                    <label className="admin-label">Sort order</label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
                       value={faqForm.sort_order}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/[^\d]/g, "");
                         setFaqForm((p) => ({
                           ...p,
-                          sort_order: e.target.value,
-                        }))
-                      }
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                          sort_order: v,
+                        }));
+                      }}
+                      className="admin-input"
                       disabled={savingFaq}
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Status
-                    </label>
+                    <label className="admin-label">Status</label>
                     <select
                       value={faqForm.status}
                       onChange={(e) =>
                         setFaqForm((p) => ({ ...p, status: e.target.value }))
                       }
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      className="admin-input"
                       disabled={savingFaq}
                     >
                       <option value="active">Active</option>
@@ -503,7 +491,7 @@ export default function HelpSupportConfig() {
                   type="button"
                   disabled={savingFaq}
                   onClick={() => setFaqModal(false)}
-                  className="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                  className="rounded-lg border border-admin-border px-3.5 py-2 text-sm font-medium text-admin-muted hover:bg-admin-raised disabled:opacity-50"
                 >
                   Cancel
                 </button>

@@ -4,64 +4,54 @@ import { TrendingUp } from "lucide-react";
 
 const colorVariants = {
   blue: {
-    bg: "bg-blue-50 dark:bg-blue-900/30",
-    text: "text-blue-600 dark:text-blue-300",
-    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-admin-accent-soft",
+    text: "text-admin-accent-text",
   },
   green: {
-    bg: "bg-green-50 dark:bg-green-900/30",
-    text: "text-green-600 dark:text-green-300",
-    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-emerald-50 dark:bg-emerald-950/40",
+    text: "text-emerald-700 dark:text-emerald-300",
   },
   purple: {
-    bg: "bg-purple-50 dark:bg-purple-900/30",
-    text: "text-purple-600 dark:text-purple-300",
-    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-violet-50 dark:bg-violet-950/40",
+    text: "text-violet-700 dark:text-violet-300",
   },
   orange: {
-    bg: "bg-orange-50 dark:bg-orange-900/30",
-    text: "text-orange-600 dark:text-orange-300",
-    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-amber-50 dark:bg-amber-950/40",
+    text: "text-amber-700 dark:text-amber-300",
   },
   indigo: {
-    bg: "bg-indigo-50 dark:bg-indigo-900/30",
-    text: "text-indigo-600 dark:text-indigo-300",
-    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-slate-100 dark:bg-slate-800",
+    text: "text-slate-700 dark:text-slate-300",
   },
   pink: {
-    bg: "bg-pink-50 dark:bg-pink-900/30",
-    text: "text-pink-600 dark:text-pink-300",
-    border: "border-slate-200 dark:border-slate-800",
+    bg: "bg-rose-50 dark:bg-rose-950/40",
+    text: "text-rose-700 dark:text-rose-300",
   },
 };
 
 export default function StatisticsCard({ title, total, active, icon: Icon, color = "blue", extra }) {
-  const colors = colorVariants[color];
+  const colors = colorVariants[color] || colorVariants.blue;
 
   return (
-    <div className={`rounded-xl border ${colors.border} bg-white p-4 transition-all hover:shadow-md dark:bg-slate-900`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className={`p-2 rounded-lg ${colors.bg}`}>
+    <div className="admin-panel p-4 transition-colors hover:border-teal-300/60 dark:hover:border-teal-800">
+      <div className="mb-3 flex items-center justify-between">
+        <div className={`rounded-md p-2 ${colors.bg}`}>
           <Icon size={18} className={colors.text} />
         </div>
-        {active !== undefined && (
-          <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full dark:bg-emerald-900/40 dark:text-emerald-300">
+        {active !== undefined && total > 0 && (
+          <div className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
             <TrendingUp size={10} />
             <span>{Math.round((active / total) * 100)}% Active</span>
           </div>
         )}
       </div>
-      <p className="text-2xl font-bold text-gray-800 dark:text-white">{total}</p>
-      <p className="text-xs text-gray-500 mt-1">{title}</p>
+      <p className="text-2xl font-bold tabular-nums tracking-tight text-admin-text">{total}</p>
+      <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-admin-muted">{title}</p>
       {active !== undefined && (
-        <p className="text-xs text-gray-400 mt-1">
-          {active} active
-        </p>
+        <p className="mt-1 text-xs text-admin-muted">{active} active</p>
       )}
       {extra && (
-        <p className="text-xs text-gray-400 mt-1 truncate">
-          {extra}
-        </p>
+        <p className="mt-1 truncate text-xs text-admin-muted">{extra}</p>
       )}
     </div>
   );

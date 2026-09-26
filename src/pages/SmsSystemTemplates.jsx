@@ -16,6 +16,7 @@ import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
 import ModalScrollLock from "../components/common/ModalScrollLock";
 import { TableSkeleton } from "../components/SkeletonComponent";
+import ActionMenu from "../components/common/ActionMenu";
 
 const EMPTY_FORM = {
   template_id: "",
@@ -49,7 +50,7 @@ function StatusBadge({ status }) {
   const active = String(status).toLowerCase() === "active";
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
+      className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
         active
           ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300"
           : "border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
@@ -262,25 +263,25 @@ export default function SmsSystemTemplates() {
       onRefresh={() => fetchList(true)}
       refreshing={refreshing}
       actions={
-        <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />} tone="indigo">
+        <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />}>
           Add template
         </ManagementButton>
       }
     >
       <div className="space-y-4">
-        <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="admin-panel p-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates…"
-              className="w-full max-w-md rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="admin-input w-full max-w-md"
             />
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value)}
-              className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              className="admin-input w-full sm:w-auto"
             >
               <option value="">All types</option>
               {types.map((item) => (
@@ -292,7 +293,7 @@ export default function SmsSystemTemplates() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="admin-panel overflow-hidden">
           {loading ? (
             <TableSkeleton columns={5} rows={8} />
           ) : rows.length === 0 ? (
@@ -301,7 +302,7 @@ export default function SmsSystemTemplates() {
               <p className="font-semibold text-slate-700 dark:text-slate-200">
                 No system SMS templates yet
               </p>
-              <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />} tone="indigo">
+              <ManagementButton onClick={openCreate} leftIcon={<Plus size={14} />}>
                 Add template
               </ManagementButton>
             </div>
@@ -310,6 +311,7 @@ export default function SmsSystemTemplates() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-400">
+                    <th className="px-4 py-3 w-12">S.No</th>
                     <th className="px-4 py-3">Type</th>
                     <th className="px-4 py-3">Template</th>
                     <th className="px-4 py-3">Preview</th>
@@ -317,14 +319,15 @@ export default function SmsSystemTemplates() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {rows.map((row) => (
+                <tbody className="divide-y divide-admin-border">
+                  {rows.map((row, index) => (
                     <tr key={row.template_id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/70">
-                      <td className="px-4 py-3 font-semibold capitalize text-slate-900 dark:text-white">
+                      <td className="px-4 py-3 text-slate-500">{index + 1}</td>
+                      <td className="px-4 py-3 font-semibold capitalize text-admin-text">
                         {row.type}
                       </td>
                       <td className="px-4 py-3">
-                        <p className="font-medium text-slate-800 dark:text-slate-200">{row.name}</p>
+                        <p className="font-medium text-admin-text">{row.name}</p>
                         <p className="text-xs text-slate-400">{row.dlt_message_id || "—"}</p>
                       </td>
                       <td className="max-w-xs px-4 py-3">
@@ -335,35 +338,32 @@ export default function SmsSystemTemplates() {
                       <td className="px-4 py-3">
                         <StatusBadge status={row.status} />
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={() => toggleStatus(row)}
-                            disabled={statusBusyId === row.template_id}
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-200"
-                          >
-                            <Power size={12} />
-                            {String(row.status).toLowerCase() === "active"
-                              ? "Deactivate"
-                              : "Activate"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => openEdit(row)}
-                            className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
-                          >
-                            <Pencil size={12} /> Edit
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(row)}
-                            disabled={deleteBusyId === row.template_id}
-                            className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-                          >
-                            <Trash2 size={12} /> Delete
-                          </button>
-                        </div>
+                      <td className="px-4 py-3 text-right">
+                        <ActionMenu
+                          actions={[
+                            {
+                              label:
+                                String(row.status).toLowerCase() === "active"
+                                  ? "Deactivate"
+                                  : "Activate",
+                              icon: <Power size={12} />,
+                              disabled: statusBusyId === row.template_id,
+                              onClick: () => toggleStatus(row),
+                            },
+                            {
+                              label: "Edit",
+                              icon: <Pencil size={12} />,
+                              onClick: () => openEdit(row),
+                            },
+                            {
+                              label: "Delete",
+                              icon: <Trash2 size={12} />,
+                              danger: true,
+                              disabled: deleteBusyId === row.template_id,
+                              onClick: () => handleDelete(row),
+                            },
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -388,11 +388,11 @@ export default function SmsSystemTemplates() {
               <motion.div
                 role="dialog"
                 aria-modal="true"
-                className="flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900"
+                className="admin-panel flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden"
                 variants={modalVariants}
               >
-                <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                <div className="flex items-center justify-between border-b border-admin-border px-5 py-4">
+                  <h3 className="text-lg font-bold text-admin-text">
                     {isEdit ? "Edit template" : "Add template"}
                   </h3>
                   <button
@@ -406,8 +406,8 @@ export default function SmsSystemTemplates() {
 
                 <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-5">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <label className="block text-xs font-semibold uppercase text-slate-500">
-                      Type
+                    <div>
+                      <label className="admin-label">Type</label>
                       <select
                         value={form.type}
                         onChange={(e) =>
@@ -417,7 +417,7 @@ export default function SmsSystemTemplates() {
                             variable_keys: [],
                           }))
                         }
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="admin-input"
                       >
                         {types.map((item) => (
                           <option key={item.name} value={item.name}>
@@ -425,22 +425,22 @@ export default function SmsSystemTemplates() {
                           </option>
                         ))}
                       </select>
-                    </label>
-                    <label className="block text-xs font-semibold uppercase text-slate-500">
-                      Name
+                    </div>
+                    <div>
+                      <label className="admin-label">Name</label>
                       <input
                         value={form.name}
                         onChange={(e) =>
                           setForm((prev) => ({ ...prev, name: e.target.value }))
                         }
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="admin-input"
                       />
-                    </label>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <label className="block text-xs font-semibold uppercase text-slate-500">
-                      DLT message ID
+                    <div>
+                      <label className="admin-label">DLT message ID</label>
                       <input
                         value={form.dlt_message_id}
                         onChange={(e) =>
@@ -449,41 +449,41 @@ export default function SmsSystemTemplates() {
                             dlt_message_id: e.target.value,
                           }))
                         }
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="admin-input"
                       />
-                    </label>
-                    <label className="block text-xs font-semibold uppercase text-slate-500">
-                      Route
+                    </div>
+                    <div>
+                      <label className="admin-label">Route</label>
                       <select
                         value={form.route}
                         onChange={(e) =>
                           setForm((prev) => ({ ...prev, route: e.target.value }))
                         }
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="admin-input"
                       >
                         <option value="dlt">DLT</option>
                         <option value="dlt_manual">DLT Manual</option>
                         <option value="otp">OTP</option>
                         <option value="q">Quick SMS</option>
                       </select>
-                    </label>
-                    <label className="block text-xs font-semibold uppercase text-slate-500">
-                      Status
+                    </div>
+                    <div>
+                      <label className="admin-label">Status</label>
                       <select
                         value={form.status}
                         onChange={(e) =>
                           setForm((prev) => ({ ...prev, status: e.target.value }))
                         }
-                        className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                        className="admin-input"
                       >
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                       </select>
-                    </label>
+                    </div>
                   </div>
 
-                  <label className="block text-xs font-semibold uppercase text-slate-500">
-                    Sender ID (optional override)
+                  <div>
+                    <label className="admin-label">Sender ID (optional override)</label>
                     <input
                       value={form.sender_id}
                       onChange={(e) =>
@@ -492,12 +492,12 @@ export default function SmsSystemTemplates() {
                           sender_id: e.target.value.toUpperCase(),
                         }))
                       }
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      className="admin-input"
                     />
-                  </label>
+                  </div>
 
-                  <label className="block text-xs font-semibold uppercase text-slate-500">
-                    Message body
+                  <div>
+                    <label className="admin-label">Message body</label>
                     <textarea
                       rows={5}
                       value={form.message_body}
@@ -508,13 +508,13 @@ export default function SmsSystemTemplates() {
                         }))
                       }
                       placeholder="Approved DLT text with {#var#} placeholders"
-                      className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                      className="admin-textarea"
                     />
-                  </label>
+                  </div>
 
                   {slotCount > 0 ? (
                     <div className="space-y-2">
-                      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      <p className="text-sm font-semibold text-admin-text">
                         Variable placement ({slotCount})
                       </p>
                       {Array.from({ length: slotCount }).map((_, index) => (
@@ -522,8 +522,8 @@ export default function SmsSystemTemplates() {
                           key={`slot-${index}`}
                           className={`rounded-xl border p-3 ${
                             activeSlot === index
-                              ? "border-indigo-400 bg-indigo-50/70 dark:bg-indigo-950/30"
-                              : "border-slate-200 dark:border-slate-700"
+                              ? "border-teal-400 bg-admin-accent-soft ring-2 ring-teal-200 dark:bg-teal-950/30 dark:ring-teal-800"
+                              : "border-admin-border"
                           }`}
                           onClick={() => setActiveSlot(index)}
                         >
@@ -533,7 +533,7 @@ export default function SmsSystemTemplates() {
                           <select
                             value={form.variable_keys[index] || ""}
                             onChange={(e) => setVariableKey(index, e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+                            className="admin-input w-full"
                           >
                             <option value="">Select variable…</option>
                             {availableVariables.map((variable) => (
@@ -548,11 +548,11 @@ export default function SmsSystemTemplates() {
                   ) : null}
                 </div>
 
-                <div className="flex justify-end gap-2 border-t border-slate-200 px-5 py-4 dark:border-slate-800">
+                <div className="flex justify-end gap-2 border-t border-admin-border bg-admin-surface px-5 py-4">
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300"
+                    className="rounded-lg border border-admin-border px-4 py-2.5 text-sm font-semibold text-admin-text-sub hover:bg-admin-raised"
                   >
                     Cancel
                   </button>
@@ -560,7 +560,7 @@ export default function SmsSystemTemplates() {
                     type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-50"
                   >
                     {saving ? <Loader2 size={14} className="animate-spin" /> : null}
                     {saving ? "Saving…" : isEdit ? "Save changes" : "Create"}

@@ -14,6 +14,8 @@ import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
 import ModalScrollLock from "../components/common/ModalScrollLock";
+import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
+import ActionMenu from "../components/common/ActionMenu";
 
 const emptyBank = {
   bank_id: "",
@@ -206,10 +208,10 @@ export default function WalletPayments() {
         <button
           type="button"
           onClick={() => setTab("requests")}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             tab === "requests"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              ? "bg-admin-accent-soft text-admin-accent-text"
+              : "text-admin-text-sub hover:bg-admin-raised hover:text-admin-text"
           }`}
         >
           <Inbox className="h-3.5 w-3.5" />
@@ -218,10 +220,10 @@ export default function WalletPayments() {
         <button
           type="button"
           onClick={() => setTab("banks")}
-          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold ${
+          className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             tab === "banks"
-              ? "bg-slate-900 text-white"
-              : "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              ? "bg-admin-accent-soft text-admin-accent-text"
+              : "text-admin-text-sub hover:bg-admin-raised hover:text-admin-text"
           }`}
         >
           <Landmark className="h-3.5 w-3.5" />
@@ -230,18 +232,19 @@ export default function WalletPayments() {
       </div>
 
       {tab === "banks" ? (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="overflow-hidden admin-panel">
           {loading ? (
-            <p className="p-4 text-sm text-slate-500">Loading…</p>
+            <TableSkeleton columns={5} rows={6} />
           ) : banks.length === 0 ? (
-            <p className="p-6 text-sm text-slate-500">
+            <p className="p-6 text-sm text-admin-muted">
               No bank accounts yet. Add one for users to transfer funds.
             </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-950">
+                <thead className="border-b border-admin-border bg-admin-raised text-[11px] uppercase tracking-wide text-admin-muted">
                   <tr>
+                    <th className="px-4 py-3 w-12">S.No</th>
                     <th className="px-4 py-3">Account</th>
                     <th className="px-4 py-3">Bank / IFSC</th>
                     <th className="px-4 py-3">UPI</th>
@@ -249,11 +252,12 @@ export default function WalletPayments() {
                     <th className="px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {banks.map((row) => (
+                <tbody className="divide-y divide-admin-border">
+                  {banks.map((row, index) => (
                     <tr key={row.bank_id}>
+                      <td className="px-4 py-3 text-slate-500">{index + 1}</td>
                       <td className="px-4 py-3">
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-admin-text">
                           {row.account_name}
                         </p>
                         <p className="font-mono text-xs text-slate-500">
@@ -272,7 +276,7 @@ export default function WalletPayments() {
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ${
                             row.status === "active"
                               ? "bg-emerald-50 text-emerald-700"
                               : "bg-slate-100 text-slate-500"
@@ -282,20 +286,21 @@ export default function WalletPayments() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => openEditBank(row)}
-                          className="mr-2 inline-flex rounded-md p-1.5 text-slate-600 hover:bg-slate-100"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => removeBank(row)}
-                          className="inline-flex rounded-md p-1.5 text-rose-600 hover:bg-rose-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <ActionMenu
+                          actions={[
+                            {
+                              label: "Edit",
+                              icon: <Pencil className="h-3.5 w-3.5" />,
+                              onClick: () => openEditBank(row),
+                            },
+                            {
+                              label: "Delete",
+                              icon: <Trash2 className="h-3.5 w-3.5" />,
+                              danger: true,
+                              onClick: () => removeBank(row),
+                            },
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -312,10 +317,10 @@ export default function WalletPayments() {
                 key={s}
                 type="button"
                 onClick={() => setStatusFilter(s)}
-                className={`rounded-md px-2.5 py-1 text-[11px] font-semibold capitalize ${
+                className={`rounded-md px-2.5 py-1 text-[11px] font-semibold capitalize transition-colors ${
                   statusFilter === s
-                    ? "bg-slate-900 text-white"
-                    : "bg-slate-100 text-slate-600 dark:bg-slate-800"
+                    ? "bg-admin-accent-soft text-admin-accent-text"
+                    : "bg-admin-raised text-admin-text-sub hover:bg-admin-accent-soft/50"
                 }`}
               >
                 {s}
@@ -323,18 +328,18 @@ export default function WalletPayments() {
             ))}
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+          <div className="overflow-hidden admin-panel">
             {loading ? (
-              <p className="p-4 text-sm text-slate-500">Loading…</p>
+              <ListPageSkeleton columns={4} rows={6} />
             ) : requests.length === 0 ? (
-              <p className="p-6 text-sm text-slate-500">No payment requests.</p>
+              <p className="p-6 text-sm text-admin-muted">No payment requests.</p>
             ) : (
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="divide-y divide-admin-border">
                 {requests.map((row) => (
                   <div key={row.request_id} className="space-y-2 p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-semibold text-admin-text">
                           ₹
                           {Number(row.amount || 0).toLocaleString("en-IN", {
                             minimumFractionDigits: 2,
@@ -363,7 +368,7 @@ export default function WalletPayments() {
                         ) : null}
                       </div>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${
+                        className={`rounded-md px-2 py-0.5 text-[11px] font-semibold capitalize ${
                           row.status === "approved"
                             ? "bg-emerald-50 text-emerald-700"
                             : row.status === "rejected"
@@ -387,7 +392,7 @@ export default function WalletPayments() {
                               [row.request_id]: e.target.value,
                             }))
                           }
-                          className="h-9 min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-950"
+                          className="admin-input h-9 min-w-[200px] flex-1"
                         />
                         <ManagementButton
                           type="button"
@@ -434,8 +439,8 @@ export default function WalletPayments() {
         <>
           <ModalScrollLock />
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-800 dark:bg-slate-900">
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            <div className="admin-panel w-full max-w-lg p-5">
+              <h3 className="text-base font-bold text-admin-text">
                 {bankForm.bank_id ? "Edit bank account" : "Add bank account"}
               </h3>
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -448,48 +453,45 @@ export default function WalletPayments() {
                   ["upi_id", "UPI ID (optional)"],
                 ].map(([key, label]) => (
                   <div key={key} className={key === "account_name" ? "sm:col-span-2" : ""}>
-                    <label className="mb-1 block text-[11px] font-semibold uppercase text-slate-500">
-                      {label}
-                    </label>
+                    <label className="admin-label">{label}</label>
                     <input
                       type="text"
                       value={bankForm[key] || ""}
                       onChange={(e) =>
                         setBankForm((prev) => ({ ...prev, [key]: e.target.value }))
                       }
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-950"
+                      className="admin-input"
                     />
                   </div>
                 ))}
                 <div>
-                  <label className="mb-1 block text-[11px] font-semibold uppercase text-slate-500">
-                    Status
-                  </label>
+                  <label className="admin-label">Status</label>
                   <select
                     value={bankForm.status}
                     onChange={(e) =>
                       setBankForm((prev) => ({ ...prev, status: e.target.value }))
                     }
-                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-950"
+                    className="admin-input"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1 block text-[11px] font-semibold uppercase text-slate-500">
-                    Sort order
-                  </label>
+                  <label className="admin-label">Sort order</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
                     value={bankForm.sort_order}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const v = e.target.value.replace(/[^\d]/g, "");
                       setBankForm((prev) => ({
                         ...prev,
-                        sort_order: e.target.value,
-                      }))
-                    }
-                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm dark:border-slate-700 dark:bg-slate-950"
+                        sort_order: v,
+                      }));
+                    }}
+                    className="admin-input"
                   />
                 </div>
               </div>

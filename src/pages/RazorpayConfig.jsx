@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
+import { DetailPageSkeleton } from "../components/SkeletonComponent";
 
 export default function RazorpayConfig() {
   const [loading, setLoading] = useState(true);
@@ -211,14 +212,14 @@ export default function RazorpayConfig() {
         </div>
       }
     >
-      <div className="mx-auto max-w-2xl space-y-4 rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        {loading ? (
-          <p className="text-sm text-slate-500">Loading…</p>
-        ) : (
+      {loading ? (
+        <DetailPageSkeleton />
+      ) : (
+      <div className="admin-panel space-y-4 p-5">
           <>
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span
-                className={`rounded-full px-2 py-0.5 font-semibold ${
+                className={`rounded-md px-2 py-0.5 font-semibold ${
                   meta.environment === "live"
                     ? "bg-emerald-50 text-emerald-700"
                     : "bg-amber-50 text-amber-700"
@@ -234,9 +235,7 @@ export default function RazorpayConfig() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Key ID
-              </label>
+              <label className="admin-label">Key ID</label>
               <input
                 type="text"
                 value={form.key_id}
@@ -244,16 +243,14 @@ export default function RazorpayConfig() {
                   setForm((prev) => ({ ...prev, key_id: e.target.value }))
                 }
                 placeholder="rzp_live_… or rzp_test_…"
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-input"
                 disabled={loading || saving}
                 autoComplete="off"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Key Secret
-              </label>
+              <label className="admin-label">Key Secret</label>
               <input
                 type="password"
                 value={form.key_secret}
@@ -265,19 +262,17 @@ export default function RazorpayConfig() {
                     ? `Saved ${meta.key_secret_masked} — leave blank to keep`
                     : "Enter Key Secret"
                 }
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-input"
                 disabled={loading || saving}
                 autoComplete="new-password"
               />
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-admin-muted">
                 API Key Secret from Razorpay Dashboard → Settings → API Keys (not the webhook secret).
               </p>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Webhook Secret
-              </label>
+              <label className="admin-label">Webhook Secret</label>
               <input
                 type="password"
                 value={form.webhook_secret}
@@ -289,16 +284,14 @@ export default function RazorpayConfig() {
                     ? `Saved ${meta.webhook_secret_masked} — leave blank to keep`
                     : "Webhook signing secret"
                 }
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-input"
                 disabled={loading || saving}
                 autoComplete="new-password"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Webhook URL
-              </label>
+              <label className="admin-label">Webhook URL</label>
               <div className="flex gap-2">
                 <input
                   type="url"
@@ -307,36 +300,34 @@ export default function RazorpayConfig() {
                     setForm((prev) => ({ ...prev, webhook_url: e.target.value }))
                   }
                   placeholder="https://server.ooms.in/api/v1/webhook/razorpay"
-                  className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                  className="admin-input min-w-0 flex-1"
                   disabled={loading || saving}
                 />
                 <button
                   type="button"
                   onClick={copyWebhookUrl}
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 dark:border-slate-700"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-admin-border text-admin-muted hover:bg-admin-raised"
                   title="Copy webhook URL"
                 >
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </button>
               </div>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-admin-muted">
                 Paste this URL in Razorpay Dashboard → Settings → Webhooks. Enable{" "}
-                <code className="rounded bg-slate-100 px-1">payment.captured</code>,{" "}
-                <code className="rounded bg-slate-100 px-1">order.paid</code>, and{" "}
-                <code className="rounded bg-slate-100 px-1">payment.failed</code>.
+                <code className="rounded bg-admin-raised px-1">payment.captured</code>,{" "}
+                <code className="rounded bg-admin-raised px-1">order.paid</code>, and{" "}
+                <code className="rounded bg-admin-raised px-1">payment.failed</code>.
               </p>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Status
-              </label>
+              <label className="admin-label">Status</label>
               <select
                 value={form.status}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, status: e.target.value }))
                 }
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                className="admin-input"
                 disabled={loading || saving}
               >
                 <option value="active">Active</option>
@@ -344,50 +335,51 @@ export default function RazorpayConfig() {
               </select>
             </div>
 
-            <div className="border-t border-slate-200 pt-4 dark:border-slate-800">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <div className="border-t border-admin-border pt-4">
+              <h3 className="text-sm font-bold text-admin-text">
                 Wallet gateway charges
               </h3>
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-admin-muted">
                 Applied only on Razorpay wallet top-ups. User pays net + fee; wallet is credited the net amount. Manual payment requests have no fee.
               </p>
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Fee percent (%)
-                  </label>
+                  <label className="admin-label">Fee percent (%)</label>
                   <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
                     value={feeForm.gateway_fee_percent}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const v = e.target.value
+                        .replace(/[^\d.]/g, "")
+                        .replace(/(\..*)\./g, "$1");
                       setFeeForm((prev) => ({
                         ...prev,
-                        gateway_fee_percent: e.target.value,
-                      }))
-                    }
-                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                        gateway_fee_percent: v,
+                      }));
+                    }}
+                    className="admin-input"
                     disabled={loading || savingFee}
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Flat fee (₹)
-                  </label>
+                  <label className="admin-label">Flat fee (₹)</label>
                   <input
-                    type="number"
-                    min="0"
-                    step="0.01"
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
                     value={feeForm.gateway_fee_flat}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const v = e.target.value
+                        .replace(/[^\d.]/g, "")
+                        .replace(/(\..*)\./g, "$1");
                       setFeeForm((prev) => ({
                         ...prev,
-                        gateway_fee_flat: e.target.value,
-                      }))
-                    }
-                    className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                        gateway_fee_flat: v,
+                      }));
+                    }}
+                    className="admin-input"
                     disabled={loading || savingFee}
                   />
                 </div>
@@ -410,8 +402,8 @@ export default function RazorpayConfig() {
               </div>
             </div>
           </>
-        )}
       </div>
+      )}
     </ManagementHub>
   );
 }

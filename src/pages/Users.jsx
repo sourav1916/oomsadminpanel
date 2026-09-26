@@ -20,13 +20,14 @@ import {
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
 import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
-import Pagination, { usePagination } from "../components/common/PaginationComponent";
+import TablePagination from "../components/common/TablePagination";
+import { usePagination } from "../components/common/PaginationComponent";
 import ManagementTable from '../components/common/ManagementTable';
 import ManagementHub from '../components/common/ManagementHub';
 import ModalScrollLock from "../components/common/ModalScrollLock";
 import { useNavigate } from 'react-router-dom';
 
-// ─── Constants & Helpers ─────────────────────────────────────────────────────
+// âââ Constants & Helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 const modalVariants = {
   hidden: { opacity: 0, scale: 0.9, y: 20 },
@@ -55,24 +56,22 @@ const formatDateSimple = (date) => {
   });
 };
 
-const getStatusBadge = (status) => {
-  if (status) {
-    return { icon: CheckCircle, text: 'Active', className: 'bg-green-100 text-green-800 border border-green-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800' };
-  }
-  return { icon: Ban, text: 'Inactive', className: 'bg-red-100 text-red-800 border border-red-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800' };
-};
-
 const StatusBadge = ({ status }) => {
-  const badge = getStatusBadge(status);
-  const Icon = badge.icon;
+  if (status) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+        <CheckCircle size={10} /> Active
+      </span>
+    );
+  }
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${badge.className}`}>
-      <Icon size={10} /> {badge.text}
+    <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
+      <Ban size={10} /> Inactive
     </span>
   );
 };
 
-// ─── Profile Avatar Component ───────────────────────────────────────
+// âââ Profile Avatar Component âââââââââââââââââââââââââââââââââââââââ
 
 const ProfileAvatar = ({ record, name, className, children, onClick }) => {
   const getInitials = () => {
@@ -80,7 +79,7 @@ const ProfileAvatar = ({ record, name, className, children, onClick }) => {
     return name.charAt(0).toUpperCase();
   };
 
-  const profileImage = record?.profile?.avatar || record?.profile?.profile_image || null;
+  const profileImage = record?.profile?.image || record?.profile?.avatar || record?.profile?.profile_image || null;
 
   if (profileImage) {
     return (
@@ -107,21 +106,21 @@ const ProfileAvatar = ({ record, name, className, children, onClick }) => {
   );
 };
 
-// ─── Info Item Component ─────────────────────────────────────────────────────
+// âââ Info Item Component âââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
-  <div className={`flex items-start gap-2 rounded-xl border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 px-3 py-2 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800 ${className}`}>
-    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/80 border border-gray-200 dark:border-slate-600 dark:bg-slate-900">
+  <div className={`flex items-start gap-2 rounded-lg border border-admin-border bg-admin-raised px-3 py-2 ${className}`}>
+    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-admin-border bg-admin-surface text-admin-muted">
       <Icon size={14} />
     </div>
     <div className="min-w-0 flex-1">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 leading-none mb-1 dark:text-slate-400">{label}</div>
-      <div className="text-sm font-medium text-gray-800 leading-snug break-words dark:text-slate-100">{value || 'N/A'}</div>
+      <div className="admin-label mb-1 leading-none">{label}</div>
+      <div className="text-sm font-medium leading-snug break-words text-admin-text">{value || 'N/A'}</div>
     </div>
   </div>
 );
 
-// ─── View User Modal ─────────────────────────────────────────────────────────
+// âââ View User Modal âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
   const [showBranches, setShowBranches] = useState(false);
@@ -136,15 +135,15 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
       <ModalScrollLock />
       <motion.div
         variants={modalVariants} initial="hidden" animate="visible" exit="exit"
-        className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden m-auto dark:bg-slate-900 dark:border dark:border-slate-800"
+        className="admin-panel m-auto flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="shrink-0 flex justify-between items-center p-5 border-b bg-white rounded-t-xl dark:border-slate-800 dark:bg-slate-900">
-          <h2 className="text-lg font-bold flex items-center gap-2 text-slate-800 dark:text-white">
-            <User className="text-blue-500" size={20} /> User Details
+        <div className="flex shrink-0 items-center justify-between border-b border-admin-border bg-admin-surface p-5">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-admin-text">
+            <User className="text-admin-accent-text" size={20} /> Client Details
           </h2>
-          <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition-all shadow-sm hover:shadow-md bg-white/50 border border-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+          <button onClick={onClose} className="flex h-9 w-9 items-center justify-center rounded-md border border-admin-border bg-admin-raised text-admin-muted transition-colors hover:text-admin-text">
             <X size={18} />
           </button>
         </div>
@@ -152,11 +151,11 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
           {/* User Header */}
-          <div className="flex items-center gap-4 pb-4 border-b">
+          <div className="flex items-center gap-4 border-b border-admin-border pb-4">
             <ProfileAvatar
               record={user}
               name={user.profile?.name || user.username}
-              className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold cursor-pointer hover:opacity-80 transition-opacity"
+              className="flex h-16 w-16 cursor-pointer items-center justify-center rounded-lg bg-teal-600 text-2xl font-bold text-white transition-opacity hover:opacity-80"
               onClick={() => {
                 onNavigateToProfile(user);
                 onClose();
@@ -166,7 +165,7 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
             </ProfileAvatar>
             <div>
               <h3 
-                className="text-xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors dark:text-white"
+                className="cursor-pointer text-xl font-bold text-admin-text transition-colors hover:text-admin-accent-text"
                 onClick={() => {
                   onNavigateToProfile(user);
                   onClose();
@@ -174,37 +173,37 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
               >
                 {user.profile?.name || user.username}
               </h3>
-              <p className="text-gray-600 flex items-center gap-2 mt-1">
-                <Mail className="text-blue-500" size={14} />
+              <p className="mt-1 flex items-center gap-2 text-admin-text-sub">
+                <Mail className="text-admin-accent-text" size={14} />
                 {user.login_id}
               </p>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-1 flex items-center gap-2">
                 <StatusBadge status={user.status} />
-                <span className="text-xs text-gray-400">ID: {user.username}</span>
+                <span className="text-xs text-admin-muted">ID: {user.username}</span>
               </div>
             </div>
           </div>
 
           {/* Remark & Create Date */}
-          <div className="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
-            <div className="flex justify-between items-center">
+          <div className="mt-4 rounded-lg border border-admin-border bg-admin-raised p-3">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-500">Remark</p>
-                <p className="text-sm font-medium text-gray-700">{user.remark || 'N/A'}</p>
+                <p className="text-xs text-admin-muted">Remark</p>
+                <p className="text-sm font-medium text-admin-text">{user.remark || 'N/A'}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-gray-500">Registered On</p>
-                <p className="text-sm font-medium text-gray-700">{formatDate(user.create_date)}</p>
+                <p className="text-xs text-admin-muted">Registered On</p>
+                <p className="text-sm font-medium text-admin-text">{formatDate(user.create_date)}</p>
               </div>
             </div>
           </div>
 
           {/* Profile Information */}
           <div className="mt-4">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2 dark:text-slate-200">
-              <IdCard className="text-blue-500" size={16} /> Profile Information
+            <h4 className="mb-3 flex items-center gap-2 text-sm font-semibold text-admin-text">
+              <IdCard className="text-admin-accent-text" size={16} /> Profile Information
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
               <InfoItem icon={User} label="Full Name" value={user.profile?.name} />
               <InfoItem icon={Phone} label="Mobile" value={user.profile?.mobile} />
               <InfoItem icon={Mail} label="Email" value={user.profile?.email} />
@@ -221,44 +220,44 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
 
           {/* Branches Section */}
           {hasBranches && (
-            <div className="mt-4 border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div className="mt-4 overflow-hidden rounded-lg border border-admin-border">
               <button
                 onClick={() => setShowBranches(!showBranches)}
-                className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors dark:bg-slate-800 dark:hover:bg-slate-700"
+                className="flex w-full items-center justify-between bg-admin-raised px-4 py-3 transition-colors hover:bg-admin-surface"
                 type="button"
               >
                 <div className="flex items-center gap-2">
-                  <Building className="text-purple-500" size={16} />
-                  <span className="text-sm font-semibold text-gray-700">Branches</span>
-                  <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 font-medium">{user.branches.length}</span>
+                  <Building className="text-admin-accent-text" size={16} />
+                  <span className="text-sm font-semibold text-admin-text">Branches</span>
+                  <span className="ml-1 rounded-md bg-admin-accent-soft px-2 py-0.5 text-xs font-medium text-admin-accent-text">{user.branches.length}</span>
                 </div>
                 <motion.div animate={{ rotate: showBranches ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  {showBranches ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+                  {showBranches ? <ChevronUp className="h-4 w-4 text-admin-muted" /> : <ChevronDown className="h-4 w-4 text-admin-muted" />}
                 </motion.div>
               </button>
               <AnimatePresence>
                 {showBranches && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-                    <div className="p-3 bg-white space-y-3 max-h-[400px] overflow-y-auto">
+                    <div className="max-h-[400px] space-y-3 overflow-y-auto bg-admin-surface p-3">
                       {user.branches.map((branch, idx) => (
                         <motion.div
                           key={branch.branch_id || idx}
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: idx * 0.05 }}
-                          className="p-3 bg-slate-50 rounded-xl border border-slate-200 dark:bg-slate-800 dark:border-slate-700"
+                          className="rounded-lg border border-admin-border bg-admin-raised p-3"
                         >
-                          <div className="flex justify-between items-start mb-2">
-                            <h5 className="font-semibold text-gray-800">{branch.name}</h5>
+                          <div className="mb-2 flex items-start justify-between">
+                            <h5 className="font-semibold text-admin-text">{branch.name}</h5>
                             <StatusBadge status={branch.status} />
                           </div>
-                          <div className="grid grid-cols-2 gap-2 text-sm">
-                            <p><span className="text-xs text-gray-500">Branch ID:</span> {branch.branch_id}</p>
-                            <p><span className="text-xs text-gray-500">PAN:</span> {branch.pan || 'N/A'}</p>
-                            <p><span className="text-xs text-gray-500">GST:</span> {branch.gst || 'N/A'}</p>
-                            <p><span className="text-xs text-gray-500">City:</span> {branch.city || 'N/A'}</p>
-                            <p><span className="text-xs text-gray-500">State:</span> {branch.state || 'N/A'}</p>
-                            <p><span className="text-xs text-gray-500">Created:</span> {formatDateSimple(branch.create_date)}</p>
+                          <div className="grid grid-cols-2 gap-2 text-sm text-admin-text-sub">
+                            <p><span className="text-xs text-admin-muted">Branch ID:</span> {branch.branch_id}</p>
+                            <p><span className="text-xs text-admin-muted">PAN:</span> {branch.pan || 'N/A'}</p>
+                            <p><span className="text-xs text-admin-muted">GST:</span> {branch.gst || 'N/A'}</p>
+                            <p><span className="text-xs text-admin-muted">City:</span> {branch.city || 'N/A'}</p>
+                            <p><span className="text-xs text-admin-muted">State:</span> {branch.state || 'N/A'}</p>
+                            <p><span className="text-xs text-admin-muted">Created:</span> {formatDateSimple(branch.create_date)}</p>
                           </div>
                         </motion.div>
                       ))}
@@ -271,18 +270,18 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 shrink-0 dark:border-slate-800 dark:bg-slate-800/60">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-admin-border bg-admin-raised px-6 py-4">
           <button
             onClick={() => {
               onNavigateToProfile(user);
               onClose();
             }}
-            className="px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all flex items-center gap-2"
+            className="flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
           >
             <User size={16} />
             View Full Profile
           </button>
-          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-all dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+          <button onClick={onClose} className="rounded-lg border border-admin-border bg-admin-surface px-5 py-2.5 text-sm font-semibold text-admin-text-sub transition-colors hover:bg-admin-raised">
             Close
           </button>
         </div>
@@ -291,7 +290,7 @@ const ViewUserModal = ({ user, onClose, onNavigateToProfile }) => {
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// âââ Main Component âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -317,7 +316,7 @@ export default function UserManagement() {
     navigate(`/user/profile/${user.username}`);
   }, [navigate]);
 
-  // Open modal with user details
+  // Open modal with Client Details
   const handleViewUserModal = useCallback((user) => {
     setSelectedUser(user);
     setModalOpen(true);
@@ -365,7 +364,8 @@ export default function UserManagement() {
     try {
       const params = new URLSearchParams({
         page_no: page.toString(),
-        limit: pagination.limit.toString()
+        limit: pagination.limit.toString(),
+        user_type: 'user',
       });
       if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
 
@@ -379,7 +379,7 @@ export default function UserManagement() {
         return;
       }
 
-      if (!response.ok) throw new Error('Failed to fetch users');
+      if (!response.ok) throw new Error('Failed to fetch clients');
 
       const result = await response.json();
 
@@ -397,12 +397,12 @@ export default function UserManagement() {
         // Update last fetch params
         lastFetchParams.current = currentParams;
       } else {
-        throw new Error(result.message || 'Failed to fetch users');
+        throw new Error(result.message || 'Failed to fetch clients');
       }
     } catch (err) {
       console.error("Fetch error:", err);
       setError(err.message);
-      toast.error(err.message || "Failed to load users.");
+      toast.error(err.message || "Failed to load clients.");
     } finally {
       if (requestId === currentRequestId.current) {
         setLoading(false);
@@ -459,13 +459,13 @@ export default function UserManagement() {
   const tableColumns = useMemo(() => [
     {
       key: 'user',
-      label: 'User',
+      label: 'Client',
       render: (user) => (
-        <div className="flex items-center gap-3 w-full">
+        <div className="flex w-full items-center gap-3">
           <ProfileAvatar
             record={user}
             name={user.profile?.name || user.username}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold cursor-pointer hover:opacity-80 transition-opacity shrink-0"
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md bg-teal-600 font-semibold text-white transition-opacity hover:opacity-80"
             onClick={(e) => {
               e.stopPropagation();
               handleNavigateToProfile(user);
@@ -475,7 +475,7 @@ export default function UserManagement() {
           </ProfileAvatar>
           <div className="min-w-0 flex-1">
             <p 
-              className="truncate font-semibold text-gray-800 text-sm cursor-pointer hover:text-blue-600 transition-colors"
+              className="cursor-pointer truncate text-sm font-semibold text-admin-text transition-colors hover:text-admin-accent-text"
               onClick={(e) => {
                 e.stopPropagation();
                 handleNavigateToProfile(user);
@@ -483,7 +483,7 @@ export default function UserManagement() {
             >
               {user.profile?.name || user.username}
             </p>
-            <p className="truncate text-xs text-gray-500">{user.login_id}</p>
+            <p className="truncate text-xs text-admin-muted">{user.login_id}</p>
           </div>
         </div>
       ),
@@ -494,12 +494,12 @@ export default function UserManagement() {
       render: (user) => (
         <div>
           {user.profile?.mobile && (
-            <p className="text-sm text-gray-700 flex items-center gap-1">
-              <Phone size={10} className="text-gray-400" /> {user.profile.mobile}
+            <p className="flex items-center gap-1 text-sm text-admin-text-sub">
+              <Phone size={10} className="text-admin-muted" /> {user.profile.mobile}
             </p>
           )}
           {user.profile?.email && user.profile.email !== user.login_id && (
-            <p className="text-xs text-gray-500 mt-1">{user.profile.email}</p>
+            <p className="mt-1 text-xs text-admin-muted">{user.profile.email}</p>
           )}
         </div>
       ),
@@ -510,10 +510,10 @@ export default function UserManagement() {
       render: (user) => (
         <div>
           {user.profile?.city && (
-            <p className="text-sm text-gray-700">{user.profile.city}</p>
+            <p className="text-sm text-admin-text-sub">{user.profile.city}</p>
           )}
           {user.profile?.state && (
-            <p className="text-xs text-gray-500">{user.profile.state}</p>
+            <p className="text-xs text-admin-muted">{user.profile.state}</p>
           )}
         </div>
       ),
@@ -523,10 +523,10 @@ export default function UserManagement() {
       label: 'Branches',
       render: (user) => (
         <div className="flex items-center gap-1">
-          <Building size={12} className="text-purple-500" />
-          <span className="text-sm font-medium text-gray-700">{user.branch_count}</span>
+          <Building size={12} className="text-admin-accent-text" />
+          <span className="text-sm font-medium text-admin-text">{user.branch_count}</span>
           {user.branch_count > 0 && (
-            <span className="text-xs text-gray-400">({user.branches?.length || 0} active)</span>
+            <span className="text-xs text-admin-muted">({user.branches?.length || 0} active)</span>
           )}
         </div>
       ),
@@ -540,8 +540,8 @@ export default function UserManagement() {
       key: 'registered',
       label: 'Registered',
       render: (user) => (
-        <div className="flex items-center gap-1.5 text-sm text-gray-600">
-          <Calendar className="text-gray-400 text-xs shrink-0" size={12} />
+        <div className="flex items-center gap-1.5 text-sm text-admin-text-sub">
+          <Calendar className="shrink-0 text-admin-muted" size={12} />
           {formatDateSimple(user.create_date)}
         </div>
       ),
@@ -553,8 +553,8 @@ export default function UserManagement() {
     return (
       <ManagementHub
         eyebrow="Directory"
-        title="Users"
-        description="Registered platform accounts, status, and assigned branches."
+        title="Clients"
+        description="Client accounts, status, and assigned branches."
         accent="slate"
       >
         <ListPageSkeleton columns={5} />
@@ -565,8 +565,8 @@ export default function UserManagement() {
   return (
     <ManagementHub
       eyebrow="Directory"
-      title="Users"
-      description="Registered platform accounts, status, and assigned branches."
+      title="Clients"
+      description="Client accounts, status, and assigned branches."
       accent="slate"
       onRefresh={handleRefresh}
     >
@@ -577,22 +577,22 @@ export default function UserManagement() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm dark:bg-slate-900 dark:border-slate-800"
+          className="admin-panel flex flex-col justify-between gap-4 p-4 lg:flex-row lg:items-center"
         >
-          <div className="flex items-center gap-4 flex-1">
-            <div className="relative flex-1 w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <div className="flex flex-1 items-center gap-4">
+            <div className="relative w-full flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" size={18} />
               <input
                 type="text"
-                placeholder="Search by username, email, name, or mobile..."
+                placeholder="Search clients by username, email, name, or mobile"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm min-h-[42px] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100"
+                className="admin-input pl-10 pr-10"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-admin-muted hover:text-admin-text"
                 >
                   <X size={14} />
                 </button>
@@ -600,10 +600,10 @@ export default function UserManagement() {
             </div>
 
             {!loading && users.length > 0 && (
-              <p className="text-sm text-gray-500 hidden xl:block">
-                <span className="font-semibold text-gray-800 dark:text-slate-100">{users.length}</span> of{' '}
-                <span className="font-semibold text-gray-800 dark:text-slate-100">{pagination.total}</span> users
-                {searchTerm && <span className="ml-1 text-blue-600">· "{searchTerm}"</span>}
+              <p className="hidden text-sm text-admin-muted xl:block">
+                <span className="font-semibold text-admin-text">{users.length}</span> of{' '}
+                <span className="font-semibold text-admin-text">{pagination.total}</span> clients
+                {searchTerm && <span className="ml-1 text-admin-accent-text">· "{searchTerm}"</span>}
               </p>
             )}
           </div>
@@ -614,13 +614,13 @@ export default function UserManagement() {
         )}
 
         {error && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900">
-            <X className="text-6xl text-red-400 mx-auto mb-4" size={48} />
-            <p className="text-xl text-gray-600">Error loading users</p>
-            <p className="text-gray-400 mt-2">{error}</p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="admin-panel py-16 text-center">
+            <X className="mx-auto mb-4 text-rose-400" size={48} />
+            <p className="text-xl text-admin-text-sub">Error loading clients</p>
+            <p className="mt-2 text-admin-muted">{error}</p>
             <button
               onClick={handleRefresh}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="mt-4 rounded-lg bg-teal-600 px-4 py-2 text-white transition-colors hover:bg-teal-700"
             >
               Try Again
             </button>
@@ -629,59 +629,54 @@ export default function UserManagement() {
 
         {/* Empty state */}
         {!loading && !error && users.length === 0 && (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900">
-            <User className="text-8xl text-gray-300 mx-auto mb-4" size={64} />
-            <p className="text-xl text-gray-500">No users found</p>
-            <p className="text-gray-400 mt-2">{searchTerm ? 'Try adjusting your search' : 'No users registered yet'}</p>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="admin-panel py-16 text-center">
+            <User className="mx-auto mb-4 text-admin-muted" size={64} />
+            <p className="text-xl text-admin-text-sub">No clients found</p>
+            <p className="mt-2 text-admin-muted">{searchTerm ? 'Try adjusting your search' : 'No clients registered yet'}</p>
           </motion.div>
         )}
 
         {/* Content */}
         {!loading && !error && users.length > 0 && (
-          <>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="rounded-xl bg-white shadow-xl dark:bg-slate-900"
-            >
-              <ManagementTable
-                  rows={users}
-                  columns={tableColumns}
-                  rowKey={(row) => row.username}
-                  onRowClick={(row) => handleViewUserModal(row)}
-                  getActions={(user) => [
-                    {
-                      label: 'View Details',
-                      icon: <Eye size={12} />,
-                      onClick: () => handleViewUserModal(user),
-                      className: 'text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/40',
-                    },
-                    {
-                      label: 'View Profile',
-                      icon: <User size={12} />,
-                      onClick: () => handleNavigateToProfile(user),
-                      className: 'text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/40',
-                    },
-                  ]}
-                  accent="slate"
-                />
-            </motion.div>
-
-            {/* Pagination */}
-            {(users.length > 0 || pagination.total > 0) && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="mt-6">
-                <Pagination
-                  currentPage={pagination.page}
-                  totalItems={pagination.total}
-                  itemsPerPage={pagination.limit}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <ManagementTable
+              rows={users}
+              columns={tableColumns}
+              rowKey={(row) => row.username}
+              onRowClick={(row) => handleViewUserModal(row)}
+              showSerial
+              serialStart={(pagination.page - 1) * pagination.limit + 1}
+              getActions={(user) => [
+                {
+                  label: 'View Details',
+                  icon: <Eye size={12} />,
+                  onClick: () => handleViewUserModal(user),
+                  className: 'text-admin-accent-text hover:bg-admin-accent-soft',
+                },
+                {
+                  label: 'View Profile',
+                  icon: <User size={12} />,
+                  onClick: () => handleNavigateToProfile(user),
+                  className: 'text-admin-text-sub hover:bg-admin-raised hover:text-admin-text',
+                },
+              ]}
+              accent="slate"
+              footer={
+                <TablePagination
+                  page={pagination.page}
+                  limit={pagination.limit}
+                  total={pagination.total}
+                  totalPages={pagination.total_pages}
                   onPageChange={handlePageChange}
-                  showInfo
                   onLimitChange={handleLimitChange}
                 />
-              </motion.div>
-            )}
-          </>
+              }
+            />
+          </motion.div>
         )}
       </div>
 

@@ -17,9 +17,11 @@ import {
 import { toast } from 'react-toastify';
 import apiCall from '../utils/apiCall';
 import { ListPageSkeleton, TableSkeleton } from "../components/SkeletonComponent";
-import RefreshButton from "../components/common/RefreshButton";
-import Pagination, { usePagination } from "../components/common/PaginationComponent";
+import { usePagination } from "../components/common/PaginationComponent";
+import TablePagination from "../components/common/TablePagination";
 import ManagementTable from "../components/common/ManagementTable";
+import ManagementHub from "../components/common/ManagementHub";
+import ManagementButton from "../components/common/ManagementButton";
 
 // ─── Helper Components ─────────────────────────────────────────────────────
 
@@ -43,15 +45,15 @@ const formatDate = (date) => {
 
 const getFrequencyBadge = (frequency) => {
   const badges = {
-    monthly: { icon: Calendar, text: 'Monthly', className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' },
-    quarterly: { icon: Calendar, text: 'Quarterly', className: 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300' },
-    yearly: { icon: Calendar, text: 'Yearly', className: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' },
-    one_time: { icon: Clock, text: 'One Time', className: 'bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-slate-300' },
+    monthly: { icon: Calendar, text: 'Monthly', className: 'bg-admin-accent-soft text-admin-accent-text' },
+    quarterly: { icon: Calendar, text: 'Quarterly', className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300' },
+    yearly: { icon: Calendar, text: 'Yearly', className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' },
+    one_time: { icon: Clock, text: 'One Time', className: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300' },
   };
   const badge = badges[frequency?.toLowerCase()] || badges.monthly;
   const Icon = badge.icon;
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${badge.className}`}>
+    <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${badge.className}`}>
       <Icon size={10} /> {badge.text}
     </span>
   );
@@ -60,13 +62,13 @@ const getFrequencyBadge = (frequency) => {
 const getTypeBadge = (type, isCompliance) => {
   if (isCompliance || type === 'compliance') {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
         <CheckCircle size={10} /> Compliance
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800 dark:bg-slate-800 dark:text-slate-300">
+    <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-600 dark:bg-slate-800 dark:text-slate-300">
       <Tag size={10} /> General
     </span>
   );
@@ -78,8 +80,8 @@ const tableColumns = [
     label: 'Service',
     render: (service) => (
       <div>
-        <p className="font-semibold text-slate-800 dark:text-slate-100">{service.name}</p>
-        <p className="text-xs font-mono text-slate-500">{service.service_id}</p>
+        <p className="font-semibold text-admin-text">{service.name}</p>
+        <p className="font-mono text-xs text-admin-muted">{service.service_id}</p>
       </div>
     ),
   },
@@ -87,7 +89,7 @@ const tableColumns = [
     key: 'sac_code',
     label: 'SAC',
     render: (service) => (
-      <span className="font-mono text-xs text-slate-600 dark:text-slate-400">{service.sac_code || 'N/A'}</span>
+      <span className="font-mono text-xs text-admin-text-sub">{service.sac_code || 'N/A'}</span>
     ),
   },
   {
@@ -104,14 +106,14 @@ const tableColumns = [
     key: 'fees',
     label: 'Fees',
     render: (service) => (
-      <span className="font-semibold text-slate-800 dark:text-slate-100">{formatCurrency(service.fees)}</span>
+      <span className="font-semibold text-admin-text">{formatCurrency(service.fees)}</span>
     ),
   },
   {
     key: 'gst_value',
     label: 'GST',
     render: (service) => (
-      <span className="text-slate-600 dark:text-slate-300">
+      <span className="text-admin-text-sub">
         {formatCurrency(service.gst_value)}
         {service.gst_rate ? ` (${service.gst_rate}%)` : ''}
       </span>
@@ -121,7 +123,7 @@ const tableColumns = [
     key: 'create_date',
     label: 'Created',
     render: (service) => (
-      <span className="text-sm text-slate-600 dark:text-slate-400">{formatDate(service.create_date)}</span>
+      <span className="text-sm text-admin-muted">{formatDate(service.create_date)}</span>
     ),
   },
 ];
@@ -272,148 +274,143 @@ export default function BranchServices() {
   };
 
   if (loading && services.length === 0) {
-    return <ListPageSkeleton columns={4} />;
+    return (
+      <ManagementHub
+        eyebrow="Directory"
+        title={branchInfo?.name || "Branch Services"}
+        description="Services assigned to this branch."
+        accent="slate"
+      >
+        <ListPageSkeleton columns={4} />
+      </ManagementHub>
+    );
   }
 
   return (
-    <div className="min-h-screen mx-auto">
-      {/* Header Section */}
-      <div className="mb-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
-          {/* Top Bar */}
-          <div className="flex items-center justify-between px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
-            <div className="flex items-center gap-4">
+    <ManagementHub
+      eyebrow="Directory"
+      title={branchInfo?.name || "Branch Services"}
+      description={branchInfo ? `Branch ID: ${branchInfo.branch_id}` : "Services assigned to this branch."}
+      accent="slate"
+      onRefresh={handleRefresh}
+      refreshing={refreshing}
+      actions={
+        <ManagementButton tone="slate" variant="outline" leftIcon={<ArrowLeft size={14} />} onClick={handleBack}>
+          Back
+        </ManagementButton>
+      }
+      summary={
+        branchInfo ? (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-teal-600 text-white">
+              {branchInfo.logo ? (
+                <img src={branchInfo.logo} alt={branchInfo.name} className="h-full w-full object-cover" />
+              ) : (
+                <Building size={18} />
+              )}
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-semibold text-admin-text">{branchInfo.name}</p>
+              <p className="text-xs text-admin-muted">ID: {branchInfo.branch_id}</p>
+            </div>
+          </div>
+        ) : null
+      }
+    >
+      <div className="space-y-3">
+        {/* Search Bar */}
+        <div className="admin-panel p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" size={18} />
+            <input
+              type="text"
+              placeholder="Search services by name, SAC code, or type..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="admin-input pl-10 pr-10"
+            />
+            {searchTerm && (
               <button
-                onClick={handleBack}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors dark:hover:bg-slate-800"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-admin-muted hover:text-admin-text"
               >
-                <ArrowLeft size={18} className="text-gray-600 dark:text-slate-300" />
+                <X size={14} />
               </button>
-              <div className="flex items-center gap-2">
-                <Building size={16} className="text-purple-500" />
-                <span className="text-sm font-medium text-gray-600 dark:text-slate-400">Branch Services</span>
-                <span className="text-xs text-gray-400">/</span>
-                <span className="text-sm text-gray-900 dark:text-white">{branchInfo?.name || 'Services'}</span>
-              </div>
-            </div>
-            <RefreshButton onClick={handleRefresh} loading={refreshing}  className="justify-center px-3 sm:px-4">
-              <span className="hidden sm:inline">{refreshing ? "Refreshing..." : "Refresh"}</span>
-            </RefreshButton>
+            )}
           </div>
-
-          {/* Branch Info */}
-          {branchInfo && (
-            <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800/50">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg">
-                  {branchInfo.logo ? (
-                    <img src={branchInfo.logo} alt={branchInfo.name} className="w-full h-full rounded-xl object-cover" />
-                  ) : (
-                    <Building size={24} className="text-white" />
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">{branchInfo.name}</h1>
-                  <p className="text-sm text-gray-600">Branch ID: {branchInfo.branch_id}</p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
 
-      {/* Search Bar */}
-      <div className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input
-            type="text"
-            placeholder="Search services by name, SAC code, or type..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
-            >
-              <X size={16} className="text-gray-400 hover:text-gray-600" />
-            </button>
-          )}
-        </div>
-      </div>
+        {/* Loading indicator for subsequent loads */}
+        {refreshing && services.length > 0 && (
+          <TableSkeleton columns={6} rows={6} showActions={false} />
+        )}
 
-      {/* Loading indicator for subsequent loads */}
-      {refreshing && services.length > 0 && (
-        <TableSkeleton columns={6} rows={6} showActions={false} />
-      )}
-
-      {/* Error state */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900"
-        >
-          <Ban className="text-6xl text-red-400 mx-auto mb-4" size={48} />
-          <p className="text-xl text-gray-600 dark:text-slate-300">Error loading services</p>
-          <p className="text-gray-400 mt-2">{error}</p>
-          <button
-            onClick={handleRefresh}
-            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        {/* Error state */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="admin-panel py-16 text-center"
           >
-            Try Again
-          </button>
-        </motion.div>
-      )}
+            <Ban className="mx-auto mb-4 text-rose-400" size={48} />
+            <p className="text-xl text-admin-text-sub">Error loading services</p>
+            <p className="mt-2 text-admin-muted">{error}</p>
+            <button
+              onClick={handleRefresh}
+              className="mt-4 rounded-lg bg-teal-600 px-4 py-2 text-white transition-colors hover:bg-teal-700"
+            >
+              Try Again
+            </button>
+          </motion.div>
+        )}
 
-      {/* Empty state */}
-      {!loading && !error && services.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center py-16 bg-white rounded-xl shadow-xl dark:bg-slate-900"
-        >
-          <BookOpen className="text-8xl text-gray-300 mx-auto mb-4" size={64} />
-          <p className="text-xl text-gray-500 dark:text-slate-400">No Services Found</p>
-          <p className="text-gray-400 mt-2">
-            {searchTerm ? 'Try adjusting your search' : 'No services available for this branch'}
-          </p>
-        </motion.div>
-      )}
+        {/* Empty state */}
+        {!loading && !error && services.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="admin-panel py-16 text-center"
+          >
+            <BookOpen className="mx-auto mb-4 text-admin-muted" size={64} />
+            <p className="text-xl text-admin-text-sub">No Services Found</p>
+            <p className="mt-2 text-admin-muted">
+              {searchTerm ? 'Try adjusting your search' : 'No services available for this branch'}
+            </p>
+          </motion.div>
+        )}
 
-      {!loading && !error && services.length > 0 && !refreshing && (
-        <>
-          <ManagementTable
-            rows={services}
-            columns={tableColumns}
-            rowKey={(row) => row.service_id}
-            showActionsColumn={false}
-            accent="slate"
-          />
+        {!loading && !error && services.length > 0 && !refreshing && (
+          <>
+            <ManagementTable
+              rows={services}
+              columns={tableColumns}
+              rowKey={(row) => row.service_id}
+              showActionsColumn={false}
+              showSerial
+              serialStart={(pagination.page - 1) * pagination.limit + 1}
+              accent="slate"
+              footer={
+                pagination.total > 0 ? (
+                  <TablePagination
+                    page={pagination.page}
+                    limit={pagination.limit}
+                    total={pagination.total}
+                    totalPages={pagination.total_pages}
+                    onPageChange={handlePageChange}
+                    onLimitChange={handleLimitChange}
+                  />
+                ) : null
+              }
+            />
 
-          {/* Pagination */}
-          {pagination.total > 0 && (
-            <div className="mt-8">
-              <Pagination
-                currentPage={pagination.page}
-                totalItems={pagination.total}
-                itemsPerPage={pagination.limit}
-                onPageChange={handlePageChange}
-                onLimitChange={handleLimitChange}
-                showInfo={true}
-              />
+            {/* Results summary */}
+            <div className="mt-2 text-center text-sm text-admin-muted">
+              Showing {services.length} of {pagination.total} services
+              {searchTerm && <span className="ml-2 text-admin-accent-text">· Search: "{searchTerm}"</span>}
             </div>
-          )}
-
-          {/* Results summary */}
-          <div className="text-center text-sm text-gray-500 mt-4">
-            Showing {services.length} of {pagination.total} services
-            {searchTerm && <span className="ml-2 text-purple-600">· Search: "{searchTerm}"</span>}
-          </div>
-        </>
-      )}
-    </div>
+          </>
+        )}
+      </div>
+    </ManagementHub>
   );
 }

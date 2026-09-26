@@ -13,13 +13,13 @@ import { TableSkeleton } from "../SkeletonComponent";
 const StatusBadge = ({ status }) => {
   if (status) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
         <CheckCircle size={10} /> Active
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+    <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
       <Ban size={10} /> Inactive
     </span>
   );
@@ -31,59 +31,61 @@ const BranchCard = ({ branch, index, onViewDetails }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className="border border-gray-200 rounded-xl hover:shadow-md transition-all bg-white overflow-hidden group cursor-pointer dark:border-slate-800 dark:bg-slate-900"
+      className="admin-panel group cursor-pointer overflow-hidden transition-colors hover:border-teal-300/60 dark:hover:border-teal-800"
       onClick={() => onViewDetails(branch.branch_id)}
     >
       <div className="p-4">
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex items-center gap-2 flex-1">
-            <Building size={18} className="text-purple-600 shrink-0" />
+        <div className="mb-3 flex items-start justify-between">
+          <div className="flex flex-1 items-center gap-2">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-admin-accent-soft text-admin-accent-text">
+              <Building size={16} />
+            </div>
             <div>
-              <h3 className="font-semibold text-gray-800 group-hover:text-purple-600 transition-colors dark:text-slate-100">
+              <h3 className="font-semibold text-admin-text transition-colors group-hover:text-admin-accent-text">
                 {branch.name}
               </h3>
-              <p className="text-xs text-gray-400 font-mono mt-0.5">ID: {branch.branch_id}</p>
+              <p className="mt-0.5 font-mono text-xs text-admin-muted">ID: {branch.branch_id}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <StatusBadge status={branch.status} />
             <button 
-              className="p-1.5 rounded-lg bg-gray-50 group-hover:bg-purple-50 transition-colors"
+              className="rounded-md bg-admin-raised p-1.5 transition-colors group-hover:bg-admin-accent-soft"
               onClick={(e) => {
                 e.stopPropagation();
                 onViewDetails(branch.branch_id);
               }}
             >
-              <Eye size={14} className="text-gray-500 group-hover:text-purple-600" />
+              <Eye size={14} className="text-admin-muted group-hover:text-admin-accent-text" />
             </button>
           </div>
         </div>
 
         {/* Quick Info Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
+        <div className="mb-3 grid grid-cols-2 gap-3">
           {branch.contact?.mobile_1 && (
             <div className="flex items-center gap-1.5">
-              <Phone size={12} className="text-gray-400" />
-              <span className="text-xs text-gray-600">{branch.contact.mobile_1}</span>
+              <Phone size={12} className="text-admin-muted" />
+              <span className="text-xs text-admin-text-sub">{branch.contact.mobile_1}</span>
             </div>
           )}
           {branch.address?.city && (
             <div className="flex items-center gap-1.5">
-              <MapPin size={12} className="text-gray-400" />
-              <span className="text-xs text-gray-600 truncate">{branch.address.city}</span>
+              <MapPin size={12} className="text-admin-muted" />
+              <span className="truncate text-xs text-admin-text-sub">{branch.address.city}</span>
             </div>
           )}
           {branch.contact?.email_1 && (
-            <div className="flex items-center gap-1.5 col-span-2">
-              <Mail size={12} className="text-gray-400 shrink-0" />
-              <span className="text-xs text-gray-600 truncate">{branch.contact.email_1}</span>
+            <div className="col-span-2 flex items-center gap-1.5">
+              <Mail size={12} className="shrink-0 text-admin-muted" />
+              <span className="truncate text-xs text-admin-text-sub">{branch.contact.email_1}</span>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-          <div className="flex items-center gap-3 text-xs text-gray-400">
+        <div className="flex items-center justify-between border-t border-admin-border pt-2">
+          <div className="flex items-center gap-3 text-xs text-admin-muted">
             {branch.create_date && (
               <span className="flex items-center gap-1">
                 <Calendar size={10} />
@@ -91,7 +93,7 @@ const BranchCard = ({ branch, index, onViewDetails }) => {
               </span>
             )}
           </div>
-          <div className="flex items-center gap-1 text-xs text-purple-600 font-medium">
+          <div className="flex items-center gap-1 text-xs font-semibold text-admin-accent-text">
             View Details
             <ChevronRight size={12} />
           </div>
@@ -152,10 +154,10 @@ export default function BranchesTab({ username }) {
 
   if (branches.length === 0) {
     return (
-      <div className="text-center py-12">
-        <Building className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">No Branches Found</h3>
-        <p className="text-gray-500 mt-1">This user hasn't created any branches yet.</p>
+      <div className="py-12 text-center">
+        <Building className="mx-auto mb-3 h-12 w-12 text-admin-muted" />
+        <h3 className="text-lg font-medium text-admin-text">No Branches Found</h3>
+        <p className="mt-1 text-admin-muted">This user hasn't created any branches yet.</p>
       </div>
     );
   }
@@ -164,23 +166,23 @@ export default function BranchesTab({ username }) {
     <div className="space-y-4">
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" size={16} />
         <input
           type="text"
           placeholder="Search branches by name, ID, city, mobile, or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-9 pr-8 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm"
+          className="admin-input pl-9 pr-8"
         />
         {searchTerm && (
           <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-            <X size={14} className="text-gray-400 hover:text-gray-600" />
+            <X size={14} className="text-admin-muted hover:text-admin-text" />
           </button>
         )}
       </div>
 
       {/* Branches Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {filteredBranches.map((branch, index) => (
           <BranchCard 
             key={branch.branch_id || index} 
@@ -192,13 +194,13 @@ export default function BranchesTab({ username }) {
       </div>
 
       {/* Results Count */}
-      <div className="text-center text-xs text-gray-400 pt-2">
+      <div className="pt-2 text-center text-xs text-admin-muted">
         Showing {filteredBranches.length} of {branches.length} branches
       </div>
 
       {filteredBranches.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No branches match your search.</p>
+        <div className="py-8 text-center">
+          <p className="text-admin-muted">No branches match your search.</p>
         </div>
       )}
     </div>

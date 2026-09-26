@@ -68,13 +68,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+    <div className="min-h-screen bg-admin-bg">
       <div className="grid min-h-screen lg:grid-cols-2">
         <div className="relative hidden overflow-hidden border-r border-slate-800 bg-slate-950 lg:flex lg:flex-col lg:justify-between p-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.18),_transparent_42%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,1),_transparent_40%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(13,148,136,0.16),_transparent_42%)]" />
           <div className="relative">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-sky-500 text-white">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-600 text-white">
                 <Shield className="h-4 w-4" />
               </div>
               <div>
@@ -96,46 +96,46 @@ const Login = () => {
               "Service catalog and SMTP controls",
             ].map((item) => (
               <li key={item} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+                <span className="h-1.5 w-1.5 rounded-full bg-teal-500" />
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="relative flex items-center justify-center bg-slate-100 px-4 py-12 dark:bg-slate-950">
+        <div className="relative flex items-center justify-center bg-admin-bg px-4 py-12">
           <button
             type="button"
             onClick={toggleTheme}
-            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-raised hover:text-admin-text"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
-          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="admin-panel w-full max-w-md p-8">
             <div className="mb-8 flex items-center gap-3 lg:hidden">
-              <div className="flex h-9 w-9 items-center justify-center rounded-md bg-slate-900 text-sky-300">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-600 text-white">
                 <Shield className="h-4 w-4" />
               </div>
-              <p className="text-lg font-semibold text-slate-900 dark:text-white">OOMS Admin</p>
+              <p className="text-lg font-semibold text-admin-text">OOMS Admin</p>
             </div>
 
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Sign in</h2>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            <h2 className="text-xl font-bold text-admin-text">Sign in</h2>
+            <p className="mt-1 text-sm text-admin-text-sub">
               Use the registered admin mobile number. A one-time code will be sent.
             </p>
 
             {!otpSent ? (
               <form onSubmit={sendOtp} className="mt-8">
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <label className="admin-label">
                   Mobile number
                 </label>
                 <div className="relative mb-6">
-                  <Smartphone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Smartphone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-muted" />
                   <input
                     type="tel"
                     placeholder="10-digit mobile"
-                    className="w-full rounded-md border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-800"
+                    className="admin-input pl-10"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
                     inputMode="numeric"
@@ -145,7 +145,7 @@ const Login = () => {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full rounded-md bg-slate-900 py-2.5 font-semibold text-white hover:bg-slate-800"
+                  className="w-full rounded-lg bg-teal-600 py-2.5 font-semibold text-white hover:bg-teal-700"
                   disabled={loading}
                 >
                   {loading ? "Sending OTP…" : "Request OTP"}
@@ -153,35 +153,35 @@ const Login = () => {
               </form>
             ) : (
               <form onSubmit={verifyLogin} className="mt-8">
-                <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <label className="admin-label">
                   One-time code
                 </label>
                 <div className="relative mb-2">
-                  <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-admin-muted" />
                   <input
                     type="text"
                     maxLength={6}
                     placeholder="6-digit OTP"
-                    className="w-full rounded-md border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-center font-mono text-xl tracking-[0.4em] text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:bg-slate-800"
+                    className="admin-input pl-10 text-center font-mono text-xl tracking-[0.4em]"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     required
                     autoFocus
                   />
                 </div>
-                <p className="mb-6 text-center text-xs text-slate-500">
+                <p className="mb-6 text-center text-xs text-admin-muted">
                   Sent to +91 {normalizeMobile(mobile)}
                 </p>
                 <Button
                   type="submit"
-                  className="w-full rounded-md bg-slate-900 py-2.5 font-semibold text-white hover:bg-slate-800"
+                  className="w-full rounded-lg bg-teal-600 py-2.5 font-semibold text-white hover:bg-teal-700"
                   disabled={loading}
                 >
                   {loading ? "Verifying…" : "Verify and continue"}
                 </Button>
                 <button
                   type="button"
-                  className="mt-3 w-full text-sm font-medium text-sky-700 hover:underline disabled:opacity-50"
+                  className="mt-3 w-full text-sm font-medium text-admin-accent-text hover:underline disabled:opacity-50"
                   onClick={sendOtp}
                   disabled={loading}
                 >
@@ -189,7 +189,7 @@ const Login = () => {
                 </button>
                 <button
                   type="button"
-                  className="mt-2 w-full text-sm text-slate-500 hover:text-slate-700"
+                  className="mt-2 w-full text-sm text-admin-muted hover:text-admin-text-sub"
                   onClick={() => {
                     setOtpSent(false);
                     setOtp("");
@@ -200,7 +200,7 @@ const Login = () => {
               </form>
             )}
 
-            <div className="mt-8 flex items-center gap-2 border-t border-slate-100 pt-4 text-xs text-slate-500">
+            <div className="mt-8 flex items-center gap-2 border-t border-admin-border pt-4 text-xs text-admin-muted">
               <Lock className="h-3.5 w-3.5" />
               Restricted to authorized platform operators.
             </div>

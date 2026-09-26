@@ -32,24 +32,24 @@ import StatisticsCard from "../components/user/StatisticsCard";
 const StatusBadge = ({ status }) => {
   if (status) {
     return (
-      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-green-100 text-green-800 border border-green-200 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800">
-        <CheckCircle size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Active
+      <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 sm:text-xs">
+        <CheckCircle size={10} className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> Active
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-red-100 text-red-800 border border-red-200 dark:bg-rose-900/40 dark:text-rose-300 dark:border-rose-800">
-      <Ban size={10} className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Inactive
+    <span className="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 sm:text-xs">
+      <Ban size={10} className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> Inactive
     </span>
   );
 };
 
 const DetailItem = ({ icon: Icon, label, value, className = "" }) => (
   <div className={`flex items-center gap-1 sm:gap-2 ${className}`}>
-    <Icon size={12} className="text-gray-400 shrink-0 w-3 h-3 sm:w-3.5 sm:h-3.5" />
-    <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
-      <span className="text-[10px] sm:text-xs text-gray-500 shrink-0">{label}:</span>
-      <span className="text-[11px] sm:text-sm text-gray-800 font-medium truncate dark:text-slate-200">{value || "N/A"}</span>
+    <Icon size={12} className="h-3 w-3 shrink-0 text-admin-muted sm:h-3.5 sm:w-3.5" />
+    <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
+      <span className="shrink-0 text-[10px] text-admin-muted sm:text-xs">{label}:</span>
+      <span className="truncate text-[11px] font-medium text-admin-text sm:text-sm">{value || "N/A"}</span>
     </div>
   </div>
 );
@@ -160,14 +160,13 @@ export default function UserProfile() {
 
   if (error || !userData) {
     return (
-      <div className="min-h-screen bg-transparent flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">😕</div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2 dark:text-white">User Not Found</h2>
-          <p className="text-gray-600 mb-6 dark:text-slate-400">{error || "Unable to load user profile"}</p>
+      <div className="flex min-h-screen items-center justify-center bg-transparent">
+        <div className="admin-panel max-w-md p-8 text-center">
+          <h2 className="mb-2 text-xl font-semibold text-admin-text">User Not Found</h2>
+          <p className="mb-6 text-admin-muted">{error || "Unable to load user profile"}</p>
           <button
             onClick={handleBack}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="rounded-md bg-teal-600 px-6 py-2 text-sm font-semibold text-white hover:bg-teal-700"
           >
             Go Back
           </button>
@@ -179,85 +178,83 @@ export default function UserProfile() {
   const { user, profile, statistics } = userData;
 
   return (
-    <div className="min-h-screen mx-auto">
+    <div className="mx-auto min-h-screen space-y-4">
       {/* Header Section */}
-      <div className="mb-2 lg:mb-6">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
-          {/* Top Bar with Eyebrow and Refresh */}
-          <div className="flex items-center justify-between gap-3 px-2 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white dark:border-slate-800 dark:from-slate-900 dark:to-slate-900">
-            <div className="flex items-center gap-2 min-w-0">
-              <button
-                onClick={handleBack}
-                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0 dark:hover:bg-slate-800"
-              >
-                <ArrowLeft size={18} className="text-gray-600 dark:text-slate-300" />
-              </button>
-              <UserCircle size={16} className="text-blue-500 shrink-0" />
-              <span className="text-sm font-medium text-gray-600 shrink-0 hidden sm:inline dark:text-slate-400">Profile</span>
-              <span className="text-xs text-gray-400 shrink-0 hidden sm:inline">/</span>
-              <span className="text-sm text-gray-900 font-semibold truncate dark:text-white">{profile?.name || user?.username}</span>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <RefreshButton
-                onClick={handleRefresh}
-                loading={refreshing}
-                className="justify-center px-3 sm:px-4"
-              >
-                <span className="hidden sm:inline">{refreshing ? "Refreshing..." : "Refresh"}</span>
-              </RefreshButton>
-            </div>
+      <div className="admin-panel overflow-hidden">
+        {/* Top Bar with Eyebrow and Refresh */}
+        <div className="flex items-center justify-between gap-3 border-b border-admin-border bg-admin-raised px-3 py-3 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              onClick={handleBack}
+              className="shrink-0 rounded-md p-1.5 text-admin-muted transition-colors hover:bg-admin-surface hover:text-admin-text"
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <UserCircle size={16} className="shrink-0 text-admin-accent-text" />
+            <span className="hidden shrink-0 text-sm font-medium text-admin-muted sm:inline">Profile</span>
+            <span className="hidden shrink-0 text-xs text-admin-muted sm:inline">/</span>
+            <span className="truncate text-sm font-semibold text-admin-text">{profile?.name || user?.username}</span>
           </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <RefreshButton
+              onClick={handleRefresh}
+              loading={refreshing}
+              className="justify-center px-3 sm:px-4"
+            >
+              <span className="hidden sm:inline">{refreshing ? "Refreshing..." : "Refresh"}</span>
+            </RefreshButton>
+          </div>
+        </div>
 
-          {/* Main User Info */}
-          <div className="px-3 sm:px-6 py-3 sm:py-5">
-            <div className="flex flex-row items-start gap-3 sm:gap-5">
-              {/* Avatar */}
-              <div className="w-12 h-12 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm sm:shadow-lg ring-2 sm:ring-4 ring-blue-50 shrink-0">
-                {profile?.image ? (
-                  <img
-                    src={profile.image}
-                    alt={profile.name}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                ) : (
-                  <span className="text-lg sm:text-3xl font-bold text-white">
-                    {profile?.name?.charAt(0) || user?.username?.charAt(0) || "U"}
-                  </span>
+        {/* Main User Info */}
+        <div className="px-3 py-3 sm:px-6 sm:py-5">
+          <div className="flex flex-row items-start gap-3 sm:gap-5">
+            {/* Avatar */}
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-admin-accent-soft text-admin-accent-text sm:h-16 sm:w-16">
+              {profile?.image ? (
+                <img
+                  src={profile.image}
+                  alt={profile.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-lg font-bold sm:text-2xl">
+                  {profile?.name?.charAt(0) || user?.username?.charAt(0) || "U"}
+                </span>
+              )}
+            </div>
+
+            {/* User Details */}
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex items-center gap-1 sm:mb-2 sm:gap-3">
+                <h1 className="truncate text-base font-bold leading-tight text-admin-text sm:text-2xl">
+                  {profile?.name || user?.username}
+                </h1>
+                <StatusBadge status={user?.status} />
+              </div>
+
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 sm:mb-3">
+                <div className="flex max-w-full items-center gap-1 rounded-md border border-admin-border bg-admin-raised px-1.5 py-0.5 sm:px-2 sm:py-1">
+                  <Mail size={10} className="shrink-0 text-admin-muted sm:h-3 sm:w-3" />
+                  <span className="truncate text-[10px] leading-none text-admin-text-sub sm:text-sm">{user?.login_id}</span>
+                </div>
+                {profile?.mobile && (
+                  <div className="flex max-w-full items-center gap-1 rounded-md border border-admin-border bg-admin-raised px-1.5 py-0.5 sm:px-2 sm:py-1">
+                    <Phone size={10} className="shrink-0 text-admin-muted sm:h-3 sm:w-3" />
+                    <span className="truncate text-[10px] leading-none text-admin-text-sub sm:text-sm">+{profile.country_code || '91'} {profile.mobile}</span>
+                  </div>
                 )}
               </div>
 
-              {/* User Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 sm:gap-3 mb-1 sm:mb-2">
-                  <h1 className="text-base sm:text-2xl font-bold text-gray-900 truncate leading-tight dark:text-white">
-                    {profile?.name || user?.username}
-                  </h1>
-                  <StatusBadge status={user?.status} />
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 mb-1.5 sm:mb-3">
-                  <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full dark:border-slate-700 dark:bg-slate-800">
-                    <Mail size={10} className="text-gray-400 shrink-0 sm:w-3 sm:h-3" />
-                    <span className="text-[10px] sm:text-sm text-gray-600 truncate leading-none">{user?.login_id}</span>
-                  </div>
-                  {profile?.mobile && (
-                    <div className="flex items-center gap-1 bg-gray-50 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded border border-gray-100 max-w-full dark:border-slate-700 dark:bg-slate-800">
-                      <Phone size={10} className="text-gray-400 shrink-0 sm:w-3 sm:h-3" />
-                      <span className="text-[10px] sm:text-sm text-gray-600 truncate leading-none">+{profile.country_code || '91'} {profile.mobile}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Additional Details Row */}
-                <div className="flex flex-wrap gap-x-3 sm:gap-x-6 gap-y-1 sm:gap-y-2 w-full text-left">
-                  <DetailItem icon={Calendar} label="Since" value={new Date(user?.create_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
-                  {user?.create_by && (
-                    <DetailItem icon={User} label="By" value={user?.create_by} />
-                  )}
-                  {user?.remark && (
-                    <DetailItem icon={FileText} label="Remark" value={user?.remark} />
-                  )}
-                </div>
+              {/* Additional Details Row */}
+              <div className="flex w-full flex-wrap gap-x-3 gap-y-1 text-left sm:gap-x-6 sm:gap-y-2">
+                <DetailItem icon={Calendar} label="Since" value={new Date(user?.create_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })} />
+                {user?.create_by && (
+                  <DetailItem icon={User} label="By" value={user?.create_by} />
+                )}
+                {user?.remark && (
+                  <DetailItem icon={FileText} label="Remark" value={user?.remark} />
+                )}
               </div>
             </div>
           </div>
@@ -270,7 +267,7 @@ export default function UserProfile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-4 gap-2 mb-2 lg:mb-6"
+          className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-4"
         >
           <StatisticsCard
             title="Branches"
@@ -324,32 +321,32 @@ export default function UserProfile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6 dark:border-slate-800 dark:bg-slate-900"
+          className="admin-panel p-4 sm:p-6"
         >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2 dark:text-white">
-            <FileText size={20} className="text-blue-600" />
+          <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-admin-text">
+            <FileText size={20} className="text-admin-accent-text" />
             Task Overview
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="text-center p-3 bg-green-50 rounded-xl">
-              <p className="text-2xl font-bold text-green-600">{statistics.tasks.complete || 0}</p>
-              <p className="text-xs text-gray-600">Completed</p>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+            <div className="rounded-md border border-admin-border bg-emerald-50 p-3 text-center dark:bg-emerald-950/30">
+              <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{statistics.tasks.complete || 0}</p>
+              <p className="text-xs text-admin-muted">Completed</p>
             </div>
-            <div className="text-center p-3 bg-red-50 rounded-xl">
-              <p className="text-2xl font-bold text-red-600">{statistics.tasks.cancel || 0}</p>
-              <p className="text-xs text-gray-600">Cancelled</p>
+            <div className="rounded-md border border-admin-border bg-rose-50 p-3 text-center dark:bg-rose-950/30">
+              <p className="text-2xl font-bold text-rose-700 dark:text-rose-300">{statistics.tasks.cancel || 0}</p>
+              <p className="text-xs text-admin-muted">Cancelled</p>
             </div>
-            <div className="text-center p-3 bg-yellow-50 rounded-xl">
-              <p className="text-2xl font-bold text-yellow-600">{statistics.tasks.pending_from_department || 0}</p>
-              <p className="text-xs text-gray-600">Pending (Dept)</p>
+            <div className="rounded-md border border-admin-border bg-amber-50 p-3 text-center dark:bg-amber-950/30">
+              <p className="text-2xl font-bold text-amber-700 dark:text-amber-300">{statistics.tasks.pending_from_department || 0}</p>
+              <p className="text-xs text-admin-muted">Pending (Dept)</p>
             </div>
-            <div className="text-center p-3 bg-orange-50 rounded-xl">
-              <p className="text-2xl font-bold text-orange-600">{statistics.tasks.pending_from_client || 0}</p>
-              <p className="text-xs text-gray-600">Pending (Client)</p>
+            <div className="rounded-md border border-admin-border bg-orange-50 p-3 text-center dark:bg-orange-950/30">
+              <p className="text-2xl font-bold text-orange-700 dark:text-orange-300">{statistics.tasks.pending_from_client || 0}</p>
+              <p className="text-xs text-admin-muted">Pending (Client)</p>
             </div>
-            <div className="text-center p-3 bg-blue-50 rounded-xl">
-              <p className="text-2xl font-bold text-blue-600">{statistics.tasks.in_process || 0}</p>
-              <p className="text-xs text-gray-600">In Process</p>
+            <div className="rounded-md border border-admin-border bg-admin-accent-soft p-3 text-center">
+              <p className="text-2xl font-bold text-admin-accent-text">{statistics.tasks.in_process || 0}</p>
+              <p className="text-xs text-admin-muted">In Process</p>
             </div>
           </div>
         </motion.div>
@@ -360,10 +357,10 @@ export default function UserProfile() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900"
+        className="admin-panel overflow-hidden"
       >
-        <div className="border-b border-gray-200 dark:border-slate-800">
-          <nav className="flex overflow-x-auto scrollbar-hide">
+        <div className="border-b border-admin-border">
+          <nav className="scrollbar-hide flex overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -371,10 +368,10 @@ export default function UserProfile() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`
-                      flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative whitespace-nowrap
+                      relative flex items-center gap-2 whitespace-nowrap px-6 py-4 text-sm font-medium transition-all
                       ${activeTab === tab.id
-                      ? "text-blue-600 dark:text-sky-300"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-800"
+                      ? "text-admin-accent-text"
+                      : "text-admin-muted hover:bg-admin-raised hover:text-admin-text"
                     }
                     `}
                 >
@@ -383,7 +380,7 @@ export default function UserProfile() {
                   {activeTab === tab.id && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-600"
                       transition={{ duration: 0.2 }}
                     />
                   )}
@@ -393,7 +390,7 @@ export default function UserProfile() {
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <AnimatePresence mode="wait">
             {activeTab === "profile" && (
               <motion.div

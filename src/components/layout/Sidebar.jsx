@@ -4,7 +4,6 @@ import {
   Users,
   Building2,
   ConciergeBell,
-  Settings,
   Mail,
   MessageSquareText,
   Smartphone,
@@ -17,106 +16,131 @@ import {
   Scale,
   ChevronDown,
   SlidersHorizontal,
+  Megaphone,
+  Wallet,
 } from 'lucide-react';
 import { useLocation, Link, NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
-const menuSections = [
+/** Flat nav items — no section labels. Settings split into category parents. */
+const menuItems = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+  { icon: Users, label: 'Clients', path: '/users', match: ['/users', '/user/'] },
+  { icon: Building2, label: 'Branches', path: '/branches', match: ['/branches', '/branch/'] },
+  { icon: ConciergeBell, label: 'Services', path: '/services' },
   {
-    id: 'overview',
-    label: 'Overview',
-    items: [
-      { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    icon: Megaphone,
+    label: 'Messaging',
+    path: '/settings/mail',
+    match: [
+      '/settings/mail',
+      '/settings/wp-system-templates',
+      '/settings/sms-system-config',
+      '/settings/sms-system-templates',
+      '/settings/call-system-config',
     ],
-  },
-  {
-    id: 'directory',
-    label: 'Directory',
-    items: [
-      { icon: Users, label: 'Users', path: '/users', match: ['/users', '/user/'] },
-      { icon: Building2, label: 'Branches', path: '/branches', match: ['/branches', '/branch/'] },
-      { icon: ConciergeBell, label: 'Services', path: '/services' },
-    ],
-  },
-  {
-    id: 'configuration',
-    label: 'Configuration',
-    items: [
+    children: [
+      { icon: Mail, label: 'Company Mail', path: '/settings/mail' },
       {
-        icon: Settings,
-        label: 'Settings',
-        path: '/settings',
-        children: [
-          { icon: SlidersHorizontal, label: 'Overview', path: '/settings' },
-          { icon: Mail, label: 'Company Mail', path: '/settings/mail' },
-          {
-            icon: MessageSquareText,
-            label: 'System WhatsApp',
-            path: '/settings/wp-system-templates',
-          },
-          {
-            icon: Smartphone,
-            label: 'System SMS Config',
-            path: '/settings/sms-system-config',
-          },
-          {
-            icon: MessageSquare,
-            label: 'System SMS Templates',
-            path: '/settings/sms-system-templates',
-          },
-          {
-            icon: Phone,
-            label: 'System Call Config',
-            path: '/settings/call-system-config',
-          },
-          {
-            icon: CreditCard,
-            label: 'Razorpay',
-            path: '/settings/razorpay',
-          },
-          {
-            icon: Landmark,
-            label: 'Wallet Payments',
-            path: '/settings/wallet-payments',
-          },
-          {
-            icon: LifeBuoy,
-            label: 'Help & Support',
-            path: '/settings/help-support',
-          },
-          {
-            icon: Globe,
-            label: 'Website Contact',
-            path: '/settings/website-contact',
-          },
-          {
-            icon: Scale,
-            label: 'Website Legal',
-            path: '/settings/website-legal',
-          },
-        ],
+        icon: MessageSquareText,
+        label: 'System WhatsApp',
+        path: '/settings/wp-system-templates',
+      },
+      {
+        icon: Smartphone,
+        label: 'System SMS Config',
+        path: '/settings/sms-system-config',
+      },
+      {
+        icon: MessageSquare,
+        label: 'System SMS Templates',
+        path: '/settings/sms-system-templates',
+      },
+      {
+        icon: Phone,
+        label: 'System Call Config',
+        path: '/settings/call-system-config',
       },
     ],
+  },
+  {
+    icon: Wallet,
+    label: 'Payments',
+    path: '/settings/razorpay',
+    match: ['/settings/razorpay', '/settings/wallet-payments'],
+    children: [
+      { icon: CreditCard, label: 'Razorpay', path: '/settings/razorpay' },
+      {
+        icon: Landmark,
+        label: 'Wallet Payments',
+        path: '/settings/wallet-payments',
+      },
+    ],
+  },
+  {
+    icon: Globe,
+    label: 'Website',
+    path: '/settings/website-contact',
+    match: [
+      '/settings/website-contact',
+      '/settings/website-legal',
+      '/settings/help-support',
+    ],
+    children: [
+      {
+        icon: Globe,
+        label: 'Website Contact',
+        path: '/settings/website-contact',
+      },
+      {
+        icon: Scale,
+        label: 'Website Legal',
+        path: '/settings/website-legal',
+      },
+      {
+        icon: LifeBuoy,
+        label: 'Help & Support',
+        path: '/settings/help-support',
+      },
+    ],
+  },
+  {
+    icon: SlidersHorizontal,
+    label: 'Settings',
+    path: '/settings',
   },
 ];
 
 const isPathActive = (currentPath, item) => {
   if (item.children?.length) {
-    return currentPath === item.path || currentPath.startsWith(`${item.path}/`);
+    if (item.match) {
+      return item.match.some(
+        (m) => currentPath === m || currentPath.startsWith(`${m}/`)
+      );
+    }
+    return (
+      currentPath === item.path ||
+      item.children.some(
+        (c) => currentPath === c.path || currentPath.startsWith(`${c.path}/`)
+      )
+    );
   }
   if (item.path === '/' || item.path === '/dashboard') {
     return currentPath === '/' || currentPath === '/dashboard';
   }
+  if (item.path === '/settings') {
+    return currentPath === '/settings';
+  }
   if (item.match) {
-    return item.match.some((m) => currentPath === m || currentPath.startsWith(m));
+    return item.match.some(
+      (m) => currentPath === m || currentPath.startsWith(m)
+    );
   }
   return currentPath === item.path || currentPath.startsWith(`${item.path}/`);
 };
 
-const isChildActive = (currentPath, child) => {
-  if (child.path === '/settings') return currentPath === '/settings';
-  return currentPath === child.path || currentPath.startsWith(`${child.path}/`);
-};
+const isChildActive = (currentPath, child) =>
+  currentPath === child.path || currentPath.startsWith(`${child.path}/`);
 
 const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -124,14 +148,17 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const settingsOpenByRoute = currentPath === '/settings' || currentPath.startsWith('/settings/');
-  const [openMenus, setOpenMenus] = useState(() => (settingsOpenByRoute ? { Settings: true } : {}));
+  const [openMenu, setOpenMenu] = useState(null);
 
   useEffect(() => {
-    if (settingsOpenByRoute) {
-      setOpenMenus((prev) => ({ ...prev, Settings: true }));
-    }
-  }, [settingsOpenByRoute]);
+    let active = null;
+    menuItems.forEach((item) => {
+      if (item.children && isPathActive(currentPath, item)) {
+        active = item.label;
+      }
+    });
+    setOpenMenu(active);
+  }, [currentPath]);
 
   useEffect(() => {
     if (onHover && !isMobile) onHover(isHovered);
@@ -143,25 +170,20 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
     if (expanded) setCollapsedFlyout(null);
   }, [expanded]);
 
+  /** Accordion: only one parent menu open at a time. */
   const toggleMenu = (label) => {
-    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+    setOpenMenu((prev) => (prev === label ? null : label));
   };
 
   const itemClass = (active) => `
-    relative flex w-full items-center rounded-xl transition-all duration-150
-    ${expanded ? 'px-2.5 py-2 gap-2.5' : 'justify-center px-0 py-2'}
-    ${active
-      ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/30'
-      : 'text-slate-600 hover:bg-slate-900/5 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100'
+    relative flex w-full items-center transition-colors duration-150
+    ${expanded ? 'px-2.5 py-2 gap-2.5 rounded-lg' : 'justify-center px-0 py-2 rounded-lg'}
+    ${
+      active
+        ? 'bg-admin-accent-soft text-admin-accent-text'
+        : 'text-admin-text-sub hover:bg-admin-raised hover:text-admin-text'
     }
   `;
-
-  const iconWrap = (active) =>
-    `flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-      active
-        ? 'bg-white/20 text-white'
-        : 'bg-slate-200/80 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-    }`;
 
   const renderLeaf = (item) => {
     const active = isPathActive(currentPath, item);
@@ -170,32 +192,41 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
       <NavLink
         key={item.path}
         to={item.path}
-        end={item.path === '/'}
+        end={item.path === '/' || item.path === '/settings'}
         onClick={() => isMobile && toggleSidebar()}
         title={!expanded ? item.label : ''}
         className={itemClass(active)}
       >
-        <span className={iconWrap(active)}>
-          <Icon className="h-4 w-4" />
-        </span>
+        {active && expanded && (
+          <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-teal-600" />
+        )}
+        <Icon className={`h-4 w-4 shrink-0 ${active ? 'text-admin-accent-text' : ''}`} />
         {expanded && (
-          <span className={`text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
+          <span className={`text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}>
+            {item.label}
+          </span>
         )}
       </NavLink>
     );
   };
 
   const renderChildren = (item, compact = false) => (
-    <div className={compact ? 'space-y-0.5 p-1.5' : 'relative ml-5 space-y-0.5 border-l border-slate-200 pl-3 dark:border-slate-700'}>
+    <div
+      className={
+        compact
+          ? 'space-y-0.5 p-1.5'
+          : 'relative ml-4 space-y-0.5 border-l border-admin-border pl-3'
+      }
+    >
       {item.children.map((child, index) => {
         const childActive = isChildActive(currentPath, child);
         const ChildIcon = child.icon;
         return (
           <motion.div
             key={child.path}
-            initial={{ opacity: 0, x: -8 }}
+            initial={{ opacity: 0, x: -6 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.18, delay: index * 0.04, ease: 'easeOut' }}
+            transition={{ duration: 0.15, delay: index * 0.02 }}
           >
             <Link
               to={child.path}
@@ -203,10 +234,10 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
                 if (isMobile) toggleSidebar();
                 setCollapsedFlyout(null);
               }}
-              className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-[12.5px] transition-colors ${
+              className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] transition-colors ${
                 childActive
-                  ? 'bg-sky-50 font-semibold text-sky-800 dark:bg-sky-500/15 dark:text-sky-200'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+                  ? 'bg-admin-accent-soft font-semibold text-admin-accent-text'
+                  : 'text-admin-muted hover:bg-admin-raised hover:text-admin-text'
               }`}
             >
               <ChildIcon className="h-3.5 w-3.5" />
@@ -220,7 +251,7 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
 
   const renderParent = (item) => {
     const parentActive = isPathActive(currentPath, item);
-    const open = Boolean(openMenus[item.label]);
+    const open = openMenu === item.label;
     const Icon = item.icon;
 
     if (!expanded) {
@@ -237,17 +268,15 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
             onClick={() => isMobile && toggleSidebar()}
             className={itemClass(parentActive)}
           >
-            <span className={iconWrap(parentActive)}>
-              <Icon className="h-4 w-4" />
-            </span>
+            <Icon className={`h-4 w-4 shrink-0 ${parentActive ? 'text-admin-accent-text' : ''}`} />
           </Link>
           {collapsedFlyout === item.label && (
             <motion.div
-              initial={{ opacity: 0, x: -6 }}
+              initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
-              className="absolute left-full top-0 z-50 ml-3 w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+              className="absolute left-full top-0 z-50 ml-2 w-52 rounded-xl border border-admin-border bg-admin-surface p-1.5 shadow-panel"
             >
-              <p className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
+              <p className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-admin-muted">
                 {item.label}
               </p>
               {renderChildren(item, true)}
@@ -264,13 +293,20 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
           onClick={() => toggleMenu(item.label)}
           className={itemClass(parentActive)}
         >
-          <span className={iconWrap(parentActive)}>
-            <Icon className="h-4 w-4" />
-          </span>
-          <span className={`flex-1 text-left text-[13px] ${parentActive ? 'font-semibold' : 'font-medium'}`}>
+          {parentActive && (
+            <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r bg-teal-600" />
+          )}
+          <Icon className={`h-4 w-4 shrink-0 ${parentActive ? 'text-admin-accent-text' : ''}`} />
+          <span
+            className={`flex-1 text-left text-[13px] ${parentActive ? 'font-semibold' : 'font-medium'}`}
+          >
             {item.label}
           </span>
-          <ChevronDown className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${open ? 'rotate-0' : '-rotate-90'}`} />
+          <ChevronDown
+            className={`h-3.5 w-3.5 opacity-60 transition-transform duration-200 ${
+              open ? 'rotate-0' : '-rotate-90'
+            }`}
+          />
         </button>
 
         <AnimatePresence initial={false}>
@@ -279,12 +315,10 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.18 }}
               className="overflow-hidden"
             >
-              <div className="pt-0.5 pb-0.5">
-                {renderChildren(item)}
-              </div>
+              <div className="pb-0.5 pt-0.5">{renderChildren(item)}</div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -293,33 +327,23 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
   };
 
   const navBody = (
-    <nav className={`h-full space-y-5 overflow-y-auto ${expanded ? 'p-2.5' : 'p-1.5'}`}>
-      {menuSections.map((section) => (
-        <div key={section.id}>
-          {expanded && (
-            <p className="mb-2 px-2 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
-              {section.label}
-            </p>
-          )}
-          <div className="space-y-1">
-            {section.items.map((item) => (item.children ? renderParent(item) : renderLeaf(item)))}
-          </div>
-        </div>
-      ))}
+    <nav className={`h-full space-y-0.5 overflow-y-auto ${expanded ? 'p-3' : 'p-2'}`}>
+      {menuItems.map((item) =>
+        item.children ? renderParent(item) : renderLeaf(item)
+      )}
     </nav>
   );
 
-  const shell = 'bg-transparent';
-
   if (isMobile) {
     return (
-      <div className={`
-        fixed left-0 top-14 z-30 h-[calc(100vh-3.5rem)] w-[17.5rem]
-        ${shell}
+      <div
+        className={`
+        fixed left-0 top-14 z-30 h-[calc(100vh-3.5rem)] w-[17rem]
         transform transition-transform duration-300 ease-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="m-2 h-[calc(100%-1rem)] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
+      `}
+      >
+        <div className="m-2 h-[calc(100%-1rem)] overflow-hidden rounded-xl border border-admin-border bg-admin-surface shadow-panel">
           {navBody}
         </div>
       </div>
@@ -330,7 +354,7 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
     <div
       className={`
         fixed left-0 top-14 z-20 h-[calc(100vh-3.5rem)]
-        transition-all duration-300 ease-out ${shell}
+        transition-all duration-300 ease-out
         ${expanded ? 'w-64' : 'w-16'}
       `}
       onMouseEnter={() => {
@@ -344,7 +368,7 @@ const Sidebar = ({ isMobile, sidebarOpen, toggleSidebar, onHover, isExpanded }) 
         if (onHover) onHover(false);
       }}
     >
-      <div className={`h-[calc(100%-1rem)] overflow-visible rounded-2xl border border-slate-200/80 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900 ${expanded ? 'm-2' : 'm-1.5'}`}>
+      <div className="h-[calc(100%-1rem)] overflow-visible border-r border-admin-border bg-admin-surface">
         {navBody}
       </div>
     </div>

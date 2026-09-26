@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 
 const MainLayout = ({ children }) => {
+  const location = useLocation();
+  const mainRef = useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [sidebarHovered, setSidebarHovered] = useState(false);
@@ -29,10 +31,26 @@ const MainLayout = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const sidebarOffset = isMobile ? '0px' : (desktopSidebarCollapsed ? '64px' : '256px');
+    const sidebarOffset = isMobile ? '0px' : desktopSidebarCollapsed ? '64px' : '256px';
     document.documentElement.style.setProperty('--sidebar-offset', sidebarOffset);
     window.dispatchEvent(new Event('sidebar-offset-change'));
   }, [isMobile, desktopSidebarCollapsed]);
+
+  // Reset scroll when navigating so the previous page's position is not kept.
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    const resetScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (mainRef.current) mainRef.current.scrollTop = 0;
+    };
+    resetScroll();
+    const frame = requestAnimationFrame(resetScroll);
+    return () => cancelAnimationFrame(frame);
+  }, [location.pathname, location.search, location.hash]);
 
   const toggleSidebar = () => {
     if (isMobile) {
@@ -41,7 +59,11 @@ const MainLayout = ({ children }) => {
       const nextCollapsed = !desktopSidebarCollapsed;
       setDesktopSidebarCollapsed(nextCollapsed);
       setSidebarHovered(false);
-      try { localStorage.setItem('sidebarCollapsed', String(nextCollapsed)); } catch {}
+      try {
+        localStorage.setItem('sidebarCollapsed', String(nextCollapsed));
+      } catch {
+        /* ignore */
+      }
     }
   };
 
@@ -65,7 +87,7 @@ const MainLayout = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+    <div className="min-h-screen bg-admin-bg">
       <Navbar
         toggleSidebar={toggleSidebar}
         isMobile={isMobile}
@@ -73,7 +95,7 @@ const MainLayout = ({ children }) => {
         isDesktopSidebarExpanded={!desktopSidebarCollapsed}
       />
 
-      <div className="flex relative">
+      <div className="relative flex">
         <div ref={sidebarRef} className="z-30">
           <Sidebar
             isMobile={isMobile}
@@ -86,13 +108,14 @@ const MainLayout = ({ children }) => {
 
         {isMobile && sidebarOpen && (
           <div
-            className="fixed inset-0 z-20 bg-slate-950/60 backdrop-blur-[2px] transition-opacity duration-300"
+            className="fixed inset-0 z-20 bg-slate-950/50 transition-opacity duration-300"
             onClick={handleOverlayClick}
             style={{ top: '56px' }}
           />
         )}
 
         <main
+          ref={mainRef}
           className={`
             flex-1 transition-all duration-300 ease-out
             ${getContentMargin()}
@@ -100,12 +123,14 @@ const MainLayout = ({ children }) => {
             overflow-x-hidden
           `}
           style={{
-            padding: isMobile ? '0px' : '1rem',
+            padding: isMobile ? '0px' : '0',
             transition: 'margin-left 0.3s ease-out',
-            maxWidth: isMobile ? '100%' : `calc(100vw - ${desktopSidebarCollapsed ? '64px' : '256px'})`,
+            maxWidth: isMobile
+              ? '100%'
+              : `calc(100vw - ${desktopSidebarCollapsed ? '64px' : '256px'})`,
           }}
         >
-          <div className="w-full max-w-[1600px] p-3 sm:p-4">
+          <div className="w-full max-w-[1600px] p-4 sm:p-5 lg:p-6">
             {children || <Outlet />}
           </div>
         </main>

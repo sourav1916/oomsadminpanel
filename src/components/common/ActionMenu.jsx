@@ -1,163 +1,199 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
-import { FaEllipsisV } from 'react-icons/fa';
+import { AnimatePresence, motion } from 'framer-motion';
+import { MoreVertical } from 'lucide-react';
+
+const MENU_Z = 99999;
+const MENU_GAP = 8;
+const MENU_PAD = 8;
 
 /**
- * Standardized Action Menu component — renders via a Portal (fixed positioning).
- * AnimatePresence is intentionally omitted: it injects a ref through the portal
- * boundary which triggers a React "ref is not a prop" warning.
+ * Portal + viewport-flip row action menu (⋮).
+ * Matches CLIENT/context/action-button.md — no hover tooltip on the trigger.
  *
- * @param {Array}    actions  - [{ label, icon, onClick, className, disabled, title }]
- * @param {String}   activeId - Current active menu ID (external control)
- * @param {Function} onToggle - (e, menuId) => void
- * @param {any}      menuId   - Unique id for this menu instance
- * @param {ReactNode}trigger  - Optional custom trigger element
+ * @param {Array}  actions|items - [{ label, icon, onClick, disabled, danger, warning, className }]
+ *   `icon` may be a Lucide/react-icons component OR a React node.
+ * @param {string} buttonClassName - optional trigger classes
+ * @param {ReactNode} trigger - optional custom trigger (still no tooltip)
  */
-const ActionMenu = ({ actions = [], activeId, onToggle, menuId, trigger }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  // coords: viewport-relative (for position:fixed)
-  // triggerTop = top of trigger button, triggerBottom = bottom of trigger button
-  const [coords, setCoords] = useState({ triggerTop: 0, triggerBottom: 0, triggerRight: 0 });
-  const triggerRef = useRef(null);
+export default function ActionMenu({
+  actions,
+  items,
+  buttonClassName = '',
+  trigger = null,
+  className = '',
+}) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
   const menuRef = useRef(null);
 
-  const isMenuOpen = activeId !== undefined ? activeId === menuId : isOpen;
+  const visibleItems = (actions || items || []).filter(Boolean);
 
-  const captureCoords = useCallback(() => {
-    if (triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect();
-      setCoords({
-        triggerTop: rect.top,
-        triggerBottom: rect.bottom,
-        triggerRight: rect.right,
+  const calcPos = useCallback(() => {
+    const btn = btnRef.current;
+    const menu = menuRef.current;
+    if (!btn) return;
+
+    const r = btn.getBoundingClientRect();
+    const mH = menu?.offsetHeight || Math.max(44, visibleItems.length * 36 + 8);
+    const mW = menu?.offsetWidth || 176;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // Preferred order: top → bottom → right → left (action-button.md)
+    const candidates = [
+      { top: r.top - mH - MENU_GAP, left: r.right - mW },
+      { top: r.bottom + MENU_GAP, left: r.right - mW },
+      { top: r.top, left: r.right + MENU_GAP },
+      { top: r.top, left: r.left - mW - MENU_GAP },
+    ];
+
+    const fits = (p) =>
+      p.top >= MENU_PAD &&
+      p.left >= MENU_PAD &&
+      p.top + mH <= vh - MENU_PAD &&
+      p.left + mW <= vw - MENU_PAD;
+
+    const space = [
+      r.top - MENU_PAD,
+      vh - r.bottom - MENU_PAD,
+      vw - r.right - MENU_PAD,
+      r.left - MENU_PAD,
+    ];
+    let chosen = candidates.find(fits);
+    if (!chosen) {
+      let bestIdx = 1;
+      space.forEach((s, i) => {
+        if (s > space[bestIdx]) bestIdx = i;
       });
+      chosen = candidates[bestIdx];
     }
-  }, []);
 
-  const closeMenu = useCallback(() => {
-    if (onToggle) {
-      onToggle(null, null);
-    } else {
-      setIsOpen(false);
-    }
-  }, [onToggle]);
-
-  const toggleMenu = (e) => {
-    e.stopPropagation();
-    captureCoords();
-    if (onToggle) {
-      onToggle(e, menuId);
-    } else {
-      setIsOpen((prev) => !prev);
-    }
-  };
+    setPos({
+      top: Math.min(Math.max(MENU_PAD, chosen.top), Math.max(MENU_PAD, vh - MENU_PAD - mH)),
+      left: Math.min(Math.max(MENU_PAD, chosen.left), Math.max(MENU_PAD, vw - MENU_PAD - mW)),
+    });
+  }, [visibleItems.length]);
 
   useEffect(() => {
-    if (!isMenuOpen) return;
+    if (!open) return undefined;
+    const raf = requestAnimationFrame(() => calcPos());
+    return () => cancelAnimationFrame(raf);
+  }, [open, calcPos, visibleItems.length]);
 
-    const handleClickOutside = (e) => {
-      if (
-        menuRef.current && !menuRef.current.contains(e.target) &&
-        triggerRef.current && !triggerRef.current.contains(e.target)
-      ) {
-        closeMenu();
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const onDown = (e) => {
+      if (!btnRef.current?.contains(e.target) && !menuRef.current?.contains(e.target)) {
+        setOpen(false);
       }
     };
+    const onClose = () => setOpen(false);
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
 
-    const handleScroll = () => captureCoords();
-    const handleEscape = (e) => { if (e.key === 'Escape') closeMenu(); };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-    window.addEventListener('scroll', handleScroll, true);
+    document.addEventListener('mousedown', onDown);
+    window.addEventListener('scroll', onClose, true);
+    window.addEventListener('resize', calcPos);
+    window.addEventListener('keydown', onKey);
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-      window.removeEventListener('scroll', handleScroll, true);
+      document.removeEventListener('mousedown', onDown);
+      window.removeEventListener('scroll', onClose, true);
+      window.removeEventListener('resize', calcPos);
+      window.removeEventListener('keydown', onKey);
     };
-  }, [isMenuOpen, captureCoords, closeMenu]);
-  // ── Position (all viewport-relative for position:fixed) ──────────────────────
-  const menuWidth = 192;
-  const menuHeight = actions.length * 44 + 16;
+  }, [open, calcPos]);
 
-  // Default: open below-right of trigger, aligned to right edge of trigger
-  let top = coords.triggerBottom + 6;
-  let left = coords.triggerRight - menuWidth;
+  if (!visibleItems.length) return null;
 
-  // Clamp horizontally
-  if (left < 8) left = 8;
-  if (left + menuWidth > window.innerWidth - 8) left = window.innerWidth - menuWidth - 8;
-
-  // Flip above if not enough room below
-  if (top + menuHeight > window.innerHeight - 8) {
-    top = coords.triggerTop - menuHeight - 6;
-  }
-
-  // Only portal-render when open (avoids constant re-animation / freezing)
-  const menuPortal = isMenuOpen ? createPortal(
-    <motion.div
-      ref={menuRef}
-      key={`action-menu-${String(menuId ?? 'default')}`}
-      initial={{ opacity: 0, scale: 0.95, y: -6 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ duration: 0.13, ease: 'easeOut' }}
-      style={{
-        position: 'fixed',
-        top: `${top}px`,
-        left: `${left}px`,
-        zIndex: 9999,
-        width: `${menuWidth}px`,
-      }}
-      className="overflow-hidden rounded-xl border border-gray-100 bg-white/95 p-1.5 shadow-2xl backdrop-blur-xl ring-1 ring-black/5 dark:border-slate-700 dark:bg-slate-900/95 dark:ring-white/10"
-    >
-      {actions.map((action, index) => (
-        <button
-          key={index}
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!action.disabled) { action.onClick(); closeMenu(); }
-          }}
-          disabled={action.disabled}
-          title={action.title || ''}
-          className={`
-            flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold
-            transition-all duration-150
-            ${action.disabled
-              ? 'cursor-not-allowed opacity-50 text-gray-400'
-              : `hover:bg-blue-50 hover:pl-4 dark:hover:bg-slate-800 ${action.className || 'text-gray-700 hover:text-blue-600 dark:text-slate-200'}`
-            }
-          `}
-        >
-          {action.icon && <span className="flex-shrink-0 opacity-80">{action.icon}</span>}
-          <span className="truncate">{action.label}</span>
-        </button>
-      ))}
-    </motion.div>,
-    document.body
-  ) : null;
+  const renderIcon = (icon) => {
+    if (!icon) return null;
+    if (React.isValidElement(icon)) {
+      return <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">{icon}</span>;
+    }
+    if (typeof icon === 'function') {
+      const Icon = icon;
+      return <Icon className="h-3.5 w-3.5 shrink-0" />;
+    }
+    return null;
+  };
 
   return (
-    <div className="relative inline-block text-left">
-      <div ref={triggerRef} onClick={toggleMenu} className="cursor-pointer">
-        {trigger || (
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-xl border border-gray-200
-                       bg-white text-gray-500 transition-all hover:border-blue-300
-                       hover:text-blue-600 hover:shadow-sm active:scale-95
-                       dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-sky-500 dark:hover:text-sky-300"
-          >
-            <FaEllipsisV size={14} />
-          </button>
-        )}
-      </div>
+    <div className={`relative inline-flex ${className}`.trim()}>
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        className={
+          buttonClassName ||
+          'inline-flex h-8 w-8 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-raised hover:text-admin-text'
+        }
+        aria-label="Actions"
+        aria-haspopup="menu"
+        aria-expanded={open}
+      >
+        {trigger || <MoreVertical className="h-4 w-4" />}
+      </button>
 
-      {menuPortal}
+      {typeof document !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {open ? (
+              <motion.div
+                ref={menuRef}
+                role="menu"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.12 }}
+                style={{
+                  position: 'fixed',
+                  top: pos.top,
+                  left: pos.left,
+                  zIndex: MENU_Z,
+                  height: 'auto',
+                }}
+                className="min-w-[11rem] w-max max-w-[16rem] overflow-hidden rounded-xl border border-admin-border bg-admin-surface py-1 shadow-panel"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {visibleItems.map((item, index) => (
+                  <button
+                    key={item.label || index}
+                    type="button"
+                    role="menuitem"
+                    disabled={item.disabled}
+                    title={item.title || undefined}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (item.disabled) return;
+                      setOpen(false);
+                      item.onClick?.(e);
+                    }}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                      item.danger
+                        ? 'text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40'
+                        : item.warning
+                          ? 'text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950/40'
+                          : item.className ||
+                            'text-admin-text-sub hover:bg-admin-raised hover:text-admin-text'
+                    }`}
+                  >
+                    {renderIcon(item.icon)}
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                ))}
+              </motion.div>
+            ) : null}
+          </AnimatePresence>,
+          document.body
+        )}
     </div>
   );
-};
-
-export default ActionMenu;
+}

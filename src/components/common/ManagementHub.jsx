@@ -1,32 +1,9 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import RefreshButton from './RefreshButton';
 
 function joinClasses(...classes) {
   return classes.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 }
-
-const accentStyles = {
-  slate: 'from-slate-600 to-slate-800 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  blue: 'from-blue-600 to-indigo-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  green: 'from-green-600 to-emerald-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  emerald: 'from-emerald-600 to-teal-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  indigo: 'from-indigo-600 to-violet-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  violet: 'from-violet-600 to-fuchsia-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  amber: 'from-amber-600 to-orange-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-  rose: 'from-rose-600 to-red-600 text-slate-700 border-slate-200 dark:text-slate-300 dark:border-slate-700',
-};
-
-const activeButtonStyles = {
-  slate: 'bg-gradient-to-r from-slate-700 to-slate-900 text-white shadow-md',
-  blue: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-300',
-  green: 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md shadow-green-300',
-  emerald: 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-300',
-  indigo: 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-300',
-  violet: 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md shadow-violet-300',
-  amber: 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-amber-300',
-  rose: 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-md shadow-rose-300',
-};
 
 export default function ManagementHub({
   eyebrow,
@@ -47,85 +24,80 @@ export default function ManagementHub({
   contentClassName = '',
   widthClassName = 'max-w-[1600px]',
 }) {
-  const accentClass = accentStyles[accent] || accentStyles.slate;
+  void accent;
 
   return (
-    <div className={joinClasses('min-h-screen', className)}>
+    <div className={joinClasses('min-h-0', className)}>
       <div className={joinClasses('mx-auto', widthClassName)}>
-        <motion.div
-          initial={{ opacity: 0, y: -14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-4 rounded-lg border border-slate-200 bg-white/90 p-2.5 shadow-sm shadow-slate-200/40 backdrop-blur md:p-3 dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-none"
-        >
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              {eyebrow && (
-                <div className={joinClasses(
-                  'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em]',
-                  accentClass
-                )}>
-                  {eyebrow}
-                </div>
-              )}
-              {title && <h1 className="mt-1 text-lg font-bold text-slate-900 md:text-xl dark:text-white">{title}</h1>}
-              {description && <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{description}</p>}
-            </div>
-
-            {(summary || actions || onRefresh) && (
-              <div className="flex flex-wrap items-center justify-between w-full gap-1.5">
-                {summary}
-                <div className="flex w-full items-center justify-end gap-1.5">
-                  {onRefresh && (
-                    <RefreshButton
-                      type="button"
-                      loading={refreshing}
-                      onClick={onRefresh}
-                      title={refreshTitle || refreshLabel}
-                    >
-                      {refreshLabel}
-                    </RefreshButton>
-                  )}
-                  {actions}
-                </div>
-                
-              </div>
+        <header className="mb-5 flex flex-col gap-4 border-b border-admin-border pb-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0 max-w-3xl">
+            {eyebrow && (
+              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-admin-accent-text">
+                {eyebrow}
+              </p>
+            )}
+            {title && (
+              <h1 className="text-xl font-bold tracking-tight text-admin-text md:text-2xl">
+                {title}
+              </h1>
+            )}
+            {description && (
+              <p className="mt-1 text-sm text-admin-text-sub">{description}</p>
             )}
           </div>
 
-          {tabs?.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {tabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = tab.id === activeTab;
-                const disabled = tab.disabled || false;
-
-                return (
-                  <button
-                    key={tab.id}
+          {(summary || actions || onRefresh) && (
+            <div className="flex flex-col items-stretch gap-3 sm:items-end">
+              {summary}
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {onRefresh && (
+                  <RefreshButton
                     type="button"
-                    onClick={() => !disabled && onTabChange && onTabChange(tab.id)}
-                    disabled={disabled}
-                    title={tab.title || tab.description || tab.label}
-                    className={joinClasses(
-                      'inline-flex items-center gap-1 rounded-xl border px-3 py-2 text-xs font-semibold transition-all duration-200',
-                      isActive
-                        ? activeButtonStyles[accent] || activeButtonStyles.slate
-                        : disabled
-                          ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500'
-                          : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800'
-                    )}
+                    loading={refreshing}
+                    onClick={onRefresh}
+                    title={refreshTitle || refreshLabel}
                   >
-                    {Icon && <Icon size={13} />}
-                    {tab.label}
-                  </button>
-                );
-              })}
+                    {refreshLabel}
+                  </RefreshButton>
+                )}
+                {actions}
+              </div>
             </div>
           )}
-        </motion.div>
+        </header>
 
-        <div className={`${contentClassName || ""}`}>{children}</div>
+        {tabs?.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-1 border-b border-admin-border pb-3">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = tab.id === activeTab;
+              const disabled = tab.disabled || false;
+
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => !disabled && onTabChange && onTabChange(tab.id)}
+                  disabled={disabled}
+                  title={tab.title || tab.description || tab.label}
+                  className={joinClasses(
+                    'inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors',
+                    isActive
+                      ? 'bg-admin-accent-soft text-admin-accent-text'
+                      : disabled
+                        ? 'cursor-not-allowed text-admin-muted opacity-50'
+                        : 'text-admin-text-sub hover:bg-admin-raised hover:text-admin-text'
+                  )}
+                >
+                  {Icon && <Icon size={13} />}
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        <div className={contentClassName || ''}>{children}</div>
       </div>
     </div>
   );

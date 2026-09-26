@@ -13,6 +13,8 @@ import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
 import ModalScrollLock from "../components/common/ModalScrollLock";
+import { ListPageSkeleton } from "../components/SkeletonComponent";
+import ActionMenu from "../components/common/ActionMenu";
 
 const EMPTY_FORM = {
   page_id: "",
@@ -151,17 +153,26 @@ export default function WebsiteLegalPages() {
   };
 
   const summary = useMemo(
-    () => [
-      { label: "Total pages", value: String(pages.length) },
-      {
-        label: "Active",
-        value: String(pages.filter((p) => p.status === "active").length),
-      },
-      {
-        label: "Inactive",
-        value: String(pages.filter((p) => p.status !== "active").length),
-      },
-    ],
+    () => (
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="inline-flex items-center gap-2 rounded-md border border-admin-border bg-admin-surface px-3 py-1.5 text-xs text-admin-text-sub">
+          Total:{" "}
+          <span className="font-semibold text-admin-text">{pages.length}</span>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">
+          Active:{" "}
+          <span className="font-semibold">
+            {pages.filter((p) => p.status === "active").length}
+          </span>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-md border border-admin-border bg-admin-surface px-3 py-1.5 text-xs text-admin-text-sub">
+          Inactive:{" "}
+          <span className="font-semibold text-admin-text">
+            {pages.filter((p) => p.status !== "active").length}
+          </span>
+        </div>
+      </div>
+    ),
     [pages]
   );
 
@@ -187,18 +198,15 @@ export default function WebsiteLegalPages() {
           </ManagementButton>
         }
       >
-        <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 overflow-hidden">
+        <div className="admin-panel overflow-hidden">
           {loading ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-500">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading legal pages…
-            </div>
+            <ListPageSkeleton columns={4} rows={6} />
           ) : pages.length === 0 ? (
-            <div className="py-16 text-center text-sm text-slate-500">
+            <div className="py-16 text-center text-sm text-admin-muted">
               No legal pages yet. Create Privacy Policy, Terms, and more.
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            <div className="divide-y divide-admin-border">
               {pages.map((page) => (
                 <div
                   key={page.page_id}
@@ -210,11 +218,11 @@ export default function WebsiteLegalPages() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="truncate text-sm font-bold text-slate-900 dark:text-white">
+                        <h3 className="truncate text-sm font-bold text-admin-text">
                           {page.title}
                         </h3>
                         <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                          className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
                             page.status === "active"
                               ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
                               : "bg-slate-100 text-slate-500 dark:bg-slate-900 dark:text-slate-400"
@@ -223,7 +231,7 @@ export default function WebsiteLegalPages() {
                           {page.status}
                         </span>
                       </div>
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="mt-0.5 text-xs text-admin-muted">
                         /{page.slug}
                         {page.updated_at
                           ? ` · Updated ${new Date(
@@ -233,23 +241,22 @@ export default function WebsiteLegalPages() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => openEdit(page)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-900"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(page)}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:border-rose-900 dark:text-rose-400 dark:hover:bg-rose-950/30"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                      Delete
-                    </button>
+                  <div className="shrink-0">
+                    <ActionMenu
+                      actions={[
+                        {
+                          label: "Edit",
+                          icon: <Pencil className="h-3.5 w-3.5" />,
+                          onClick: () => openEdit(page),
+                        },
+                        {
+                          label: "Delete",
+                          icon: <Trash2 className="h-3.5 w-3.5" />,
+                          danger: true,
+                          onClick: () => handleDelete(page),
+                        },
+                      ]}
+                    />
                   </div>
                 </div>
               ))}
@@ -268,18 +275,18 @@ export default function WebsiteLegalPages() {
               aria-label="Close"
               onClick={() => !saving && setModalOpen(false)}
             />
-            <div className="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-950">
-              <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 dark:border-slate-800">
+            <div className="admin-panel relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden">
+              <div className="flex items-center justify-between border-b border-admin-border px-5 py-4">
                 <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-slate-500" />
-                  <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  <FileText className="h-4 w-4 text-admin-muted" />
+                  <h2 className="text-sm font-bold text-admin-text">
                     {isNew ? "Add legal page" : "Edit legal page"}
                   </h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => !saving && setModalOpen(false)}
-                  className="text-xs font-semibold text-slate-500 hover:text-slate-800"
+                  className="text-xs font-semibold text-admin-muted hover:text-admin-text"
                 >
                   Close
                 </button>
@@ -288,56 +295,51 @@ export default function WebsiteLegalPages() {
               <div className="space-y-4 overflow-y-auto px-5 py-4">
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="sm:col-span-2">
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Title
-                    </label>
+                    <label className="admin-label">Title</label>
                     <input
                       type="text"
                       value={form.title}
                       onChange={(e) => setField("title", e.target.value)}
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      className="admin-input"
                       placeholder="Privacy Policy"
                       disabled={saving}
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Slug (URL)
-                    </label>
+                    <label className="admin-label">Slug (URL)</label>
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-slate-400">/</span>
+                      <span className="text-xs text-admin-muted">/</span>
                       <input
                         type="text"
                         value={form.slug}
                         onChange={(e) => setField("slug", slugify(e.target.value))}
-                        className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                        className="admin-input min-w-0 flex-1"
                         placeholder="privacy-policy"
                         disabled={saving}
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Sort order
-                    </label>
+                    <label className="admin-label">Sort order</label>
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
                       value={form.sort_order}
-                      onChange={(e) =>
-                        setField("sort_order", Number(e.target.value) || 0)
-                      }
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/[^\d]/g, "");
+                        setField("sort_order", v === "" ? 0 : Number(v));
+                      }}
+                      className="admin-input"
                       disabled={saving}
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                      Status
-                    </label>
+                    <label className="admin-label">Status</label>
                     <select
                       value={form.status}
                       onChange={(e) => setField("status", e.target.value)}
-                      className="h-10 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                      className="admin-input"
                       disabled={saving}
                     >
                       <option value="active">Active</option>
@@ -347,18 +349,16 @@ export default function WebsiteLegalPages() {
                 </div>
 
                 <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Content (HTML supported)
-                  </label>
+                  <label className="admin-label">Content (HTML supported)</label>
                   <textarea
                     value={form.content_html}
                     onChange={(e) => setField("content_html", e.target.value)}
                     rows={16}
-                    className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs leading-relaxed outline-none focus:ring-2 focus:ring-slate-400 dark:border-slate-700 dark:bg-slate-950"
+                    className="admin-textarea font-mono text-xs leading-relaxed"
                     placeholder="<p>Write policy content here…</p>"
                     disabled={saving}
                   />
-                  <p className="mt-1 text-[11px] text-slate-400">
+                  <p className="mt-1 text-[11px] text-admin-muted">
                     Use simple HTML tags like &lt;p&gt;, &lt;h3&gt;, &lt;ul&gt;,
                     &lt;li&gt;, &lt;a&gt;. Inactive pages are hidden on the public
                     website.
@@ -366,12 +366,12 @@ export default function WebsiteLegalPages() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 border-t border-slate-100 px-5 py-4 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2 border-t border-admin-border px-5 py-4">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
                   disabled={saving}
-                  className="rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900"
+                  className="rounded-lg px-3 py-2 text-xs font-semibold text-admin-muted hover:bg-admin-raised"
                 >
                   Cancel
                 </button>
