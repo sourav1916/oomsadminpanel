@@ -26,6 +26,7 @@ import RazorpayConfig from "./pages/RazorpayConfig";
 import WalletPayments from "./pages/WalletPayments";
 import HelpSupportConfig from "./pages/HelpSupportConfig";
 import WebsiteContactConfig from "./pages/WebsiteContactConfig";
+import WebsiteLegalPages from "./pages/WebsiteLegalPages";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
@@ -90,6 +91,7 @@ function App() {
               <Route path="settings/wallet-payments" element={<WalletPayments />} />
               <Route path="settings/help-support" element={<HelpSupportConfig />} />
               <Route path="settings/website-contact" element={<WebsiteContactConfig />} />
+              <Route path="settings/website-legal" element={<WebsiteLegalPages />} />
               <Route path="profile" element={<Profile />} />
 
               <Route path="*" element={<NotFound />} />

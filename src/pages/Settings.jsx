@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, LifeBuoy, Globe, User, ArrowRight, Shield } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, ArrowRight, Shield } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
   {
@@ -55,6 +55,12 @@ const SETTINGS_ITEMS = [
     icon: Globe,
     title: 'Website Contact',
     description: 'Public emails, phones, WhatsApp, addresses, and hours for the OOMS marketing website.',
+  },
+  {
+    to: '/settings/website-legal',
+    icon: Scale,
+    title: 'Website Legal Pages',
+    description: 'Privacy policy, terms of service, refunds, and other legal pages for ooms.in.',
   },
   {
     to: '/profile',

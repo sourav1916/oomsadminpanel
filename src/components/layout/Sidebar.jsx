@@ -14,6 +14,7 @@ import {
   Landmark,
   LifeBuoy,
   Globe,
+  Scale,
   ChevronDown,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -87,6 +88,11 @@ const menuSections = [
             icon: Globe,
             label: 'Website Contact',
             path: '/settings/website-contact',
+          },
+          {
+            icon: Scale,
+            label: 'Website Legal',
+            path: '/settings/website-legal',
           },
         ],
       },
