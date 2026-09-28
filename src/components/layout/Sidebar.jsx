@@ -14,6 +14,7 @@ import {
   LifeBuoy,
   Globe,
   Scale,
+  UserX,
   ChevronDown,
   SlidersHorizontal,
   Megaphone,
@@ -85,6 +86,7 @@ const menuItems = [
       '/settings/website-contact',
       '/settings/website-legal',
       '/settings/help-support',
+      '/settings/account-deletion',
     ],
     children: [
       {
@@ -101,6 +103,11 @@ const menuItems = [
         icon: LifeBuoy,
         label: 'Help & Support',
         path: '/settings/help-support',
+      },
+      {
+        icon: UserX,
+        label: 'Account Deletion',
+        path: '/settings/account-deletion',
       },
     ],
   },

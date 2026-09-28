@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, ArrowRight, Shield } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, ArrowRight, Shield } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
   {
@@ -61,6 +61,12 @@ const SETTINGS_ITEMS = [
     icon: Scale,
     title: 'Website Legal Pages',
     description: 'Privacy policy, terms of service, refunds, and other legal pages for ooms.in.',
+  },
+  {
+    to: '/settings/account-deletion',
+    icon: UserX,
+    title: 'Account Deletion',
+    description: 'Review and update account deletion requests submitted from the public website.',
   },
   {
     to: '/profile',
