@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, ArrowRight, Shield } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, FileText, ArrowRight, Shield } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
   {
@@ -61,6 +61,12 @@ const SETTINGS_ITEMS = [
     icon: Scale,
     title: 'Website Legal Pages',
     description: 'Privacy policy, terms of service, refunds, and other legal pages for ooms.in.',
+  },
+  {
+    to: '/settings/invoice-formats',
+    icon: FileText,
+    title: 'Invoice formats',
+    description: 'Sale, purchase, payment, receipt, journal, and expense templates, with the variables for each type.',
   },
   {
     to: '/settings/account-deletion',

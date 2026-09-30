@@ -28,6 +28,7 @@ import HelpSupportConfig from "./pages/HelpSupportConfig";
 import WebsiteContactConfig from "./pages/WebsiteContactConfig";
 import WebsiteLegalPages from "./pages/WebsiteLegalPages";
 import AccountDeletionRequests from "./pages/AccountDeletionRequests";
+import InvoiceFormats from "./pages/InvoiceFormats";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
@@ -94,6 +95,7 @@ function App() {
               <Route path="settings/website-contact" element={<WebsiteContactConfig />} />
               <Route path="settings/website-legal" element={<WebsiteLegalPages />} />
               <Route path="settings/account-deletion" element={<AccountDeletionRequests />} />
+              <Route path="settings/invoice-formats" element={<InvoiceFormats />} />
               <Route path="profile" element={<Profile />} />
 
               <Route path="*" element={<NotFound />} />

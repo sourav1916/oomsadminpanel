@@ -15,6 +15,7 @@ import {
   Globe,
   Scale,
   UserX,
+  FileText,
   ChevronDown,
   SlidersHorizontal,
   Megaphone,
@@ -29,6 +30,7 @@ const menuItems = [
   { icon: Users, label: 'Clients', path: '/users', match: ['/users', '/user/'] },
   { icon: Building2, label: 'Branches', path: '/branches', match: ['/branches', '/branch/'] },
   { icon: ConciergeBell, label: 'Services', path: '/services' },
+  { icon: FileText, label: 'Invoice formats', path: '/settings/invoice-formats' },
   {
     icon: Megaphone,
     label: 'Messaging',
