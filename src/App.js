@@ -22,6 +22,7 @@ import WpSystemTemplates from "./pages/WpSystemTemplates";
 import SmsSystemConfig from "./pages/SmsSystemConfig";
 import SmsSystemTemplates from "./pages/SmsSystemTemplates";
 import CallSystemConfig from "./pages/CallSystemConfig";
+import VoiceCallSettings from "./pages/VoiceCallSettings";
 import RazorpayConfig from "./pages/RazorpayConfig";
 import WalletPayments from "./pages/WalletPayments";
 import HelpSupportConfig from "./pages/HelpSupportConfig";
@@ -89,6 +90,7 @@ function App() {
               <Route path="settings/sms-system-config" element={<SmsSystemConfig />} />
               <Route path="settings/sms-system-templates" element={<SmsSystemTemplates />} />
               <Route path="settings/call-system-config" element={<CallSystemConfig />} />
+              <Route path="settings/voice-call-config" element={<VoiceCallSettings />} />
               <Route path="settings/razorpay" element={<RazorpayConfig />} />
               <Route path="settings/wallet-payments" element={<WalletPayments />} />
               <Route path="settings/help-support" element={<HelpSupportConfig />} />

@@ -9,6 +9,7 @@ import {
   Smartphone,
   MessageSquare,
   Phone,
+  AudioLines,
   CreditCard,
   Landmark,
   LifeBuoy,
@@ -41,6 +42,7 @@ const menuItems = [
       '/settings/sms-system-config',
       '/settings/sms-system-templates',
       '/settings/call-system-config',
+      '/settings/voice-call-config',
     ],
     children: [
       { icon: Mail, label: 'Company Mail', path: '/settings/mail' },
@@ -63,6 +65,11 @@ const menuItems = [
         icon: Phone,
         label: 'System Call Config',
         path: '/settings/call-system-config',
+      },
+      {
+        icon: AudioLines,
+        label: 'App-to-app Voice Calls',
+        path: '/settings/voice-call-config',
       },
     ],
   },
