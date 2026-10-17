@@ -45,7 +45,11 @@ export const AuthProvider = ({ children }) => {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.message || "Failed to send OTP");
+      const msg =
+        typeof data.message === "string" && data.message.trim()
+          ? data.message
+          : "Failed to send OTP";
+      throw new Error(msg);
     }
 
     return data;
@@ -62,7 +66,11 @@ export const AuthProvider = ({ children }) => {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.message || "Login failed");
+      const msg =
+        typeof data.message === "string" && data.message.trim()
+          ? data.message
+          : "Login failed";
+      throw new Error(msg);
     }
 
     const userData = {
