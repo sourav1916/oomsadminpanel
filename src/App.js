@@ -33,6 +33,7 @@ import InvoiceFormats from "./pages/InvoiceFormats";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
+import Notifications from "./pages/Notifications";
 
 function ThemedToasts() {
   const { isDark } = useTheme();
@@ -99,6 +100,7 @@ function App() {
               <Route path="settings/account-deletion" element={<AccountDeletionRequests />} />
               <Route path="settings/invoice-formats" element={<InvoiceFormats />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="notifications" element={<Notifications />} />
 
               <Route path="*" element={<NotFound />} />
             </Route>

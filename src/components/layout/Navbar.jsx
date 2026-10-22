@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -10,9 +10,11 @@ import {
   Shield,
   Sun,
   Moon,
+  Bell,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
+import apiCall from '../../utils/apiCall';
 
 const Navbar = ({
   toggleSidebar,
@@ -24,6 +26,21 @@ const Navbar = ({
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    const loadUnreadCount = async () => {
+      try {
+        const response = await apiCall('/notifications/unread-count', 'GET');
+        const payload = await response.json().catch(() => null);
+        if (active && response.ok && payload?.success !== false) setUnreadCount(Number(payload?.data?.unread_count || 0));
+      } catch { /* page has a retry state */ }
+    };
+    loadUnreadCount();
+    const timer = window.setInterval(loadUnreadCount, 60000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, []);
 
   const handleLogout = async () => {
     setOpenDropdown(false);
@@ -74,6 +91,10 @@ const Navbar = ({
         </div>
 
         <div className="flex items-center gap-1.5">
+          <button type="button" onClick={() => navigate('/notifications')} aria-label="View admin notifications" className="relative flex h-9 w-9 items-center justify-center rounded-lg text-admin-muted transition-colors hover:bg-admin-raised hover:text-admin-text">
+            <Bell className="h-4 w-4" />
+            {unreadCount > 0 && <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-rose-600 px-1 text-[10px] font-bold leading-4 text-white">{unreadCount > 99 ? '99+' : unreadCount}</span>}
+          </button>
           <button
             type="button"
             onClick={toggleTheme}
