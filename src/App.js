@@ -30,6 +30,8 @@ import WebsiteContactConfig from "./pages/WebsiteContactConfig";
 import WebsiteLegalPages from "./pages/WebsiteLegalPages";
 import AccountDeletionRequests from "./pages/AccountDeletionRequests";
 import InvoiceFormats from "./pages/InvoiceFormats";
+import PlatformSettings from "./pages/PlatformSettings";
+import SmsOtpConfig from "./pages/SmsOtpConfig";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
@@ -99,6 +101,8 @@ function App() {
               <Route path="settings/website-legal" element={<WebsiteLegalPages />} />
               <Route path="settings/account-deletion" element={<AccountDeletionRequests />} />
               <Route path="settings/invoice-formats" element={<InvoiceFormats />} />
+              <Route path="settings/platform" element={<PlatformSettings />} />
+              <Route path="settings/sms-otp-config" element={<SmsOtpConfig />} />
               <Route path="profile" element={<Profile />} />
               <Route path="notifications" element={<Notifications />} />
 

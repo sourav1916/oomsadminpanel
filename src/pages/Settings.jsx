@@ -1,7 +1,19 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, AudioLines, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, FileText, ArrowRight, Shield } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, AudioLines, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, FileText, ArrowRight, Shield, KeyRound, Plug } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
+  {
+    to: '/settings/platform',
+    icon: Plug,
+    title: 'Platform Settings',
+    description: 'Backblaze B2 storage, OneChatting, WhatsApp Web gateway, OneSaaS upload, Google sign-in, invitation link and GST rate. Replaces the old server .env entries.',
+  },
+  {
+    to: '/settings/sms-otp-config',
+    icon: KeyRound,
+    title: 'OTP SMS Config',
+    description: 'Platform Fast2SMS account and DLT template used for login, registration and contact-change OTPs on every panel.',
+  },
   {
     to: '/settings/mail',
     icon: Mail,
