@@ -21,6 +21,8 @@ import {
   SlidersHorizontal,
   Megaphone,
   Wallet,
+  KeyRound,
+  Plug,
 } from 'lucide-react';
 import { useLocation, Link, NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -39,6 +41,7 @@ const menuItems = [
     match: [
       '/settings/mail',
       '/settings/wp-system-templates',
+      '/settings/sms-otp-config',
       '/settings/sms-system-config',
       '/settings/sms-system-templates',
       '/settings/call-system-config',
@@ -46,6 +49,11 @@ const menuItems = [
     ],
     children: [
       { icon: Mail, label: 'Company Mail', path: '/settings/mail' },
+      {
+        icon: KeyRound,
+        label: 'OTP SMS Config',
+        path: '/settings/sms-otp-config',
+      },
       {
         icon: MessageSquareText,
         label: 'System WhatsApp',
@@ -120,6 +128,7 @@ const menuItems = [
       },
     ],
   },
+  { icon: Plug, label: 'Platform Settings', path: '/settings/platform' },
   {
     icon: SlidersHorizontal,
     label: 'Settings',
