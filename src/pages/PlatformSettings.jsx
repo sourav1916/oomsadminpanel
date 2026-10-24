@@ -22,8 +22,8 @@ export default function PlatformSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testingB2, setTestingB2] = useState(false);
-  const [testingGoogleCalendar, setTestingGoogleCalendar] = useState(false);
   const [groups, setGroups] = useState([]);
+  const [serverSecretStatus, setServerSecretStatus] = useState(null);
   const [form, setForm] = useState({});
   const [clearKeys, setClearKeys] = useState([]);
 
@@ -43,6 +43,7 @@ export default function PlatformSettings() {
         })
       );
       setGroups(nextGroups);
+      setServerSecretStatus(data.data?.server_secret_status || null);
       setForm(nextForm);
       setClearKeys([]);
     } catch (err) {
@@ -130,26 +131,6 @@ export default function PlatformSettings() {
       toast.error(err.message || "B2 test failed");
     } finally {
       setTestingB2(false);
-    }
-  };
-
-  const handleTestGoogleCalendar = async () => {
-    if (dirty) {
-      toast.info("Save your changes first, then test the connection.");
-      return;
-    }
-    setTestingGoogleCalendar(true);
-    try {
-      const res = await apiCall("/platform-settings/test/google-calendar", "POST", {});
-      const data = await res.json();
-      if (!res.ok || data.success === false) {
-        throw new Error(data.message || "Google Calendar test failed");
-      }
-      toast.success(data.message || "Google Calendar connection is ready");
-    } catch (err) {
-      toast.error(err.message || "Google Calendar test failed");
-    } finally {
-      setTestingGoogleCalendar(false);
     }
   };
 
@@ -270,17 +251,6 @@ export default function PlatformSettings() {
                     {testingB2 ? "Testing…" : "Test connection"}
                   </ManagementButton>
                 )}
-                {group.key === "google_calendar" && (
-                  <ManagementButton
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTestGoogleCalendar}
-                    disabled={testingGoogleCalendar || saving}
-                    leftIcon={testingGoogleCalendar ? <Loader2 size={14} className="animate-spin" /> : <PlugZap size={14} />}
-                  >
-                    {testingGoogleCalendar ? "Testing…" : "Test connection"}
-                  </ManagementButton>
-                )}
               </div>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {group.fields.map(renderField)}
@@ -288,9 +258,33 @@ export default function PlatformSettings() {
             </section>
           ))}
 
+          <section className="admin-panel space-y-3 p-5">
+            <div>
+              <h2 className="text-sm font-bold text-admin-text">Server encryption keys</h2>
+              <p className="mt-0.5 text-xs text-admin-text-sub">
+                These master keys must be set in the server deployment environment or secret manager, not in this database-backed form.
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {[
+                ["APP_ENCRYPTION_KEY", serverSecretStatus?.app_encryption_key_configured],
+                ["SMTP_ENCRYPTION_KEY", serverSecretStatus?.smtp_encryption_key_configured],
+              ].map(([key, configured]) => (
+                <div key={key} className="flex items-center justify-between gap-3 rounded-lg border border-admin-border px-3 py-2">
+                  <code className="text-xs text-admin-text">{key}</code>
+                  <span className={`text-xs font-semibold ${configured ? "text-emerald-700 dark:text-emerald-300" : "text-amber-700 dark:text-amber-300"}`}>
+                    {serverSecretStatus ? (configured ? "Configured" : "Not configured") : "Status unavailable"}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-admin-muted">
+              APP_ENCRYPTION_KEY protects platform and company credentials. SMTP_ENCRYPTION_KEY is used by legacy SMTP credential encryption. Keep configured keys stable and backed up; changing them can make existing saved credentials unreadable. This page only reports whether they are present and never reads or displays their values.
+            </p>
+          </section>
+
           <div className="admin-panel px-4 py-3 text-xs text-admin-text-sub">
-            Secrets are encrypted before they are stored and are never sent back to the browser. Google Calendar
-            credentials are database-only and are not read from environment variables. A value marked
+            Secrets are encrypted before they are stored and are never sent back to the browser. A value marked
             "From server .env (legacy)" still comes from the server's environment file; save it here to move it
             into the database, then remove it from .env.
           </div>

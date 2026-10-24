@@ -6,7 +6,7 @@ const SETTINGS_ITEMS = [
     to: '/settings/platform',
     icon: Plug,
     title: 'Platform Settings',
-    description: 'Backblaze B2 storage, Google Calendar appointment credentials, OneChatting, WhatsApp Web gateway, OneSaaS upload, Google sign-in, invitation link and GST rate.',
+    description: 'Backblaze B2 storage, Google Calendar OAuth, OneChatting, WhatsApp Web gateway, OneSaaS upload, Google sign-in, invitation link and GST rate.',
   },
   {
     to: '/settings/sms-otp-config',
