@@ -23,6 +23,7 @@ import {
   Wallet,
   KeyRound,
   Plug,
+  Inbox,
 } from 'lucide-react';
 import { useLocation, Link, NavLink } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -33,6 +34,7 @@ const menuItems = [
   { icon: Users, label: 'Clients', path: '/users', match: ['/users', '/user/'] },
   { icon: Building2, label: 'Branches', path: '/branches', match: ['/branches', '/branch/'] },
   { icon: ConciergeBell, label: 'Services', path: '/services' },
+  { icon: Inbox, label: 'Support inbox', path: '/support' },
   { icon: FileText, label: 'Invoice formats', path: '/settings/invoice-formats' },
   {
     icon: Megaphone,

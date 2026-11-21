@@ -1,7 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, AudioLines, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, FileText, ArrowRight, Shield, KeyRound, Plug } from 'lucide-react';
+import { Mail, MessageSquareText, MessageSquare, Smartphone, Phone, AudioLines, CreditCard, Landmark, LifeBuoy, Globe, Scale, User, UserX, FileText, ArrowRight, Shield, KeyRound, Plug, Inbox } from 'lucide-react';
 
 const SETTINGS_ITEMS = [
+  {
+    to: '/support',
+    icon: Inbox,
+    title: 'Support Inbox',
+    description: 'Shared customer email and website support tickets, replies, statuses, and mailbox settings.',
+  },
   {
     to: '/settings/platform',
     icon: Plug,

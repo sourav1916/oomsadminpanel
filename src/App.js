@@ -36,6 +36,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ServerUnreachable from "./pages/ServerUnreachable";
 import Notifications from "./pages/Notifications";
+import SupportPage from "./pages/SupportPage";
 
 function ThemedToasts() {
   const { isDark } = useTheme();
@@ -105,6 +106,7 @@ function App() {
               <Route path="settings/sms-otp-config" element={<SmsOtpConfig />} />
               <Route path="profile" element={<Profile />} />
               <Route path="notifications" element={<Notifications />} />
+              <Route path="support" element={<SupportPage />} />
 
               <Route path="*" element={<NotFound />} />
             </Route>
