@@ -18,7 +18,8 @@ const EMPTY_SETTINGS = {
   imap_folder: "INBOX",
   smtp_host: "",
   smtp_port: 587,
-  smtp_secure: true,
+  smtp_secure: false,
+  smtp_tls_reject_unauthorized: true,
   smtp_username: "",
   smtp_password_saved: false,
   smtp_from_name: "OOMS Support",
@@ -52,6 +53,7 @@ export default function SupportPage() {
   const [active, setActive] = useState(null);
   const [reply, setReply] = useState("");
   const [syncStatus, setSyncStatus] = useState(null);
+  const [testRecipient, setTestRecipient] = useState("");
 
   const loadSettings = useCallback(async () => {
     const res = await apiCall("/support/settings", "GET");
@@ -154,6 +156,13 @@ export default function SupportPage() {
       if (!res.ok) throw new Error(data.message || "Update failed");
       setActive(data.data);
       await loadTickets();
+      if (patch.status && data.data?.status_mail) {
+        if (data.data.status_mail.sent) {
+          toast.success("Status updated and customer notified");
+        } else {
+          toast.warning(`Status updated, but email failed: ${data.data.status_mail.error}`);
+        }
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -177,14 +186,13 @@ export default function SupportPage() {
   };
 
   const testSend = async () => {
-    if (!settings.smtp_from_address && !settings.support_address) {
-      toast.error("Set the support or sender address first");
+    if (!testRecipient.trim()) {
+      toast.error("Enter a recipient email address");
       return;
     }
-    const to = settings.smtp_from_address || settings.support_address;
     setSaving(true);
     try {
-      const res = await apiCall("/support/test-send", "POST", { to });
+      const res = await apiCall("/support/test-send", "POST", { to: testRecipient.trim() });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Test send failed");
       toast.success("Test email sent");
@@ -327,9 +335,12 @@ export default function SupportPage() {
                 ["imap_port", "IMAP port", "number"],
                 ["imap_username", "IMAP username", "text"],
                 ["imap_folder", "Inbox folder", "text"],
+                ["imap_secure", "Use IMAP implicit TLS", "checkbox"],
                 ["smtp_host", "SMTP host", "text"],
                 ["smtp_port", "SMTP port", "number"],
                 ["smtp_username", "SMTP username", "text"],
+                ["smtp_secure", "Use SMTP implicit TLS", "checkbox"],
+                ["smtp_tls_reject_unauthorized", "Verify SMTP TLS certificate", "checkbox"],
                 ["smtp_from_name", "Sender name", "text"],
                 ["smtp_from_address", "Sender address", "email"],
                 ["ack_subject", "Acknowledgment subject", "text"],
@@ -339,7 +350,18 @@ export default function SupportPage() {
                   {type === "checkbox" ? (
                     <input type="checkbox" checked={Boolean(settings[key])} onChange={(e) => setSettings((p) => ({ ...p, [key]: e.target.checked }))} />
                   ) : (
-                    <input type={type} value={settings[key] || ""} onChange={(e) => setSettings((p) => ({ ...p, [key]: type === "number" ? Number(e.target.value) : e.target.value }))} className="admin-input" />
+                    <input
+                      type={type}
+                      value={settings[key] ?? ""}
+                      onChange={(e) => setSettings((p) => {
+                        if (key === "smtp_port") {
+                          const port = Number(e.target.value);
+                          return { ...p, [key]: port, smtp_secure: port === 465 };
+                        }
+                        return { ...p, [key]: type === "number" ? Number(e.target.value) : e.target.value };
+                      })}
+                      className="admin-input"
+                    />
                   )}
                 </div>
               ))}
@@ -359,6 +381,14 @@ export default function SupportPage() {
             </div>
           )}
           <div className="mt-5 flex justify-end gap-2">
+            <input
+              type="email"
+              value={testRecipient}
+              onChange={(e) => setTestRecipient(e.target.value)}
+              placeholder="recipient@example.com"
+              className="admin-input w-full max-w-xs"
+              aria-label="Test recipient email"
+            />
             <ManagementButton type="button" onClick={testSend} disabled={saving}>Test send</ManagementButton>
             <ManagementButton type="button" onClick={saveSettings} disabled={saving}>{saving ? "Saving..." : "Save settings"}</ManagementButton>
           </div>
