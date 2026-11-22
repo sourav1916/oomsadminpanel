@@ -18,7 +18,7 @@ import {
   User,
   CreditCard,
   FileText,
-  DollarSign,
+  IndianRupee,
   Settings,
 } from "lucide-react";
 import { toast } from 'react-toastify';
@@ -262,7 +262,7 @@ const ViewBranchModal = ({ branch, onClose, onNavigateToBranch, onNavigateToServ
                   label="GST Verified" 
                   value={branch.tax_info.is_gst_verified ? 'Yes' : 'No'} 
                 />
-                <InfoItem icon={DollarSign} label="GST Rate" value={branch.tax_info.gst_rate ? `${branch.tax_info.gst_rate}%` : 'N/A'} />
+                <InfoItem icon={IndianRupee} label="GST Rate" value={branch.tax_info.gst_rate ? `${branch.tax_info.gst_rate}%` : 'N/A'} />
               </div>
             </div>
           )}

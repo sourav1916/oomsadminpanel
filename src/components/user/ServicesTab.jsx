@@ -1,7 +1,7 @@
 // components/user/ServicesTab.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Briefcase, CheckCircle, XCircle, Clock, Calendar, Search, X, Eye, DollarSign } from "lucide-react";
+import { Briefcase, CheckCircle, XCircle, Clock, Calendar, Search, X, Eye, IndianRupee } from "lucide-react";
 import { toast } from 'react-toastify';
 import apiCall from '../../utils/apiCall';
 import { TableSkeleton } from "../SkeletonComponent";
@@ -152,7 +152,7 @@ export default function ServicesTab({ username }) {
                   )}
                   {service.price && (
                     <span className="flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-300">
-                      <DollarSign size={12} />
+                      <IndianRupee size={12} />
                       ₹{service.price}
                     </span>
                   )}
