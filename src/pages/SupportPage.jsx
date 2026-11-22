@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import apiCall from "../utils/apiCall";
 import ManagementHub from "../components/common/ManagementHub";
 import ManagementButton from "../components/common/ManagementButton";
+import SelectField from "../components/common/SelectField";
 import { TableSkeleton, DetailPageSkeleton } from "../components/SkeletonComponent";
 
 const EMPTY_SETTINGS = {
@@ -289,9 +290,19 @@ export default function SupportPage() {
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                   <label className="text-xs text-admin-muted">Status</label>
-                  <select value={active.ticket.status} onChange={(e) => updateTicket({ status: e.target.value })} className="admin-input max-w-[220px] py-1.5">
-                    {statuses.slice(1).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                  </select>
+                  <div className="w-[220px]">
+                    <SelectField
+                      options={statuses.slice(1).map(([value, label]) => ({ value, label }))}
+                      value={
+                        statuses.slice(1)
+                          .map(([value, label]) => ({ value, label }))
+                          .find((option) => option.value === active.ticket.status) || null
+                      }
+                      onChange={(option) => updateTicket({ status: option?.value })}
+                      isSearchable={false}
+                      aria-label="Ticket status"
+                    />
+                  </div>
                 </div>
                 <div className="mt-4 space-y-3">
                   {active.messages.map((message) => (
